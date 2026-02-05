@@ -35,6 +35,10 @@ public class EmailService {
         }
     }
 
+    public static void sendEmail(String destination, String topic, String messageHtml) throws Exception {
+        sendEmail(destination, topic, messageHtml, null);
+    }
+
     public static void sendEmail(String destination, String topic, String messageHtml, String filePath) throws Exception {
         try {
             URL url = new URL(BREVO_API_URL);
