@@ -12,6 +12,19 @@ public class Student {
     private String cpf;
     private StudentStatusEnum status;
 
+    // Constructors:
+    public Student(){
+
+    }
+
+    public Student(int enrollment, String name, String email, String cpf, StudentStatusEnum status){
+        this.enrollment = enrollment;
+        this.name = name;
+        this.email = email;
+        this.cpf = cpf;
+        this.status = status;
+    }
+
     // Getters:
     public int getEnrollment() {
         return enrollment;
