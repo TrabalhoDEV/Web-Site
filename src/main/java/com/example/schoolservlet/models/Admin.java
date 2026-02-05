@@ -5,6 +5,15 @@ public class Admin {
     private String document;
     private String password;
 
+    // Constructors:
+    public Admin(){
+
+    }
+
+    public Admin(String document){
+        this.document = document;
+    }
+
     // Getters:
     public String getDocument() {
         return document;
