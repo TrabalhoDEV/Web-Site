@@ -1,15 +1,29 @@
 package com.example.schoolservlet.models;
 
-import com.example.schoolservlet.models.enums.UserStatusEnum;
+import com.example.schoolservlet.models.enums.StudentStatusEnum;
 
-public class User {
+public class Student {
+    // Attributes:
     private int enrollment;
 
     private String name;
     private String email;
     private String password;
     private String cpf;
-    private UserStatusEnum status;
+    private StudentStatusEnum status;
+
+    // Constructors:
+    public Student(){
+
+    }
+
+    public Student(int enrollment, String name, String email, String cpf, StudentStatusEnum status){
+        this.enrollment = enrollment;
+        this.name = name;
+        this.email = email;
+        this.cpf = cpf;
+        this.status = status;
+    }
 
     // Getters:
     public int getEnrollment() {
@@ -32,7 +46,7 @@ public class User {
         return cpf;
     }
 
-    public UserStatusEnum getStatus() {
+    public StudentStatusEnum getStatus() {
         return status;
     }
 
@@ -53,7 +67,7 @@ public class User {
         this.cpf = cpf;
     }
 
-    public void setStatus(UserStatusEnum status) {
+    public void setStatus(StudentStatusEnum status) {
         this.status = status;
     }
 }
