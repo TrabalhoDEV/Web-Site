@@ -8,6 +8,19 @@ public class StudentSubject {
     private Double grade2;
     private String obs;
 
+    // Constructors
+    public StudentSubject(){
+
+    }
+
+    public StudentSubject(int studentEnrollment, int subjectId, Double grade1, Double grade2, String obs){
+        this.studentEnrollment = studentEnrollment;
+        this.subjectId = subjectId;
+        this.grade1 = grade1;
+        this.grade2 = grade2;
+        this.obs = obs;
+    }
+
     // Getters:
 
     public int getStudentEnrollment() {
