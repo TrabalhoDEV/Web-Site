@@ -1,0 +1,73 @@
+package com.example.schoolservlet.models;
+
+import com.example.schoolservlet.models.enums.StudentStatusEnum;
+
+public class Student {
+    // Attributes:
+    private int enrollment;
+
+    private String name;
+    private String email;
+    private String password;
+    private String cpf;
+    private StudentStatusEnum status;
+
+    // Constructors:
+    public Student(){
+
+    }
+
+    public Student(int enrollment, String name, String email, String cpf, StudentStatusEnum status){
+        this.enrollment = enrollment;
+        this.name = name;
+        this.email = email;
+        this.cpf = cpf;
+        this.status = status;
+    }
+
+    // Getters:
+    public int getEnrollment() {
+        return enrollment;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public StudentStatusEnum getStatus() {
+        return status;
+    }
+
+    // Setters:
+    public void setEnrollment(int enrollment) {
+        this.enrollment = enrollment;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public void setStatus(StudentStatusEnum status) {
+        this.status = status;
+    }
+}
