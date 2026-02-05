@@ -72,7 +72,7 @@ public class EmailService {
             //  Create a JSON with all information:
             String json =
                     "{"
-                            + "\"sender\": {\"name\": \"Fluxar\", \"email\": \"" + BREVO_EMAIL + "\"},"
+                            + "\"sender\": {\"name\": \"Secreatária escolar\", \"email\": \"" + BREVO_EMAIL + "\"},"
                             + "\"to\": [{\"email\": \"" + destination + "\"}],"
                             + "\"subject\": \"" + topic + "\","
                             + "\"htmlContent\": \"" + html + "\""
@@ -91,7 +91,7 @@ public class EmailService {
                     StringBuilder response = new StringBuilder();
                     String line;
                     while ((line = br.readLine()) != null) response.append(line);
-                    throw new Exception("❌ Erro ao enviar e-mail: " + response);
+                    throw new Exception("Erro ao enviar e-mail: " + response);
                 }
             }
         } catch (Exception e) {
