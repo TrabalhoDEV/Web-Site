@@ -3,6 +3,7 @@ package com.example.schoolservlet.models;
 import com.example.schoolservlet.models.enums.StudentStatusEnum;
 
 public class Student {
+    // Attributes:
     private int enrollment;
 
     private String name;
