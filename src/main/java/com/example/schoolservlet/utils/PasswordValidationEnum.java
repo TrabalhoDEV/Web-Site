@@ -6,5 +6,6 @@ public enum PasswordValidationEnum {
     MISSING_UPPERCASE,
     MISSING_LOWERCASE,
     MISSING_NUMBER,
+    IS_NULL,
     RIGHT,
 }
