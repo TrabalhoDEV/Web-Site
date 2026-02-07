@@ -12,6 +12,7 @@ public class InputNormalizer {
      * @return      e-mail in lower case
      */
     public static String normalizeEmail(String email){
+        if (email == null || email.isEmpty()) return null;
         return email.trim().toLowerCase();
     }
 
@@ -21,7 +22,7 @@ public class InputNormalizer {
      * @return      name in lower case
      */
     public static String normalizeName(String name){
-
+        if (name == null || name.isEmpty()) return null;
         return name.trim().toLowerCase();
     }
 
@@ -31,6 +32,7 @@ public class InputNormalizer {
      * @return      enrollment without the initial zeros
      */
     public static int normalizeEnrollment(String enrollment){
+        if (enrollment == null || enrollment.isEmpty()) return -1;
         String helper = enrollment.trim();
         helper = helper.replaceFirst("^0+", "");
         return Integer.parseInt(helper);
@@ -42,6 +44,7 @@ public class InputNormalizer {
      * @return    observation in lower case
      */
     public static String normalizeObs(String obs){
+        if (obs == null || obs.isEmpty()) return null;
         return obs.trim();
     }
 
@@ -51,6 +54,7 @@ public class InputNormalizer {
      * @return         userName in lower case
      */
     public static String normalizeUserName(String userName){
+        if (userName == null || userName.isEmpty()) return null;
         return userName.trim().toLowerCase();
     }
 
@@ -60,6 +64,7 @@ public class InputNormalizer {
      * @return    The cf without . or -
      */
     public static String normalizeCpf(String cpf){
+        if (cpf == null || cpf.isEmpty()) return null;
         return cpf.replaceAll("[^\\d]", "");
     }
 }
