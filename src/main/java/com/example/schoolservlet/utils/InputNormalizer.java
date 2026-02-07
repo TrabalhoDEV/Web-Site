@@ -12,7 +12,7 @@ public class InputNormalizer {
      * @return      e-mail in lower case
      */
     public static String normalizeEmail(String email){
-        return email.toLowerCase();
+        return email.trim().toLowerCase();
     }
 
     /**
@@ -21,7 +21,8 @@ public class InputNormalizer {
      * @return      name in lower case
      */
     public static String normalizeName(String name){
-        return name.toLowerCase();
+
+        return name.trim().toLowerCase();
     }
 
     /**
@@ -29,8 +30,8 @@ public class InputNormalizer {
      * @param enrollment Is the enrollment that every student has
      * @return      enrollment without the initial zeros
      */
-    public static int normalizeEnrollment(int enrollment){
-        String helper = Integer.toString(enrollment);
+    public static int normalizeEnrollment(String enrollment){
+        String helper = enrollment.trim();
         helper = helper.replaceFirst("^0+", "");
         return Integer.parseInt(helper);
     }
@@ -41,7 +42,7 @@ public class InputNormalizer {
      * @return    observation in lower case
      */
     public static String normalizeObs(String obs){
-        return obs.toLowerCase();
+        return obs.trim();
     }
 
     /**
@@ -50,7 +51,7 @@ public class InputNormalizer {
      * @return         userName in lower case
      */
     public static String normalizeUserName(String userName){
-        return userName.toLowerCase();
+        return userName.trim().toLowerCase();
     }
 
     /**
