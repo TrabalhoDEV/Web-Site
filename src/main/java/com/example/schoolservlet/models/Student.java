@@ -50,6 +50,10 @@ public class Student {
         return status;
     }
 
+    public String getEnrollment(){
+        return String.format("%06d", this.id);
+    }
+
     // Setters:
     public void setId(int id) {
         this.id = id;

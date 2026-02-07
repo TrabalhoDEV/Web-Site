@@ -46,16 +46,6 @@ public class OutputFormatService {
     }
 
     /**
-     * Static method that makes the enrollment has 6 characters with some zeros before if needed
-     * @param enrollment Is student's enrollment
-     * @return           The enrollment with 6 characters
-     */
-    public static String formatEnrollment(int enrollment){
-        if (enrollment < 0 || enrollment > 999999) return null;
-        return String.format("%06d", enrollment);
-    }
-
-    /**
      * Static method that transform cpf with only numbers to a cpf with .and -
      * @param cpf Is the cpf stored in the database
      * @return    Is the cpf formatted
