@@ -2,7 +2,7 @@ package com.example.schoolservlet.utils;
 
 public class RegexService {
     /**
-     * Static method that verifies if cpd is valid
+     * Static method that verifies if cpf is valid
      * @param cpf Is user's cpf
      * @return    true if cpf's format is valid
      */
