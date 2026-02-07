@@ -2,6 +2,7 @@ package com.example.schoolservlet.models;
 
 public class Admin {
     // Attributes:
+    private int id;
     private String document;
     private String password;
 
@@ -10,11 +11,21 @@ public class Admin {
 
     }
 
-    public Admin(String document){
+    public Admin(int id, String document){
+        this.id = id;
         this.document = document;
     }
 
+    public Admin(String document, String password) {
+        this.document = document;
+        this.password = password;
+    }
+
     // Getters:
+    public int getId() {
+        return id;
+    }
+
     public String getDocument() {
         return document;
     }
@@ -24,6 +35,10 @@ public class Admin {
     }
 
     // Setters:
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public void setDocument(String document) {
         this.document = document;
