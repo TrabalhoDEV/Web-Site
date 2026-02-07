@@ -26,26 +26,46 @@ public class ValidationService {
 
     /**
      * Static method that verifies password format
-     * @param password Is the user password
-     * @return         A number that allows to determine in which validation the user is being wrong
+     * @param password the user's password
+     * @return         a {@link PasswordValidationEnum} indication which validation rule failed, or if the password is valid
      */
-    public static int validatePassword(String password){
+    public static PasswordValidationEnum validatePassword(String password){
         if (password.length()>28){
-            return 1;
+            return PasswordValidationEnum.MAX_LENGHT_EXCEEDED;
         }
         if (password.length()<8){
-            return 2;
+            return PasswordValidationEnum.MIN_LENGHT_NOT_REACHED;
         }
-        if (!password.matches(".*[A-Z].*")){
-            return 3;
+
+        boolean hasUppercase = false;
+        boolean hasLowercase = false;
+        boolean hasDigit = false;
+
+        for(char c: password.toCharArray()){
+            if (Character.isUpperCase(c)){
+                hasUppercase = true;
+            } else if (Character.isLowerCase(c)){
+                hasLowercase = true;
+            } else if (Character.isDigit(c)) {
+                hasDigit = true;
+            }
+
+            if (hasUppercase && hasLowercase && hasDigit){
+                break;
+            }
         }
-        if (!password.matches(".*[a-z].*")){
-            return 4;
+
+        if (!hasUppercase){
+            return PasswordValidationEnum.MISSING_UPPERCASE;
         }
-        if (!password.matches(".*\\d.*")){
-            return 5;
+        if (!hasLowercase){
+            return PasswordValidationEnum.MISSING_LOWERCASE;
         }
-        return 0;
+        if (!hasDigit){
+            return PasswordValidationEnum.MISSING_NUMBER;
+        }
+
+        return PasswordValidationEnum.RIGHT;
     }
 
     /**
