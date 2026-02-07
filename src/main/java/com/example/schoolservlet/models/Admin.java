@@ -16,6 +16,11 @@ public class Admin {
         this.document = document;
     }
 
+    public Admin(String document, String password) {
+        this.document = document;
+        this.password = password;
+    }
+
     // Getters:
     public int getId() {
         return id;

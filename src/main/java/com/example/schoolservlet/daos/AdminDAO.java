@@ -18,13 +18,14 @@ public class AdminDAO implements GenericDAO<Admin>{
         Admin admin = null;
 
         try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM student WHERE id = ?")){
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM admin WHERE id = ?")){
+            pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()){
                 admin = new Admin();
                 admin.setId(rs.getInt("id"));
-
+                admin.setDocument(rs.getString("document"));
             }
         } catch (SQLException sqle){
             sqle.printStackTrace();
@@ -94,7 +95,7 @@ public class AdminDAO implements GenericDAO<Admin>{
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET document = ? WHERE id = ?")){
             pstmt.setString(1, admin.getDocument());
-            pstmt.setInt(1, admin.getId());
+            pstmt.setInt(2, admin.getId());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
@@ -126,5 +127,23 @@ public class AdminDAO implements GenericDAO<Admin>{
             sqle.printStackTrace();
             return false;
         }
+    }
+
+    public boolean login(String document, String password){
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT document, password FROM admin WHERE document = ?")){
+            pstmt.setString(1, document);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()){
+                String hash = rs.getString("password");
+                return BCrypt.checkpw(password, hash);
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+        }
+        return false;
     }
 }
