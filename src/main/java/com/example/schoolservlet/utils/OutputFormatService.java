@@ -50,4 +50,13 @@ public class OutputFormatService {
     public static String formatEnrollment(int enrollment){
         return String.format("%06d", enrollment);
     }
+
+    /**
+     * Static method that transform cpf with only numbers to a cpf with .and -
+     * @param cpf Is the cpf stored in the database
+     * @return    Is the cpf formatted
+     */
+    public static String formatCpf(String cpf){
+        return cpf.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+    }
 }
