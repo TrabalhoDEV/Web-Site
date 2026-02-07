@@ -4,7 +4,7 @@ import com.example.schoolservlet.models.enums.StudentStatusEnum;
 
 public class Student {
     // Attributes:
-    private int enrollment;
+    private int id;
 
     private String name;
     private String email;
@@ -17,8 +17,8 @@ public class Student {
 
     }
 
-    public Student(int enrollment, String name, String email, String cpf, StudentStatusEnum status){
-        this.enrollment = enrollment;
+    public Student(int id, String name, String email, String cpf, StudentStatusEnum status){
+        this.id = id;
         this.name = name;
         this.email = email;
         this.cpf = cpf;
@@ -26,8 +26,8 @@ public class Student {
     }
 
     // Getters:
-    public int getEnrollment() {
-        return enrollment;
+    public int getId() {
+        return id;
     }
 
     public String getName() {
@@ -50,9 +50,13 @@ public class Student {
         return status;
     }
 
+    public String getEnrollment(){
+        return String.format("%06d", this.id);
+    }
+
     // Setters:
-    public void setEnrollment(int enrollment) {
-        this.enrollment = enrollment;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setName(String name) {
