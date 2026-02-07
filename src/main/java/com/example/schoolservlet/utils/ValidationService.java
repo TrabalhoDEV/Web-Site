@@ -1,5 +1,7 @@
 package com.example.schoolservlet.utils;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Class that user regex or ifs to validate if user's input is valid or not.
  * This allows us to change business' rules of validation much easier than if we use that
@@ -12,6 +14,8 @@ public class ValidationService {
      * @return    true if cpf's format is valid
      */
     public static boolean validateCpf(String cpf){
+        if (cpf == null || cpf.isEmpty()) return false;
+        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(cpf)) return false;
         return cpf.matches("\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}");
     }
 
@@ -21,7 +25,9 @@ public class ValidationService {
      * @return      true if the email's format is valid (name@domain.com)
      */
     public static boolean validateEmail(String email){
-        return email.matches("^[^@\\s]+@[^@\\s]+\\.[A-Za-z]+$");
+        if (email == null || email.isEmpty()) return false;
+        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(email)) return false;
+        return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
 
     /**
@@ -30,12 +36,10 @@ public class ValidationService {
      * @return         a {@link PasswordValidationEnum} indication which validation rule failed, or if the password is valid
      */
     public static PasswordValidationEnum validatePassword(String password){
-        if (password.length()>28){
-            return PasswordValidationEnum.MAX_LENGHT_EXCEEDED;
-        }
-        if (password.length()<8){
-            return PasswordValidationEnum.MIN_LENGHT_NOT_REACHED;
-        }
+        if (password == null || password.isEmpty()) return PasswordValidationEnum.IS_NULL;
+
+        if (password.length()>28) return PasswordValidationEnum.MAX_LENGHT_EXCEEDED;
+        if (password.length()<8) return PasswordValidationEnum.MIN_LENGHT_NOT_REACHED;
 
         boolean hasUppercase = false;
         boolean hasLowercase = false;
@@ -50,20 +54,12 @@ public class ValidationService {
                 hasDigit = true;
             }
 
-            if (hasUppercase && hasLowercase && hasDigit){
-                break;
-            }
+            if (hasUppercase && hasLowercase && hasDigit) break;
         }
 
-        if (!hasUppercase){
-            return PasswordValidationEnum.MISSING_UPPERCASE;
-        }
-        if (!hasLowercase){
-            return PasswordValidationEnum.MISSING_LOWERCASE;
-        }
-        if (!hasDigit){
-            return PasswordValidationEnum.MISSING_NUMBER;
-        }
+        if (!hasUppercase) return PasswordValidationEnum.MISSING_UPPERCASE;
+        if (!hasLowercase) return PasswordValidationEnum.MISSING_LOWERCASE;
+        if (!hasDigit) return PasswordValidationEnum.MISSING_NUMBER;
 
         return PasswordValidationEnum.RIGHT;
     }
@@ -83,6 +79,7 @@ public class ValidationService {
      * @return          true if enrollment has 6 characters
      */
     public static boolean validateEnrollment(String enrollment){
+        if (enrollment == null || enrollment.isEmpty()) return false;
         return enrollment.matches("^\\d{6}$");
     }
 }
