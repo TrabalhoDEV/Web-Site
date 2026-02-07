@@ -10,6 +10,8 @@ public class OutputFormatService {
      * @return     name with all parts capitalized
      */
     public static String formatName(String name){
+        if (name.isEmpty()) return null;
+
         String[] nameDivided = name.split("\\s+");
         StringBuilder result = new StringBuilder();
 
@@ -30,7 +32,7 @@ public class OutputFormatService {
      * @return     The word capitalized
      */
     private static String capitalizeOne(String word){
-        return word.substring(0, 1).toUpperCase() + word.substring(1);
+        return word.substring(0, 1).toUpperCase();
     }
 
     /**
@@ -39,6 +41,7 @@ public class OutputFormatService {
      * @return    The observation capitalized
      */
     public static String formatObs(String obs){
+        if (obs.isEmpty()) return null;
         return capitalizeOne(obs);
     }
 
@@ -48,6 +51,7 @@ public class OutputFormatService {
      * @return           The enrollment with 6 characters
      */
     public static String formatEnrollment(int enrollment){
+        if (enrollment < 0 || enrollment > 999999) return null;
         return String.format("%06d", enrollment);
     }
 
@@ -57,6 +61,7 @@ public class OutputFormatService {
      * @return    Is the cpf formatted
      */
     public static String formatCpf(String cpf){
+        if (cpf.isEmpty()) return null;
         return cpf.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
     }
 }
