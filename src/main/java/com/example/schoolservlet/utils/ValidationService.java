@@ -82,7 +82,7 @@ public class ValidationService {
      * @param enrollment Is student's enrollment
      * @return          true if enrollment has 6 characters
      */
-    public static boolean validateEnrollment(int enrollment){
-        return Integer.toString(enrollment).matches("^\\d{6}$");
+    public static boolean validateEnrollment(String enrollment){
+        return enrollment.matches("^\\d{6}$");
     }
 }
