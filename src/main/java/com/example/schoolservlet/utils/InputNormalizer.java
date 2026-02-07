@@ -52,4 +52,13 @@ public class InputNormalizer {
     public static String normalizeUserName(String userName){
         return userName.toLowerCase();
     }
+
+    /**
+     * Static method that normalize cpf to only have number
+     * @param cpf Is the cpf of user
+     * @return    The cf without . or -
+     */
+    public static String normalizeCpf(String cpf){
+        return cpf.replaceAll("[^\\d]", "");
+    }
 }
