@@ -7,7 +7,7 @@ package com.example.schoolservlet.utils;
  */
 public class InputNormalizer {
     /**
-     * Static method that normalize e-mail to lower case
+     * Static method that normalizes e-mail to lower case
      * @param email Is user's e-mail
      * @return      e-mail in lower case
      */
@@ -17,7 +17,7 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalize name to lower case
+     * Static method that normalizes name to lower case
      * @param name Is user's name
      * @return      name in lower case
      */
@@ -27,7 +27,7 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalize student's enrollment to lower case
+     * Static method that normalizes student's enrollment to lower case
      * @param enrollment Is the enrollment that every student has
      * @return      enrollment without the initial zeros
      */
@@ -39,8 +39,8 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalize observation to lower case
-     * @param obs Is the observation made by a teacher for a user
+     * Static method that normalizes observation to lower case
+     * @param obs is the observation made by a teacher for some user
      * @return    observation in lower case
      */
     public static String normalizeObs(String obs){
@@ -49,8 +49,8 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalize userName to lower case
-     * @param userName Is the userName of the teachers
+     * Static method that normalizes userName to lower case
+     * @param userName is teacher's userName
      * @return         userName in lower case
      */
     public static String normalizeUserName(String userName){
@@ -59,9 +59,9 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalize cpf to only have number
-     * @param cpf Is the cpf of user
-     * @return    The cf without . or -
+     * Static method that normalizes cpf to only have number
+     * @param cpf is the cpf of user
+     * @return    cpf without . or -
      */
     public static String normalizeCpf(String cpf){
         if (cpf == null || cpf.isEmpty()) return null;
