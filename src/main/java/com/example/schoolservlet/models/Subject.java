@@ -13,16 +13,13 @@ public class Subject {
 
     }
 
-    public Subject(int id, String name, String teacherName, String teacherUser, String teacherPassword){
+    public Subject(int id, String name, String teacherName, String teacherUser){
         this.id = id;
         this.name = name;
         this.teacherName = teacherName;
         this.teacherUser = teacherUser;
-        this.teacherPassword = teacherPassword;
     }
-    public Subject(int id){
-        this.id = id;
-    }
+
 
     // Getters
     public int getId() {
