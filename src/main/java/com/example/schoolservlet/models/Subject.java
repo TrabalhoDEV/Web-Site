@@ -20,6 +20,7 @@ public class Subject {
         this.teacherUser = teacherUser;
     }
 
+
     // Getters
     public int getId() {
         return id;
@@ -42,11 +43,6 @@ public class Subject {
     }
 
     // Setters:
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -58,4 +54,6 @@ public class Subject {
     public void setTeacherUser(String teacherUser) {
         this.teacherUser = teacherUser;
     }
+
+    public void setTeacherPassword(String teacherPassword) {this.teacherPassword = teacherPassword; }
 }
