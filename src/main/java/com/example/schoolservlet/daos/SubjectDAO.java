@@ -10,24 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SubjectDAO implements GenericDAO<Subject> {
-    // Implement interface methods
-    @Override
-    public int totalCount(){
-        int totalCount = -1;
-
-        try(Connection conn = PostgreConnection.getConnection();
-            Statement stmt = conn.createStatement()){
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS totalCount FROM subject");
-
-            if (rs.next()){
-                totalCount = rs.getInt("totalCount");
-            }
-        } catch (SQLException | NullPointerException e){
-            e.printStackTrace();
-        }
-
-        return totalCount;
-    }
 
     @Override
     public Map<Integer, Subject> findMany(int skip, int take){
@@ -48,30 +30,11 @@ public class SubjectDAO implements GenericDAO<Subject> {
                 subjects.put(rs.getInt("id"), subject);
             }
 
-        } catch (SQLException | NullPointerException e){
-            e.printStackTrace();
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
         }
 
         return subjects;
-    }
-
-    // Define CRUD methods
-    @Override
-    public boolean create(Subject subject){
-        try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO subject" +
-                    "(name, teacher_name, teacher_user, teacher_password) VALUES (?, ?, ?, ?)")){
-            pstmt.setString(1, subject.getName());
-            pstmt.setString(2, subject.getTeacherName());
-            pstmt.setString(3, subject.getTeacherUser());
-            pstmt.setString(4, BCrypt.hashpw(subject.getTeacherPassword(), BCrypt.gensalt()));
-
-            if (pstmt.executeUpdate() > 0) return true;
-
-        } catch (SQLException | NullPointerException e){
-            e.printStackTrace();
-        }
-        return false;
     }
 
     @Override
@@ -90,11 +53,51 @@ public class SubjectDAO implements GenericDAO<Subject> {
                 );
             }
 
-        } catch (SQLException | NullPointerException e){
-            e.printStackTrace();
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
         }
         return null;
     }
+
+    @Override
+    public int totalCount(){
+        int totalCount = -1;
+
+        try(Connection conn = PostgreConnection.getConnection();
+            Statement stmt = conn.createStatement()){
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS totalCount FROM subject");
+
+            if (rs.next()){
+                totalCount = rs.getInt("totalCount");
+            }
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+
+        return totalCount;
+    }
+
+
+
+    @Override
+    public boolean create(Subject subject){
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO subject" +
+                    "(name, teacher_name, teacher_user, teacher_password) VALUES (?, ?, ?, ?)")){
+            pstmt.setString(1, subject.getName());
+            pstmt.setString(2, subject.getTeacherName());
+            pstmt.setString(3, subject.getTeacherUser());
+            pstmt.setString(4, BCrypt.hashpw(subject.getTeacherPassword(), BCrypt.gensalt()));
+
+            return pstmt.executeUpdate() > 0;
+
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        return false;
+    }
+
+
 
     @Override
     public boolean update(Subject subject){
@@ -108,8 +111,8 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
             return pstmt.executeUpdate() > 0;
 
-        } catch (SQLException | NullPointerException e){
-            e.printStackTrace();
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
             return false;
         }
     }
@@ -122,8 +125,8 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
             return pstmt.executeUpdate() > 0;
 
-        } catch (SQLException | NullPointerException e){
-            e.printStackTrace();
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
             return false;
         }
     }
@@ -137,8 +140,8 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
             return pstmt.executeUpdate() > 0;
 
-        } catch (SQLException | NullPointerException e){
-            e.printStackTrace();
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
             return false;
         }
     }
@@ -155,8 +158,8 @@ public class SubjectDAO implements GenericDAO<Subject> {
                 return BCrypt.checkpw(password, hash);
             }
 
-        } catch (SQLException | NullPointerException e) {
-            e.printStackTrace();
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
         }
         return false;
     }
