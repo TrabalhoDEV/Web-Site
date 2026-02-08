@@ -2,8 +2,11 @@ package com.example.schoolservlet.models;
 
 public class StudentSubject {
     // Attributes:
-    private int studentEnrollment;
+    private int id;
+    private int studentId;
+    private Student student;
     private int subjectId;
+    private Subject subject;
     private Double grade1;
     private Double grade2;
     private String obs;
@@ -13,8 +16,9 @@ public class StudentSubject {
 
     }
 
-    public StudentSubject(int studentEnrollment, int subjectId, Double grade1, Double grade2, String obs){
-        this.studentEnrollment = studentEnrollment;
+    public StudentSubject(int id, int studentId, int subjectId, Double grade1, Double grade2, String obs){
+        this.id = id;
+        this.studentId = studentId;
         this.subjectId = subjectId;
         this.grade1 = grade1;
         this.grade2 = grade2;
@@ -23,12 +27,24 @@ public class StudentSubject {
 
     // Getters:
 
-    public int getStudentEnrollment() {
-        return studentEnrollment;
+    public int getId() {
+        return id;
+    }
+
+    public int getStudentId() {
+        return studentId;
+    }
+
+    public Student getStudent() {
+        return student;
     }
 
     public int getSubjectId() {
         return subjectId;
+    }
+
+    public Subject getSubject() {
+        return subject;
     }
 
     public Double getGrade1() {
@@ -52,12 +68,25 @@ public class StudentSubject {
 
     // Setters:
 
-    public void setStudentEnrollment(int studentEnrollment) {
-        this.studentEnrollment = studentEnrollment;
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setStudentId(int studentId) {
+        this.studentId = StudentSubject.this.studentId;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
     public void setSubjectId(int subjectId) {
         this.subjectId = subjectId;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
     public void setGrade1(Double grade1) {
