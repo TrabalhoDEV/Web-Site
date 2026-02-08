@@ -1,5 +1,6 @@
 package com.example.schoolservlet.daos;
 
+import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.enums.StudentStatusEnum;
 import com.example.schoolservlet.utils.PostgreConnection;
@@ -8,23 +9,24 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class StudentDAO {
-    public Student findByEnrollment(int enrollment){
+    public Student findById(int id){
         Student student = null;
-        String sql = "SELECT * FROM student WHERE enrollment = ?";
+        String sql = "SELECT * FROM student WHERE id = ?";
 
         try(
             Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
-            pstmt.setInt(1, enrollment);
+            pstmt.setInt(1, id);
 
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()){
                 student = new Student();
-                student.setEnrollment(enrollment);
+                student.setId(id);
                 student.setCpf(rs.getString("cpf"));
                 student.setName(rs.getString("name"));
                 student.setEmail(rs.getString("email"));
