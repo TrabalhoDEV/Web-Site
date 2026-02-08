@@ -27,13 +27,12 @@ public class PostgreConnection {
         DB_URL = ConfigService.getEnv("DB_URL", dotenv);
         DB_USER = ConfigService.getEnv("DB_USER", dotenv);
         DB_PASSWORD = ConfigService.getEnv("DB_PASSWORD", dotenv);
-
-        if (DB_URL == null || DB_USER == null || DB_PASSWORD == null){
-            throw new RuntimeException("Variáveis de ambiente não foram setadas");
-        }
     }
 
     public static Connection getConnection() {
+        if (DB_URL == null || DB_USER == null || DB_PASSWORD == null) {
+            throw new RuntimeException("Variáveis de ambiente não configuradas");
+        }
         try {
             Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
