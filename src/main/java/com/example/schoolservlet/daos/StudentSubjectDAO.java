@@ -29,7 +29,6 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                     "st.email AS student_email, " +
                     "sb.id AS subject_id, " +
                     "sb.name AS subject_name, " +
-                    "sb.teacher_name " +
                     "FROM student_subject ss JOIN student st ON st.id = ss.student_id JOIN subject sb " +
                     "ON sb.id = ss.subject_id ORDER BY ss.id LIMIT ? OFFSET ?")
         ){
@@ -49,7 +48,6 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                 Subject subject = new Subject();
                 subject.setId(rs.getInt("subject_id"));
                 subject.setName(rs.getString("subject_name"));
-                subject.setTeacherName(rs.getString("teacher_name"));
 
                 StudentSubject studentSubject = new StudentSubject();
                 studentSubject.setId(rs.getInt("id"));
@@ -88,7 +86,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                     "sb.name AS subject_name, " +
                     "sb.teacher_name " +
                     "FROM student_subject ss JOIN student st ON st.id = ss.student_id JOIN subject sb " +
-                    "ON sb.id = ss.subject_id WHERE id = ? ORDER BY ss.id")){
+                    "ON sb.id = ss.subject_id WHERE ss.id = ?")){
             pstmt.setInt(1, id);
 
             ResultSet rs = pstmt.executeQuery();
@@ -104,7 +102,6 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                 Subject subject = new Subject();
                 subject.setId(rs.getInt("subject_id"));
                 subject.setName(rs.getString("subject_name"));
-                subject.setTeacherName(rs.getString("teacher_name"));
 
                 studentSubject = new StudentSubject();
                 studentSubject.setId(rs.getInt("id"));

@@ -25,9 +25,6 @@ public class Subject {
         return name;
     }
 
-    public String getTeacherName() {
-        return teacherName;
-
     // Setters:
     public void setName(String name) {
         this.name = name;
