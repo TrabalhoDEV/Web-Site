@@ -25,6 +25,7 @@ public class AdminDAO implements GenericDAO<Admin>{
             if (rs.next()){
                 admin = new Admin();
                 admin.setId(rs.getInt("id"));
+                admin.setEmail(rs.getString("email"));
                 admin.setDocument(rs.getString("document"));
             }
         } catch (SQLException sqle){
@@ -47,6 +48,7 @@ public class AdminDAO implements GenericDAO<Admin>{
             while (rs.next()){
                 Admin admin = new Admin();
                 admin.setId(rs.getInt("id"));
+                admin.setEmail(rs.getString("email"));
                 admin.setDocument(rs.getString("document"));
 
                 admins.put(rs.getInt("id"), admin);
@@ -80,9 +82,10 @@ public class AdminDAO implements GenericDAO<Admin>{
     @Override
     public boolean create(Admin admin){
         try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO admin (document, password) VALUES (?, ?)")){
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO admin (document, email, password) VALUES (?, ?,?)")){
             pstmt.setString(1, admin.getDocument());
-            pstmt.setString(2, BCrypt.hashpw(admin.getPassword(), BCrypt.gensalt()));
+            pstmt.setString(2, admin.getEmail());
+            pstmt.setString(3, BCrypt.hashpw(admin.getPassword(), BCrypt.gensalt()));
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
@@ -93,9 +96,10 @@ public class AdminDAO implements GenericDAO<Admin>{
     @Override
     public boolean update(Admin admin){
         try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET document = ? WHERE id = ?")){
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET document = ?, email = ? WHERE id = ?")){
             pstmt.setString(1, admin.getDocument());
-            pstmt.setInt(2, admin.getId());
+            pstmt.setString(2, admin.getEmail());
+            pstmt.setInt(3, admin.getId());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
@@ -103,11 +107,11 @@ public class AdminDAO implements GenericDAO<Admin>{
             return false;
         }
     }
-    public boolean updatePassword(String document, String newPassword){
+    public boolean updatePassword(String email, String newPassword){
         try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET password = ? WHERE document = ?")){
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET password = ? WHERE email = ?")){
             pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt()));
-            pstmt.setString(2, document);
+            pstmt.setString(2, email);
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){

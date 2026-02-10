@@ -22,11 +22,12 @@ public class SubjectDAO implements GenericDAO<Subject> {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()){
-                Subject subject = new Subject(rs.getInt("id"),
+                Subject subject = new Subject(
+                        rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("teacher_name"),
-                        rs.getString("teacher_user")
-                );
+                        rs.getDate("deadline")
+                    );
+
                 subjects.put(rs.getInt("id"), subject);
             }
 
@@ -48,9 +49,8 @@ public class SubjectDAO implements GenericDAO<Subject> {
                 return new Subject(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("teacher_name"),
-                        rs.getString("teacher_user")
-                );
+                        rs.getDate("deadline")
+                    );
             }
 
         } catch (SQLException sqle){
@@ -83,11 +83,9 @@ public class SubjectDAO implements GenericDAO<Subject> {
     public boolean create(Subject subject){
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO subject" +
-                    "(name, teacher_name, teacher_user, teacher_password) VALUES (?, ?, ?, ?)")){
+                    "(name, deadline) VALUES (?, ?)")){
             pstmt.setString(1, subject.getName());
-            pstmt.setString(2, subject.getTeacherName());
-            pstmt.setString(3, subject.getTeacherUser());
-            pstmt.setString(4, BCrypt.hashpw(subject.getTeacherPassword(), BCrypt.gensalt()));
+            pstmt.setDate(2, (Date) subject.getDateline());
 
             return pstmt.executeUpdate() > 0;
 
@@ -103,11 +101,10 @@ public class SubjectDAO implements GenericDAO<Subject> {
     public boolean update(Subject subject){
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE subject " +
-                    "SET name = ?, teacher_name = ?, teacher_user = ?, WHERE id = ?")){
+                    "SET name = ?, deadline = ? WHERE id = ?")){
             pstmt.setString(1, subject.getName());
-            pstmt.setString(2, subject.getTeacherName());
-            pstmt.setString(3, subject.getTeacherUser());
-            pstmt.setInt(4, subject.getId());
+            pstmt.setDate(2, (Date) subject.getDateline());
+            pstmt.setInt(3, subject.getId());
 
             return pstmt.executeUpdate() > 0;
 
@@ -129,38 +126,5 @@ public class SubjectDAO implements GenericDAO<Subject> {
             sqle.printStackTrace();
             return false;
         }
-    }
-
-    // Login methods
-    public boolean updatePassword(Subject subject, String newPassword){
-        try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("UPDATE subject SET teacher_password = ? WHERE id = ?")){
-            pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt()));
-            pstmt.setInt(2, subject.getId());
-
-            return pstmt.executeUpdate() > 0;
-
-        } catch (SQLException sqle){
-            sqle.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean login(String username, String password){
-        try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("SELECT teacher_password FROM subject WHERE teacher_user = ?")){
-            pstmt.setString(1, username);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()){
-                String hash = rs.getString("teacher_password");
-                return BCrypt.checkpw(password, hash);
-            }
-
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-        }
-        return false;
     }
 }
