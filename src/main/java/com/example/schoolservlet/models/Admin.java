@@ -4,6 +4,7 @@ public class Admin {
     // Attributes:
     private int id;
     private String document;
+    private String email;
     private String password;
 
     // Constructors:
@@ -11,8 +12,9 @@ public class Admin {
 
     }
 
-    public Admin(int id, String document){
+    public Admin(int id, String email, String document){
         this.id = id;
+        this.email = email;
         this.document = document;
     }
 
@@ -30,6 +32,10 @@ public class Admin {
         return document;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -38,6 +44,10 @@ public class Admin {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setDocument(String document) {
