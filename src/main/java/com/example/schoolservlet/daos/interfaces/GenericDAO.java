@@ -1,5 +1,6 @@
 package com.example.schoolservlet.daos.interfaces;
 
+<<<<<<< HEAD
 import java.util.Map;
 
 /**
@@ -50,3 +51,12 @@ public interface GenericDAO<T>{
      */
     boolean update(T object);
 }
+=======
+import java.util.List;
+
+public interface GenericDAO<T>{
+    int totalCount();
+
+    List<T> findMany(int skip, int take);
+}
+>>>>>>> 6e33e589d430f2f48d0a3e464132537d3bfe8ce9
