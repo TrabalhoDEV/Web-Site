@@ -84,7 +84,6 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                     "st.email AS student_email, " +
                     "sb.id AS subject_id, " +
                     "sb.name AS subject_name, " +
-                    "sb.teacher_name " +
                     "FROM student_subject ss JOIN student st ON st.id = ss.student_id JOIN subject sb " +
                     "ON sb.id = ss.subject_id WHERE ss.id = ?")){
             pstmt.setInt(1, id);
