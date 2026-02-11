@@ -40,6 +40,9 @@ public class TeacherDAO implements GenericDAO<Teacher> {
         PreparedStatement pstmt = conn.prepareStatement(
                 "SELECT id, name, email, username FROM teacher ORDER BY id LIMIT ? OFFSET ?")){
 
+            pstmt.setInt(1, skip);
+            pstmt.setInt(2, take);
+
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 teacherMap.put(rs.getInt("id"), new Teacher(
@@ -129,13 +132,13 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     // Auth Methods:
-    public boolean updatePassword(Teacher object, String newPassword){
+    public boolean updatePassword(int id, String newPassword){
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
                     "UPDATE teacher SET PASSWORD = ? WHERE ID = ?"
             )){
             pstmt.setString(1, newPassword);
-            pstmt.setInt(2, object.getId());
+            pstmt.setInt(2, id);
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
