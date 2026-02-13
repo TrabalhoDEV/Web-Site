@@ -1,6 +1,7 @@
 package com.example.schoolservlet.models;
 
-import com.example.schoolservlet.models.enums.StudentStatusEnum;
+import com.example.schoolservlet.utils.enums.StudentStatusEnum;
+import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 
 public class Student {
     // Attributes:
@@ -74,4 +75,5 @@ public class Student {
     public void setStatus(StudentStatusEnum status) {
         this.status = status;
     }
+
 }

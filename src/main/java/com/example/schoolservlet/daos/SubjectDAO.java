@@ -51,7 +51,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
                         rs.getString("name"),
                         rs.getDate("deadline")
                     );
-            }
+                }
 
         } catch (SQLException sqle){
             sqle.printStackTrace();
