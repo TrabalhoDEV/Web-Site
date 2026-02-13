@@ -2,6 +2,7 @@ package com.example.schoolservlet.servlets.administrator;
 
 import com.example.schoolservlet.daos.AdminDAO;
 import com.example.schoolservlet.utils.InputValidation;
+import com.example.schoolservlet.utils.PasswordValidationEnum;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.*;
@@ -30,16 +31,25 @@ public class LoginServlet extends HttpServlet {
        if(cpf == null || cpf.isEmpty()){
             request.setAttribute("error", "É necessário digitar seu cpf");
             request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
+            return;
         }
         password = request.getParameter("password").trim();
         if (password == null || password.isEmpty()){
             request.setAttribute("error", "É necessário digitar sua senha");
             request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
+            return;
         }
 
         if (!InputValidation.validateCpf(cpf)){
             request.setAttribute("error", "Formato de cpf inválido");
             request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
+            return;
+        }
+
+        if (InputValidation.validatePassword(password) != PasswordValidationEnum.RIGHT){
+            request.setAttribute("error", "Cpf e/ou senha incorretos");
+            request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
+            return;
         }
 
         if (adminDAO.login(cpf, password)){

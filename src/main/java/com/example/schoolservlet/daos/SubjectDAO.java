@@ -3,8 +3,6 @@ package com.example.schoolservlet.daos;
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.utils.PostgreConnection;
-import org.mindrot.jbcrypt.BCrypt;
-
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;

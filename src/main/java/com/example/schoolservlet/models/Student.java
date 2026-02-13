@@ -1,7 +1,6 @@
 package com.example.schoolservlet.models;
 
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
-import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 
 public class Student {
     // Attributes:
