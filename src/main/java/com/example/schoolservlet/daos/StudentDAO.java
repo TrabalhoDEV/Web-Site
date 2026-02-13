@@ -1,15 +1,13 @@
 package com.example.schoolservlet.daos;
 
-import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.models.Student;
-import com.example.schoolservlet.models.enums.StudentStatusEnum;
+import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import com.example.schoolservlet.utils.PostgreConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
 public class StudentDAO {
     public Student findById(int id){

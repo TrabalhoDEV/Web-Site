@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
  * This allows us to change business' rules of validation much easier than if we use that
  * directed in the Servlets or DAOs
  */
-public class ValidationService {
+public class InputValidation {
     /**
      * Static method that verifies if cpf is valid
      * @param cpf Is user's cpf

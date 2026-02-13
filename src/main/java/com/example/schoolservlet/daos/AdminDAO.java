@@ -2,6 +2,7 @@ package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.models.Admin;
+import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.PostgreConnection;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
@@ -26,6 +27,26 @@ public class AdminDAO implements GenericDAO<Admin>{
                 admin = new Admin();
                 admin.setId(rs.getInt("id"));
                 admin.setEmail(rs.getString("email"));
+                admin.setDocument(rs.getString("document"));
+            }
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+
+        return admin;
+    }
+
+    public Admin findByDocument(String document){
+        Admin admin = null;
+
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM admin WHERE document = ?")){
+            pstmt.setString(1, document);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()){
+                admin = new Admin();
+                admin.setId(rs.getInt("id"));
                 admin.setDocument(rs.getString("document"));
             }
         } catch (SQLException sqle){
@@ -107,11 +128,11 @@ public class AdminDAO implements GenericDAO<Admin>{
             return false;
         }
     }
-    public boolean updatePassword(String email, String newPassword){
+    public boolean updatePassword(String document, String newPassword){
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET password = ? WHERE email = ?")){
             pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt()));
-            pstmt.setString(2, email);
+            pstmt.setString(2, InputNormalizer.normalizeCpf(document));
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
@@ -136,7 +157,7 @@ public class AdminDAO implements GenericDAO<Admin>{
     public boolean login(String document, String password){
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT document, password FROM admin WHERE document = ?")){
-            pstmt.setString(1, document);
+            pstmt.setString(1, InputNormalizer.normalizeCpf(document));
 
             ResultSet rs = pstmt.executeQuery();
 

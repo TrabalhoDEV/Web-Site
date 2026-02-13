@@ -4,7 +4,7 @@ import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.models.Subject;
-import com.example.schoolservlet.models.enums.StudentStatusEnum;
+import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import com.example.schoolservlet.utils.PostgreConnection;
 
 import java.sql.*;
