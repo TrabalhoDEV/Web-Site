@@ -29,6 +29,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                     "st.email AS student_email, " +
                     "sb.id AS subject_id, " +
                     "sb.name AS subject_name, " +
+                    "sb.deadline AS subject_deadline " +
                     "FROM student_subject ss JOIN student st ON st.id = ss.student_id JOIN subject sb " +
                     "ON sb.id = ss.subject_id ORDER BY ss.id LIMIT ? OFFSET ?")
         ){
@@ -48,6 +49,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                 Subject subject = new Subject();
                 subject.setId(rs.getInt("subject_id"));
                 subject.setName(rs.getString("subject_name"));
+                subject.setDeadline(rs.getDate("subject_deadline"));
 
                 StudentSubject studentSubject = new StudentSubject();
                 studentSubject.setId(rs.getInt("id"));
@@ -84,6 +86,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                     "st.email AS student_email, " +
                     "sb.id AS subject_id, " +
                     "sb.name AS subject_name, " +
+                    "sb.deadline AS subject_deadline " +
                     "FROM student_subject ss JOIN student st ON st.id = ss.student_id JOIN subject sb " +
                     "ON sb.id = ss.subject_id WHERE ss.id = ?")){
             pstmt.setInt(1, id);
@@ -101,6 +104,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                 Subject subject = new Subject();
                 subject.setId(rs.getInt("subject_id"));
                 subject.setName(rs.getString("subject_name"));
+                subject.setDeadline(rs.getDate("subject_deadline"));
 
                 studentSubject = new StudentSubject();
                 studentSubject.setId(rs.getInt("id"));

@@ -6,17 +6,17 @@ public class Subject {
     // Attributes:
     private int id;
     private String name;
-    private Date dateline;
+    private Date deadline;
 
     // Constructors:
     public Subject(){
 
     }
 
-    public Subject(int id, String name, Date dateline){
+    public Subject(int id, String name, Date deadline){
         this.id = id;
         this.name = name;
-        this.dateline = dateline;
+        this.deadline = deadline;
     }
 
 
@@ -29,8 +29,8 @@ public class Subject {
         return name;
     }
 
-    public Date getDateline() {
-        return dateline;
+    public Date getDeadline() {
+        return deadline;
     }
     // Setters:
 
@@ -42,7 +42,7 @@ public class Subject {
         this.name = name;
     }
 
-    public void setDateline(Date dateline) {
-        this.dateline = dateline;
+    public void setDeadline(Date deadline) {
+        this.deadline = deadline;
     }
 }

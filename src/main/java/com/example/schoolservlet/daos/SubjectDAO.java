@@ -85,7 +85,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO subject" +
                     "(name, deadline) VALUES (?, ?)")){
             pstmt.setString(1, subject.getName());
-            pstmt.setDate(2, (Date) subject.getDateline());
+            pstmt.setDate(2, (Date) subject.getDeadline());
 
             return pstmt.executeUpdate() > 0;
 
@@ -103,7 +103,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
             PreparedStatement pstmt = conn.prepareStatement("UPDATE subject " +
                     "SET name = ?, deadline = ? WHERE id = ?")){
             pstmt.setString(1, subject.getName());
-            pstmt.setDate(2, (Date) subject.getDateline());
+            pstmt.setDate(2, (Date) subject.getDeadline());
             pstmt.setInt(3, subject.getId());
 
             return pstmt.executeUpdate() > 0;
