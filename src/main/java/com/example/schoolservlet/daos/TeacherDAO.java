@@ -97,15 +97,15 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     @Override
-    public boolean create(Teacher object) {
+    public boolean create(Teacher teacher) {
         try(Connection conn = PostgreConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(
                 "INSERT INTO teacher (name, email, username, password) values (?, ?, ?, ?)"
         )){
-            pstmt.setString(1, object.getName());
-            pstmt.setString(2, object.getEmail());
-            pstmt.setString(3 , object.getUsername());
-            pstmt.setString(4, object.getPassword());
+            pstmt.setString(1, teacher.getName());
+            pstmt.setString(2, teacher.getEmail());
+            pstmt.setString(3 , teacher.getUsername());
+            pstmt.setString(4, teacher.getPassword());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
@@ -115,15 +115,15 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     @Override
-    public boolean update(Teacher object) {
+    public boolean update(Teacher teacher) {
         try(Connection conn = PostgreConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(
                 "UPDATE teacher SET NAME = ?, EMAIL = ?, USERNAME = ? WHERE ID = ?"
         )){
-            pstmt.setString(1, object.getName());
-            pstmt.setString(2, object.getName());
-            pstmt.setString(3, object.getUsername());
-            pstmt.setInt(4, object.getId());
+            pstmt.setString(1, teacher.getName());
+            pstmt.setString(2, teacher.getName());
+            pstmt.setString(3, teacher.getUsername());
+            pstmt.setInt(4, teacher.getId());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
