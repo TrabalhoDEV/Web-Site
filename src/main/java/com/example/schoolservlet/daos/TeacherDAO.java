@@ -40,8 +40,8 @@ public class TeacherDAO implements GenericDAO<Teacher> {
         PreparedStatement pstmt = conn.prepareStatement(
                 "SELECT id, name, email, username FROM teacher ORDER BY id LIMIT ? OFFSET ?")){
 
-            pstmt.setInt(1, skip);
-            pstmt.setInt(2, take);
+            pstmt.setInt(1, take);
+            pstmt.setInt(2, skip);
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -100,11 +100,12 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     public boolean create(Teacher object) {
         try(Connection conn = PostgreConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(
-                "INSERT INTO teacher (name, email, username) values (?, ?, ?)"
+                "INSERT INTO teacher (name, email, username, password) values (?, ?, ?, ?)"
         )){
             pstmt.setString(1, object.getName());
             pstmt.setString(2, object.getEmail());
             pstmt.setString(3 , object.getUsername());
+            pstmt.setString(4, BCrypt.hashpw(object.getPassword(), BCrypt.gensalt()));
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
