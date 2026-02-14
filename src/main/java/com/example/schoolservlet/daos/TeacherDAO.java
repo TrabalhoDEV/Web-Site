@@ -105,7 +105,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             pstmt.setString(1, object.getName());
             pstmt.setString(2, object.getEmail());
             pstmt.setString(3 , object.getUsername());
-            pstmt.setString(4, BCrypt.hashpw(object.getPassword(), BCrypt.gensalt()));
+            pstmt.setString(4, object.getPassword());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
