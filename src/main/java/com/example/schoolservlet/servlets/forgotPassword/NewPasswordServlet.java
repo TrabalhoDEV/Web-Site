@@ -1,6 +1,7 @@
 package com.example.schoolservlet.servlets.forgotPassword;
 
 import com.example.schoolservlet.daos.AdminDAO;
+import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.TeacherDAO;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PasswordValidationEnum;
@@ -108,7 +109,14 @@ public class NewPasswordServlet extends HttpServlet {
                 request.setAttribute("error", "Não foi possível atualizar a senha, tente novamente mais tarde");
             }
         } else if (role == UserRoleEnum.STUDENT){
+            StudentDAO studentDAO = new StudentDAO();
 
+            if (studentDAO.updatePassword(userId, newPassword)){
+                response.sendRedirect(request.getContextPath() + "/auth");
+                return;
+            } else {
+                request.setAttribute("error", "Não foi possível alterar a senha, tente novamente mais tarde");
+            }
         }
 
         request.getRequestDispatcher("/WEB-INF/views/forgotPassword/newPassword.jsp").forward(request, response);

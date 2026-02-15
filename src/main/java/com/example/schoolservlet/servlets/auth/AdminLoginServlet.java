@@ -1,6 +1,7 @@
-package com.example.schoolservlet.servlets.administrator;
+package com.example.schoolservlet.servlets.auth;
 
 import com.example.schoolservlet.daos.AdminDAO;
+import com.example.schoolservlet.models.Admin;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PasswordValidationEnum;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
@@ -12,7 +13,7 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 
 @WebServlet(name = "admin-auth", value = "/admin/auth")
-public class LoginServlet extends HttpServlet {
+public class AdminLoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
@@ -55,7 +56,8 @@ public class LoginServlet extends HttpServlet {
         }
 
         if (adminDAO.login(cpf, password)){
-            AuthenticatedUser user = new AuthenticatedUser(cpf, UserRoleEnum.ADMIN);
+            Admin admin = adminDAO.findByDocument(cpf);
+            AuthenticatedUser user = new AuthenticatedUser(admin.getId(), admin.getEmail(), UserRoleEnum.ADMIN);
             session.setAttribute("user", user);
             session.setMaxInactiveInterval(60 * 60);
 

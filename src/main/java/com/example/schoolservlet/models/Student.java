@@ -5,24 +5,35 @@ import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 public class Student {
     // Attributes:
     private int id;
-
     private String name;
     private String email;
     private String password;
     private String cpf;
     private StudentStatusEnum status;
+    private int idSchoolClass;
 
     // Constructors:
     public Student(){
 
     }
 
-    public Student(int id, String name, String email, String cpf, StudentStatusEnum status){
+    public Student(int id, String name, String email, String cpf, StudentStatusEnum status, int idSchoolClass){
         this.id = id;
         this.name = name;
         this.email = email;
         this.cpf = cpf;
         this.status = status;
+        this.idSchoolClass = idSchoolClass;
+    }
+
+    public Student(int id, String name, String email, String password, String cpf, StudentStatusEnum status, int idSchoolClass) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.cpf = cpf;
+        this.status = status;
+        this.idSchoolClass = idSchoolClass;
     }
 
     // Getters:
@@ -38,10 +49,6 @@ public class Student {
         return email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public String getCpf() {
         return cpf;
     }
@@ -52,6 +59,14 @@ public class Student {
 
     public String getEnrollment(){
         return String.format("%06d", this.id);
+    }
+
+    public int getIdSchoolClass() {
+        return idSchoolClass;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     // Setters:
@@ -75,4 +90,7 @@ public class Student {
         this.status = status;
     }
 
+    public void setIdSchoolClass(int idSchoolClass) {
+        this.idSchoolClass = idSchoolClass;
+    }
 }

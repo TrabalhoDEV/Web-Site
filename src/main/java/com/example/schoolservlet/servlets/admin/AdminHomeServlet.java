@@ -1,4 +1,4 @@
-package com.example.schoolservlet.servlets.administrator;
+package com.example.schoolservlet.servlets.admin;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
