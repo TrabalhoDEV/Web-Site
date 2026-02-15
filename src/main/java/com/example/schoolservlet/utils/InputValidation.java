@@ -39,8 +39,8 @@ public class InputValidation {
     public static PasswordValidationEnum validatePassword(String password){
         if (password == null || password.isEmpty()) return PasswordValidationEnum.IS_NULL;
 
-        if (password.length()>28) return PasswordValidationEnum.MAX_LENGHT_EXCEEDED;
-        if (password.length()<8) return PasswordValidationEnum.MIN_LENGHT_NOT_REACHED;
+        if (password.length() > Constants.MAX_PASSWORD_LENGTH) return PasswordValidationEnum.MAX_LENGHT_EXCEEDED;
+        if (password.length() < Constants.MIN_PASSWORD_LENGHT) return PasswordValidationEnum.MIN_LENGHT_NOT_REACHED;
 
         boolean hasUppercase = false;
         boolean hasLowercase = false;
@@ -71,7 +71,7 @@ public class InputValidation {
      * @return      if grade is valid returns true else returns false
      */
     public static boolean validateGrade(double grade){
-        return grade >= 0 && grade <= 10;
+        return grade >= Constants.MIN_GRADE && grade <= Constants.MAX_GRADE;
     }
 
     /**
