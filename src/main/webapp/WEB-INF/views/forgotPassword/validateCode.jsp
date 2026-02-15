@@ -12,5 +12,6 @@
     <%}%>
     <button type="submit">Enviar</button>
   </form>
+  <a href="${pageContext.request.contextPath}/auth/forgot-password/send-code">Enviar e-mail novamente</a>
 </body>
 </html>

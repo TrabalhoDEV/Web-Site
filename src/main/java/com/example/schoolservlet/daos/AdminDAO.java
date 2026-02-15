@@ -107,7 +107,7 @@ public class AdminDAO implements GenericDAO<Admin>{
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO admin (document, email, password) VALUES (?, ?,?)")){
             pstmt.setString(1, admin.getDocument());
             pstmt.setString(2, admin.getEmail());
-            pstmt.setString(3, BCrypt.hashpw(admin.getPassword(), BCrypt.gensalt()));
+            pstmt.setString(3, BCrypt.hashpw(admin.getPassword(), BCrypt.gensalt(12)));
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
@@ -132,7 +132,7 @@ public class AdminDAO implements GenericDAO<Admin>{
     public boolean updatePassword(int id, String newPassword){
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET password = ? WHERE id = ?")){
-            pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+            pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt(12)));
             pstmt.setInt(2, id);
 
             return pstmt.executeUpdate() > 0;
