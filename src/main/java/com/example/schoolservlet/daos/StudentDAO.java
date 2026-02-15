@@ -111,7 +111,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     @Override
     public boolean update(Student student) {
         try (Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET name = ?" +
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET name = ? " +
                     "email = ? WHERE id = ?")){
             pstmt.setString(1, InputNormalizer.normalizeName(student.getName()));
             pstmt.setString(2, InputNormalizer.normalizeEmail(student.getEmail()));
@@ -127,7 +127,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     @Override
     public boolean updateIdSchoolClass(int id, int idSchoolClass) {
         try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET id_school_class = ? WHERE id = ?")){
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET id_school_class = ? WHERE id = ?")){
             pstmt.setInt(1, idSchoolClass);
             pstmt.setInt(2, id);
 
@@ -155,7 +155,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     @Override
     public boolean enrollIn(Student student) {
         try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET name = ?, email = ?, password = ?, status = ? WHERE id = ?")){
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET name = ?, email = ?, password = ?, status = ? WHERE id = ?")){
             pstmt.setString(1, InputNormalizer.normalizeName(student.getName()));
             pstmt.setString(2, InputNormalizer.normalizeEmail(student.getEmail()));
             pstmt.setString(3, BCrypt.hashpw(student.getPassword(), BCrypt.gensalt(12)));
