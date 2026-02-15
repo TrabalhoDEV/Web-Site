@@ -7,6 +7,6 @@
 <body>
 <h1>Arquivo de início</h1>
 <br/>
-    <a href="${pageContext.request.contextPath}/pages/admin/login.jsp">Login Admin</a>
+    <a href="${pageContext.request.contextPath}/admin/auth">Login Admin</a>
 </body>
 </html>
