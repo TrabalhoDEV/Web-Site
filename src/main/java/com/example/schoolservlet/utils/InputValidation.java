@@ -27,6 +27,7 @@ public class InputValidation {
     public static boolean validateEmail(String email){
         if (email == null || email.isEmpty()) return false;
         if (!StandardCharsets.US_ASCII.newEncoder().canEncode(email)) return false;
+        if (email.length() > 355) return false;
         return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
 
@@ -81,5 +82,16 @@ public class InputValidation {
     public static boolean validateEnrollment(String enrollment){
         if (enrollment == null || enrollment.isEmpty()) return false;
         return enrollment.matches("^\\d{6}$");
+    }
+
+    /**
+     * Static method that validates userName
+     * @param userName Is the teacher userNam
+     * @return         true if userName has a valid format
+     */
+    public static boolean validateUserName(String userName){
+        if (userName == null || userName.isEmpty()) return false;
+        if (userName.length() > 50) return false;
+        return userName.matches("^[^\\s]+\\.[^\\s]+$");
     }
 }
