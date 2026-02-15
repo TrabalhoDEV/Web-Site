@@ -33,4 +33,7 @@ public class Constants {
     public static final double MIN_GRADE = 0.0;
     public static final int MAX_OBS_LENGHT = 2000;
     public static final int MIN_OBS_LENGHT = 3;
+
+//    PAGES constratins:
+    public static final int DEFAULT_TAKE = 6;
 }
