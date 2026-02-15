@@ -62,6 +62,7 @@ public class LoginServlet extends HttpServlet {
                 session.setMaxInactiveInterval(60 * 60);
 
                 response.sendRedirect(request.getContextPath() + "/teacher/home");
+                return;
             }
         } else if (InputValidation.validateEnrollment(identifier) && !userOrPasswordWrong){
             StudentDAO studentDAO = new StudentDAO();
@@ -74,11 +75,12 @@ public class LoginServlet extends HttpServlet {
                 session.setMaxInactiveInterval(60 * 60);
 
                 response.sendRedirect(request.getContextPath() + "/student/home");
+                return;
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", "Usuário e/ou senha inválidos");
-            request.getRequestDispatcher("index.jsp").forward(request, response);
         }
+
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        request.setAttribute("error", "Usuário e/ou senha inválidos");
+        request.getRequestDispatcher("index.jsp").forward(request, response);
     }
 }
