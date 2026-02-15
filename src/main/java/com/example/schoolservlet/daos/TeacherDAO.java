@@ -2,6 +2,7 @@ package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.PostgreConnection;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -81,6 +82,28 @@ public class TeacherDAO implements GenericDAO<Teacher> {
         return null;
     }
 
+    public Teacher findByUserName(String userName) {
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "SELECT id, name, email, username FROM teacher WHERE userName = ?")){
+
+            pstmt.setString(1, InputNormalizer.normalizeUserName(userName));
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()){
+                return new Teacher(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("username")
+                );
+            }
+
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public boolean delete(int id) {
         try(Connection conn = PostgreConnection.getConnection();
@@ -105,7 +128,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             pstmt.setString(1, teacher.getName());
             pstmt.setString(2, teacher.getEmail());
             pstmt.setString(3 , teacher.getUsername());
-            pstmt.setString(4, teacher.getPassword());
+            pstmt.setString(4, BCrypt.hashpw(teacher.getPassword(), BCrypt.gensalt(12)));
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
@@ -138,7 +161,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             PreparedStatement pstmt = conn.prepareStatement(
                     "UPDATE teacher SET PASSWORD = ? WHERE ID = ?"
             )){
-            pstmt.setString(1, newPassword);
+            pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt(12)));
             pstmt.setInt(2, id);
 
             return pstmt.executeUpdate() > 0;

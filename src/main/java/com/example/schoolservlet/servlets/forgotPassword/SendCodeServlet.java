@@ -1,7 +1,9 @@
 package com.example.schoolservlet.servlets.forgotPassword;
 
 import com.example.schoolservlet.daos.AdminDAO;
+import com.example.schoolservlet.daos.TeacherDAO;
 import com.example.schoolservlet.models.Admin;
+import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.EmailService;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
@@ -26,7 +28,6 @@ public class SendCodeServlet extends HttpServlet {
 //        Variables:
         String input = "";
         HttpSession session = request.getSession();
-        AdminDAO adminDAO = new AdminDAO();
         boolean hasException = false;
         String email = null;
 
@@ -46,6 +47,7 @@ public class SendCodeServlet extends HttpServlet {
         }
 
         if (InputValidation.validateCpf(input) && !hasException){
+            AdminDAO adminDAO = new AdminDAO();
             Admin admin = adminDAO.findByDocument(InputNormalizer.normalizeCpf(input));
 
             if (admin != null){
@@ -62,7 +64,20 @@ public class SendCodeServlet extends HttpServlet {
         }
 
         if (InputValidation.validateUserName(input) && !hasException){
+            TeacherDAO teacherDAO = new TeacherDAO();
+            Teacher teacher = teacherDAO.findByUserName(input);
 
+            if (teacher != null){
+                email = teacher.getEmail();
+
+                session.setAttribute("userId", teacher.getId());
+                session.setAttribute("role", UserRoleEnum.TEACHER);
+                session.setMaxInactiveInterval(60 * 15);
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                request.setAttribute("error", "Usuário não encontrado");
+                hasException = true;
+            }
         }
 
         if (hasException){
