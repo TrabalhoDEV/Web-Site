@@ -1,8 +1,10 @@
 package com.example.schoolservlet.servlets.forgotPassword;
 
 import com.example.schoolservlet.daos.AdminDAO;
+import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.TeacherDAO;
 import com.example.schoolservlet.models.Admin;
+import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.EmailService;
 import com.example.schoolservlet.utils.InputNormalizer;
@@ -43,7 +45,21 @@ public class SendCodeServlet extends HttpServlet {
         input = input.trim();
 
         if (InputValidation.validateEnrollment(input)){
+            int id = InputNormalizer.normalizeEnrollment(input);
+            StudentDAO studentDAO = new StudentDAO();
+            Student student = studentDAO.findById(id);
 
+            if (student != null){
+                email = student.getEmail();
+
+                session.setAttribute("userId", student.getId());
+                session.setAttribute("role", UserRoleEnum.STUDENT);
+                session.setMaxInactiveInterval(60 * 15);
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                request.setAttribute("error", "Usuário não encontrado");
+                hasException = true;
+            }
         }
 
         if (InputValidation.validateCpf(input) && !hasException){

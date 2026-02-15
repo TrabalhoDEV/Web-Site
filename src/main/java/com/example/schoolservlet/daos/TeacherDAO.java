@@ -176,6 +176,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT password FROM teacher WHERE username = ?"
             )){
+            pstmt.setString(1, username);
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
