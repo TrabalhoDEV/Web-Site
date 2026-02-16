@@ -1,11 +1,7 @@
 package com.example.schoolservlet.models;
 
 public class Teacher {
-<<<<<<< HEAD
-//    Atributes:
-=======
-//    Atributtes:
->>>>>>> 127339c (feat: fixing some comments, also adding the exceptions to others DAO's methods)
+//    Atributes:   
     private int id;
     private String name;
     private String email;
