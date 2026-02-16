@@ -37,7 +37,6 @@ public class Constants {
     public static final int MIN_OBS_LENGTH = 3;
 
 //    PAGES constratins:
-    public static final int MAX_TAKE = 6;
     public static final int DEFAULT_TAKE = 6;
 
 // STRINGS
