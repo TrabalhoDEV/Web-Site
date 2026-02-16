@@ -112,7 +112,7 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
     public boolean create(SchoolClassTeacher schoolClassTeacher){
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO school_class_teacher (id_teacher, id_school_class) " +
-                    "VALUE (?, ?)")){
+                    "VALUES (?, ?)")){
             pstmt.setInt(1, schoolClassTeacher.getTeacherId());
             pstmt.setInt(2, schoolClassTeacher.getSchoolClassId());
 
@@ -126,10 +126,10 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
     @Override
     public boolean update(SchoolClassTeacher schoolClassTeacher){
         try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("UPDATE school_class_teacher SET id_teacher = ? " +
+             PreparedStatement pstmt = conn.prepareStatement("UPDATE school_class_teacher SET id_teacher = ?, " +
                      "id_school_class = ? WHERE id = ?")){
             pstmt.setInt(1, schoolClassTeacher.getTeacherId());
-            pstmt.setInt(2, schoolClassTeacher.getTeacherId());
+            pstmt.setInt(2, schoolClassTeacher.getSchoolClassId());
             pstmt.setInt(3, schoolClassTeacher.getId());
 
             return pstmt.executeUpdate() > 0;
