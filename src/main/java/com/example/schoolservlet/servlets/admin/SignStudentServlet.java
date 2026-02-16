@@ -1,6 +1,8 @@
 package com.example.schoolservlet.servlets.admin;
 
 import com.example.schoolservlet.daos.StudentDAO;
+import com.example.schoolservlet.exceptions.DataAccessException;
+import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputNormalizer;
@@ -24,6 +26,10 @@ import java.io.IOException;
  */
 @WebServlet("/admin/sign-student")
 public class SignStudentServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+
+    }
 
     /**
      * Handles POST requests for student registration.
@@ -88,10 +94,11 @@ public class SignStudentServlet extends HttpServlet {
         String studentCpf = InputNormalizer.normalizeCpf(studentCpfParam);
 
         // Validate CPF using business rules
-        if (!InputValidation.validateCpf(studentCpf)) {
+        try {
+            InputValidation.validateCpf(studentCpf);
+        } catch (ValidationException e){
             request.setAttribute("success", false);
-            request.setAttribute("error", Constants.INVALID_CPF_MESSAGE);
-
+            request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
             return;
@@ -118,15 +125,11 @@ public class SignStudentServlet extends HttpServlet {
 
         // Attempt to create the student in the database
         try{
-            if (studentDAO.create(student)) {
-                request.setAttribute("success", true);
-            } else {
-                request.setAttribute("success", false);
-                request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
-            }
-        } catch (IllegalArgumentException iae) {
+            studentDAO.create(student);
+            request.setAttribute("success", true);
+        } catch (DataAccessException | ValidationException e) {
             request.setAttribute("success", false);
-            request.setAttribute("error", iae.getMessage());
+            request.setAttribute("error", e.getMessage());
         }
 
 
