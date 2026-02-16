@@ -1,6 +1,9 @@
 package com.example.schoolservlet.servlets.auth;
 
 import com.example.schoolservlet.daos.AdminDAO;
+import com.example.schoolservlet.exceptions.DataAccessException;
+import com.example.schoolservlet.exceptions.RequiredFieldException;
+import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Admin;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PasswordValidationEnum;
@@ -30,42 +33,35 @@ public class AdminLoginServlet extends HttpServlet {
         AdminDAO adminDAO = new AdminDAO();
 
 //        Getting the user input values:
-        cpf = request.getParameter("cpf").trim();
-       if(cpf == null || cpf.isEmpty()){
-            request.setAttribute("error", "É necessário digitar seu cpf");
-            request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
-            return;
-        }
-        password = request.getParameter("password").trim();
-        if (password == null || password.isEmpty()){
-            request.setAttribute("error", "É necessário digitar sua senha");
-            request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
-            return;
-        }
+        try {
+            cpf = request.getParameter("cpf").trim();
+            password = request.getParameter("password").trim();
 
-        if (!InputValidation.validateCpf(cpf)){
-            request.setAttribute("error", "Formato de cpf inválido");
-            request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
-            return;
-        }
 
-        if (InputValidation.validatePassword(password) != PasswordValidationEnum.RIGHT){
-            request.setAttribute("error", "Cpf e/ou senha incorretos");
-            request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
-            return;
-        }
+            InputValidation.validateCpf(cpf);
+            InputValidation.validateLoginPassword(password);
 
-        if (adminDAO.login(cpf, password)){
-            Admin admin = adminDAO.findByDocument(cpf);
-            AuthenticatedUser user = new AuthenticatedUser(admin.getId(), admin.getEmail(), UserRoleEnum.ADMIN);
-            session.setAttribute("user", user);
-            session.setMaxInactiveInterval(60 * 60);
+            if (adminDAO.login(cpf, password)) {
+                Admin admin = adminDAO.findByDocument(cpf).get();
+                AuthenticatedUser user = new AuthenticatedUser(admin.getId(), admin.getEmail(), UserRoleEnum.ADMIN);
+                session.setAttribute("user", user);
+                session.setMaxInactiveInterval(60 * 60);
 
 
 //            TO DO: add context in AdminHomeServlet and change this redirect that brings all information necessarily to admin/index.jsp
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp").forward(request, response);
-        } else {
-            request.setAttribute("error", "Cpf e/ou senha incorretos");
+                response.sendRedirect(request.getContextPath() + "/AdminHomeServlet");
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                request.setAttribute("error", "Cpf e/ou senha incorretos");
+                request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
+            }
+        } catch (ValidationException e){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
+        } catch (DataAccessException dae){
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            request.setAttribute("error", dae.getMessage());
             request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
         }
     }

@@ -3,6 +3,8 @@ package com.example.schoolservlet.servlets.forgotPassword;
 import com.example.schoolservlet.daos.AdminDAO;
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.TeacherDAO;
+import com.example.schoolservlet.exceptions.DataAccessException;
+import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Admin;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.Teacher;
@@ -36,15 +38,10 @@ public class SendCodeServlet extends HttpServlet {
 //        Catching user's input:
         input = request.getParameter("input");
 
-        if (input == null || input.isEmpty()){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", "Digitar algo é obrigatório");
-            hasException = true;
-        }
-
         input = input.trim();
 
-        if (InputValidation.validateEnrollment(input)){
+        try{
+            InputValidation.validateEnrollment(input);
             int id = InputNormalizer.normalizeEnrollment(input);
             StudentDAO studentDAO = new StudentDAO();
             Student student = studentDAO.findById(id);
@@ -60,39 +57,48 @@ public class SendCodeServlet extends HttpServlet {
                 request.setAttribute("error", "Usuário não encontrado");
                 hasException = true;
             }
-        }
+        } catch (ValidationException e){
+            try{
+                InputValidation.validateCpf(input);
+                if (!hasException) {
+                    AdminDAO adminDAO = new AdminDAO();
+                    Admin admin = adminDAO.findByDocument(InputNormalizer.normalizeCpf(input)).get();
 
-        if (InputValidation.validateCpf(input) && !hasException){
-            AdminDAO adminDAO = new AdminDAO();
-            Admin admin = adminDAO.findByDocument(InputNormalizer.normalizeCpf(input));
+                    if (admin != null) {
+                        email = admin.getEmail();
 
-            if (admin != null){
-                email = admin.getEmail();
+                        session.setAttribute("userId", admin.getId());
+                        session.setAttribute("role", UserRoleEnum.ADMIN);
+                        session.setMaxInactiveInterval(60 * 15);
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                        request.setAttribute("error", "Usuário não encontrado");
+                        hasException = true;
+                    }
+                }
+            } catch (ValidationException | DataAccessException ve){
+                try{
+                    InputValidation.validateUserName(input);
+                    TeacherDAO teacherDAO = new TeacherDAO();
+                    Teacher teacher = teacherDAO.findByUserName(input);
 
-                session.setAttribute("userId", admin.getId());
-                session.setAttribute("role", UserRoleEnum.ADMIN);
-                session.setMaxInactiveInterval(60 * 15);
-            } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                request.setAttribute("error", "Usuário não encontrado");
-                hasException = true;
-            }
-        }
+                    if (!hasException) {
+                        if (teacher != null) {
+                            email = teacher.getEmail();
 
-        if (InputValidation.validateUserName(input) && !hasException){
-            TeacherDAO teacherDAO = new TeacherDAO();
-            Teacher teacher = teacherDAO.findByUserName(input);
-
-            if (teacher != null){
-                email = teacher.getEmail();
-
-                session.setAttribute("userId", teacher.getId());
-                session.setAttribute("role", UserRoleEnum.TEACHER);
-                session.setMaxInactiveInterval(60 * 15);
-            } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                request.setAttribute("error", "Usuário não encontrado");
-                hasException = true;
+                            session.setAttribute("userId", teacher.getId());
+                            session.setAttribute("role", UserRoleEnum.TEACHER);
+                            session.setMaxInactiveInterval(60 * 15);
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                            request.setAttribute("error", "Usuário não encontrado");
+                            hasException = true;
+                        }
+                    }
+                } catch (ValidationException exception){
+                    request.setAttribute("error", "Informações fornecidas erradas");
+                    hasException = true;
+                }
             }
         }
 
