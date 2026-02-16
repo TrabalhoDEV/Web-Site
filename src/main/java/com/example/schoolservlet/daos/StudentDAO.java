@@ -2,22 +2,25 @@ package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentDAO;
+import com.example.schoolservlet.exceptions.DataAccessException;
+import com.example.schoolservlet.exceptions.InvalidNumberException;
+import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.RequiredFieldException;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputNormalizer;
-import com.example.schoolservlet.utils.OutputFormatService;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import com.example.schoolservlet.utils.PostgreConnection;
 import org.mindrot.jbcrypt.BCrypt;
-
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     @Override
-    public Student findById(int id){
-        Student student = null;
+    public Student findById(int id) throws NotFoundException, DataAccessException, InvalidNumberException{
+        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
 
         try(
             Connection conn = PostgreConnection.getConnection();
@@ -26,22 +29,21 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             pstmt.setInt(1, id);
 
             ResultSet rs = pstmt.executeQuery();
-
             if (rs.next()){
-                student = new Student();
+                Student student = new Student();
                 student.setId(id);
                 student.setIdSchoolClass(rs.getInt("id_school_class"));
                 student.setCpf(rs.getString("cpf"));
                 student.setName(rs.getString("name"));
                 student.setEmail(rs.getString("email"));
                 student.setStatus(StudentStatusEnum.values()[rs.getInt("status") - 1]);
-            }
 
+                return student;
+            } else throw new NotFoundException("aluno", "id", String.valueOf(id));
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+            throw new DataAccessException("Erro ao buscar aluno", sqle);
         }
-
-        return student;
     }
 
     @Override
@@ -50,11 +52,10 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
 
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM student ORDER BY id LIMIT ? OFFSET ?")){
-            pstmt.setInt(1, take);
-            pstmt.setInt(2, skip);
+            pstmt.setInt(1, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(2, skip < 0 ? 0 : skip);
 
             ResultSet rs = pstmt.executeQuery();
-
             while (rs.next()){
                 Student student = new Student();
                 student.setId(rs.getInt("id"));
@@ -93,7 +94,10 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     }
 
     @Override
-    public boolean create(Student student) {
+    public void create(Student student) throws DataAccessException, RequiredFieldException {
+        if (student.getCpf() == null || student.getCpf().isEmpty()) throw new RequiredFieldException("cpf");
+        if (student.getIdSchoolClass() == 0) throw new RequiredFieldException("id da sala");
+
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO student " +
                     "(status, cpf, id_school_class) " +
@@ -102,18 +106,17 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             pstmt.setString(2, InputNormalizer.normalizeCpf(student.getCpf()));
             pstmt.setInt(3, student.getIdSchoolClass());
 
-            return pstmt.executeUpdate() > 0;
+            pstmt.executeUpdate();
         } catch (SQLException sqle){
             sqle.printStackTrace();
-
-            if (sqle.getSQLState().equals("23505")){throw new IllegalArgumentException(Constants.UNIQUE_VIOLATION_MESSAGE);}
-
-            return false;
+            throw new DataAccessException("Erro ao criar aluno", sqle);
         }
     }
 
     @Override
-    public boolean update(Student student) {
+    public void update(Student student) throws NotFoundException, DataAccessException, InvalidNumberException{
+        if (student.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET name = ? " +
                     "email = ? WHERE id = ?")){
@@ -121,43 +124,48 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             pstmt.setString(2, InputNormalizer.normalizeEmail(student.getEmail()));
             pstmt.setInt(3, student.getId());
 
-            return pstmt.executeUpdate() > 0;
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "id", String.valueOf(student.getId()));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            return false;
+            throw new DataAccessException("Erro ao atualizar aluno", sqle);
         }
     }
 
     @Override
-    public boolean updateIdSchoolClass(int id, int idSchoolClass) {
+    public void updateIdSchoolClass(int id, int idSchoolClass) throws NotFoundException, DataAccessException, InvalidNumberException{
+        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET id_school_class = ? WHERE id = ?")){
             pstmt.setInt(1, idSchoolClass);
             pstmt.setInt(2, id);
 
-            return pstmt.executeUpdate() > 0;
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "id da sala", String.valueOf(idSchoolClass));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            return false;
+            throw new DataAccessException("Erro ao atualizar id da sala", sqle);
         }
     }
 
     @Override
-    public boolean updatePassword(int id, String password) {
+    public void updatePassword(int id, String password) throws NotFoundException, DataAccessException, InvalidNumberException{
+        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET password = ? WHERE id = ?")){
             pstmt.setString(1, BCrypt.hashpw(password, BCrypt.gensalt(12)));
             pstmt.setInt(2, id);
 
-            return pstmt.executeUpdate() > 0;
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            return false;
+            throw new DataAccessException("Erro ao atualizar senha", sqle);
         }
     }
 
     @Override
-    public boolean enrollIn(Student student) {
+    public void enrollIn(Student student) throws NotFoundException, DataAccessException, InvalidNumberException{
+        if (student.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET name = ?, email = ?, password = ?, status = ? WHERE id = ?")){
             pstmt.setString(1, InputNormalizer.normalizeName(student.getName()));
@@ -166,28 +174,33 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal());
             pstmt.setInt(5, student.getId());
 
-            return pstmt.executeUpdate() > 0;
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "id", String.valueOf(student.getId()));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            return false;
+            throw new DataAccessException("Erro ao confimar matrícula", sqle);
         }
     }
 
     @Override
-    public boolean delete(int id) {
+    public void delete(int id) throws NotFoundException, DataAccessException, InvalidNumberException {
+        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM student WHERE id = ?")){
             pstmt.setInt(1, id);
 
-            return pstmt.executeUpdate() > 0;
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            return false;
+            throw new DataAccessException("Erro ao deletar aluno", sqle);
         }
     }
 
     @Override
-    public boolean login(String enrollment, String password) {
+    public boolean login(String enrollment, String password) throws RequiredFieldException, NotFoundException, DataAccessException{
+        if (enrollment == null || enrollment.isEmpty()) throw new RequiredFieldException("matrícula");
+        if (password == null || password.isEmpty()) throw new RequiredFieldException("senha");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT password FROM student WHERE id = ?")){
             pstmt.setInt(1, InputNormalizer.normalizeEnrollment(enrollment));
@@ -197,11 +210,10 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             if (rs.next()){
                 String hash = rs.getString("password");
                 return BCrypt.checkpw(password, hash);
-            }
-
+            } else throw new NotFoundException("aluno", "matrícula", enrollment);
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+            throw new DataAccessException("Erro ao logar aluno", sqle);
         }
-        return false;
     }
 }

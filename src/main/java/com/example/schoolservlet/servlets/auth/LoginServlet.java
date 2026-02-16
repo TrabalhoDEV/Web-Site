@@ -2,6 +2,8 @@ package com.example.schoolservlet.servlets.auth;
 
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.TeacherDAO;
+import com.example.schoolservlet.exceptions.RequiredFieldException;
+import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.InputNormalizer;
@@ -30,57 +32,54 @@ public class LoginServlet extends HttpServlet {
         String identifier = request.getParameter("identifier");
         String password = request.getParameter("password");
         HttpSession session = request.getSession();
-        boolean userOrPasswordWrong = false;
 
-        if (identifier == null || identifier.isEmpty()){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", "Matrícula/usuário é obrigatório");
-            request.getRequestDispatcher("index.jsp").forward(request, response);
-            return;
-        }
+        try {
+            InputValidation.validateLoginPassword(password);
 
-        if (password == null || password.isEmpty()){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", "Senha é obrigatória");
-            request.getRequestDispatcher("index.jsp").forward(request, response);
-            return;
-        }
+            try {
+                InputValidation.validateUserName(identifier);
+                TeacherDAO teacherDAO = new TeacherDAO();
+                String userName = InputNormalizer.normalizeUserName(identifier);
 
-        if (InputValidation.validatePassword(password) != PasswordValidationEnum.RIGHT){
-            userOrPasswordWrong = true;
-        }
+                if (teacherDAO.login(userName, password)) {
+                    Teacher teacher = teacherDAO.findByUserName(userName);
 
-        if (InputValidation.validateUserName(identifier) && !userOrPasswordWrong){
-            TeacherDAO teacherDAO = new TeacherDAO();
-            String userName = InputNormalizer.normalizeUserName(identifier);
+                    AuthenticatedUser user = new AuthenticatedUser(teacher.getId(), teacher.getEmail(), UserRoleEnum.TEACHER);
+                    session.setAttribute("user", user);
+                    session.setMaxInactiveInterval(60 * 60);
 
-            if (teacherDAO.login(userName, password)){
-                Teacher teacher = teacherDAO.findByUserName(userName);
+                    response.sendRedirect(request.getContextPath() + "/teacher/home");
+                    return;
+                }
+            } catch (ValidationException e){
+                try {
+                    InputValidation.validateEnrollment(identifier);
+                    StudentDAO studentDAO = new StudentDAO();
 
-                AuthenticatedUser user = new AuthenticatedUser(teacher.getId(), teacher.getEmail(), UserRoleEnum.TEACHER);
-                session.setAttribute("user", user);
-                session.setMaxInactiveInterval(60 * 60);
+                    if (studentDAO.login(identifier, password)) {
+                        Student student = studentDAO.findById(InputNormalizer.normalizeEnrollment(identifier)).get();
 
-                response.sendRedirect(request.getContextPath() + "/teacher/home");
-                return;
+                        AuthenticatedUser user = new AuthenticatedUser(student.getId(), student.getEmail(), UserRoleEnum.STUDENT);
+                        session.setAttribute("user", user);
+                        session.setMaxInactiveInterval(60 * 60);
+
+                        response.sendRedirect(request.getContextPath() + "/student/home");
+                        return;
+                    }
+                } catch (ValidationException ve){
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    request.setAttribute("error", "Identificador inválido");
+                    request.getRequestDispatcher("index.jsp").forward(request, response);
+                }
             }
-        } else if (InputValidation.validateEnrollment(identifier) && !userOrPasswordWrong){
-            StudentDAO studentDAO = new StudentDAO();
 
-            if (studentDAO.login(identifier, password)){
-                Student student = studentDAO.findById(InputNormalizer.normalizeEnrollment(identifier));
-
-                AuthenticatedUser user = new AuthenticatedUser(student.getId(), student.getEmail(), UserRoleEnum.STUDENT);
-                session.setAttribute("user", user);
-                session.setMaxInactiveInterval(60 * 60);
-
-                response.sendRedirect(request.getContextPath() + "/student/home");
-                return;
-            }
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            request.setAttribute("error", "Usuário e/ou senha inválidos");
+            request.getRequestDispatcher("index.jsp").forward(request, response);
+        } catch (ValidationException e){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("index.jsp").forward(request, response);
         }
-
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        request.setAttribute("error", "Usuário e/ou senha inválidos");
-        request.getRequestDispatcher("index.jsp").forward(request, response);
     }
 }

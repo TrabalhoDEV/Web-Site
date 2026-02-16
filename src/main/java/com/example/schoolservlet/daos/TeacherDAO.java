@@ -1,7 +1,9 @@
 package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
+import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.PostgreConnection;
 import org.mindrot.jbcrypt.BCrypt;
@@ -17,7 +19,7 @@ import java.util.ResourceBundle;
 public class TeacherDAO implements GenericDAO<Teacher> {
     // Implement interface methods
     @Override
-    public int totalCount() {
+    public int totalCount() throws DataAccessException {
         try(Connection conn = PostgreConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(
                         "SELECT COUNT(*) AS total_count FROM teacher");){
@@ -29,20 +31,21 @@ public class TeacherDAO implements GenericDAO<Teacher> {
 
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataAccessException("Erro ao contar professores", sqle);
         }
         return  -1;
     }
 
     @Override
-    public Map<Integer, Teacher> findMany(int skip, int take) {
+    public Map<Integer, Teacher> findMany(int skip, int take) throws DataAccessException{
         Map<Integer, Teacher> teacherMap = new HashMap<>();
 
         try(Connection conn = PostgreConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(
                 "SELECT id, name, email, username FROM teacher ORDER BY id LIMIT ? OFFSET ?")){
 
-            pstmt.setInt(1, take);
-            pstmt.setInt(2, skip);
+            pstmt.setInt(1, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(2, skip < 0 ? 0 : skip);
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -55,6 +58,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             }
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataAccessException("Erro ao listar professores", sqle);
         }
         return teacherMap;
     }
@@ -105,24 +109,31 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     @Override
-    public boolean delete(int id) {
+    public void delete(int id) throws DataAccessException, NotFoundException, InvalidNumberException{
+        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");;
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
                     "DELETE FROM teacher WHERE id = ?")){
 
             pstmt.setInt(1, id);
-            return pstmt.executeUpdate() > 0;
 
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("professor", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataAccessException("Erro ao deletar professor", sqle);
         }
-        return false;
     }
 
     @Override
-    public boolean create(Teacher teacher) {
+    public void create(Teacher teacher) throws DataAccessException, RequiredFieldException {
+        if (teacher.getName() == null || teacher.getName().isEmpty()) throw new RequiredFieldException("nome");
+        if (teacher.getEmail() == null || teacher.getEmail().isEmpty()) throw new RequiredFieldException("email");
+        if (teacher.getUsername() == null || teacher.getUsername().isEmpty()) throw new RequiredFieldException("usuário");
+        if (teacher.getPassword() == null || teacher.getPassword().isEmpty()) throw new RequiredFieldException("senha");
+
         try(Connection conn = PostgreConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(
+            PreparedStatement pstmt = conn.prepareStatement(
                 "INSERT INTO teacher (name, email, username, password) values (?, ?, ?, ?)"
         )){
             pstmt.setString(1, teacher.getName());
@@ -130,17 +141,22 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             pstmt.setString(3 , teacher.getUsername());
             pstmt.setString(4, BCrypt.hashpw(teacher.getPassword(), BCrypt.gensalt(12)));
 
-            return pstmt.executeUpdate() > 0;
+            pstmt.executeUpdate();
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataAccessException("Erro ao criar professor", sqle);
         }
-        return false;
     }
 
     @Override
-    public boolean update(Teacher teacher) {
+    public void update(Teacher teacher) throws DataAccessException, NotFoundException, InvalidNumberException, RequiredFieldException {
+        if (teacher.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+        if (teacher.getName() == null || teacher.getName().isEmpty()) throw new RequiredFieldException("nome");
+        if (teacher.getEmail() == null || teacher.getEmail().isEmpty()) throw new RequiredFieldException("email");
+        if (teacher.getUsername() == null || teacher.getUsername().isEmpty()) throw new RequiredFieldException("usuário");
+
         try(Connection conn = PostgreConnection.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement(
+            PreparedStatement pstmt = conn.prepareStatement(
                 "UPDATE teacher SET NAME = ?, EMAIL = ?, USERNAME = ? WHERE ID = ?"
         )){
             pstmt.setString(1, teacher.getName());
@@ -148,11 +164,11 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             pstmt.setString(3, teacher.getUsername());
             pstmt.setInt(4, teacher.getId());
 
-            return pstmt.executeUpdate() > 0;
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("professor", "id", String.valueOf(teacher.getId()));
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataAccessException("Erro ao atualizar professor", sqle);
         }
-        return false;
     }
 
     // Auth Methods:
