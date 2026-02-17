@@ -3,8 +3,7 @@ package com.example.schoolservlet.servlets.forgotPassword;
 import com.example.schoolservlet.daos.AdminDAO;
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.TeacherDAO;
-import com.example.schoolservlet.exceptions.DataAccessException;
-import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Admin;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.Teacher;
@@ -17,6 +16,7 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 
 @WebServlet(name = "forget-password-send-code", value = "/auth/forgot-password/send-code")
 public class SendCodeServlet extends HttpServlet {
@@ -34,81 +34,122 @@ public class SendCodeServlet extends HttpServlet {
         HttpSession session = request.getSession();
         boolean hasException = false;
         String email = null;
+        UserRoleEnum role = null;
 
 //        Catching user's input:
         input = request.getParameter("input");
 
-        input = input.trim();
-
-        try{
-            InputValidation.validateEnrollment(input);
-            int id = InputNormalizer.normalizeEnrollment(input);
-            StudentDAO studentDAO = new StudentDAO();
-            Student student = studentDAO.findById(id);
-
-            if (student != null){
-                email = student.getEmail();
-
-                session.setAttribute("userId", student.getId());
-                session.setAttribute("role", UserRoleEnum.STUDENT);
-                session.setMaxInactiveInterval(60 * 15);
-            } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                request.setAttribute("error", "Usuário não encontrado");
-                hasException = true;
-            }
-        } catch (ValidationException e){
-            try{
-                InputValidation.validateCpf(input);
-                if (!hasException) {
-                    AdminDAO adminDAO = new AdminDAO();
-                    Admin admin = adminDAO.findByDocument(InputNormalizer.normalizeCpf(input)).get();
-
-                    if (admin != null) {
-                        email = admin.getEmail();
-
-                        session.setAttribute("userId", admin.getId());
-                        session.setAttribute("role", UserRoleEnum.ADMIN);
-                        session.setMaxInactiveInterval(60 * 15);
-                    } else {
-                        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                        request.setAttribute("error", "Usuário não encontrado");
-                        hasException = true;
-                    }
-                }
-            } catch (ValidationException | DataAccessException ve){
-                try{
-                    InputValidation.validateUserName(input);
-                    TeacherDAO teacherDAO = new TeacherDAO();
-                    Teacher teacher = teacherDAO.findByUserName(input);
-
-                    if (!hasException) {
-                        if (teacher != null) {
-                            email = teacher.getEmail();
-
-                            session.setAttribute("userId", teacher.getId());
-                            session.setAttribute("role", UserRoleEnum.TEACHER);
-                            session.setMaxInactiveInterval(60 * 15);
-                        } else {
-                            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                            request.setAttribute("error", "Usuário não encontrado");
-                            hasException = true;
-                        }
-                    }
-                } catch (ValidationException exception){
-                    request.setAttribute("error", "Informações fornecidas erradas");
-                    hasException = true;
-                }
-            }
-        }
-
-        if (hasException){
+        if (input == null || input.isBlank()) {
+            request.setAttribute("error", "Campo não pode ser vazio");
             request.getRequestDispatcher("/WEB-INF/views/forgotPassword/sendCode.jsp").forward(request, response);
             return;
         }
 
-        if (email != null && !email.isEmpty()){
-            String code = String.valueOf((int) Math.round(Math.random() * 900000));
+        input = input.trim();
+
+        try {
+            InputValidation.validateEnrollment(input);
+            role = UserRoleEnum.STUDENT;
+        } catch (ValidationException e) {
+            if (role == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                request.setAttribute("error", e.getMessage());
+                hasException = true;
+            }
+        }
+
+        try {
+            InputValidation.validateCpf(input);
+            role = UserRoleEnum.ADMIN;
+        } catch (ValidationException e) {
+            if (role == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                request.setAttribute("error", e.getMessage());
+                hasException = true;
+            }
+        }
+
+        try{
+            InputValidation.validateUserName(input);
+            role = UserRoleEnum.TEACHER;
+        } catch (ValidationException e) {
+            if (role == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                request.setAttribute("error", e.getMessage());
+                hasException = true;
+            }
+        }
+
+        if (role == UserRoleEnum.STUDENT) {
+            try {
+                int id = InputNormalizer.normalizeEnrollment(input);
+                StudentDAO studentDAO = new StudentDAO();
+                Student student = studentDAO.findById(id);
+
+                if (student != null) {
+                    email = student.getEmail();
+
+                    session.setAttribute("userId", student.getId());
+                    session.setAttribute("role", UserRoleEnum.STUDENT);
+                    session.setMaxInactiveInterval(60 * 15);
+                }
+            } catch (ValidationException e) {
+                request.setAttribute("error", e.getMessage());
+                hasException = true;
+            } catch (DataException dae) {
+                request.setAttribute("error", dae.getMessage());
+                hasException = true;
+            } catch (NotFoundException nfe) {
+                response.sendRedirect(request.getContextPath() + "/auth/forgot-password/validate-code");
+                return;
+            }
+        } else if (role == UserRoleEnum.ADMIN) {
+            try {
+                AdminDAO adminDAO = new AdminDAO();
+                Admin admin = adminDAO.findByDocument(InputNormalizer.normalizeCpf(input));
+
+                if (admin != null) {
+                    email = admin.getEmail();
+
+                    session.setAttribute("userId", admin.getId());
+                    session.setAttribute("role", UserRoleEnum.ADMIN);
+                    session.setMaxInactiveInterval(60 * 15);
+                }
+            } catch (DataException | RequiredFieldException e) {
+                request.setAttribute("error", e.getMessage());
+                hasException = true;
+            } catch (NotFoundException nfe){
+                response.sendRedirect(request.getContextPath() + "/auth/forgot-password/validate-code");
+                return;
+            }
+        } else if (role == UserRoleEnum.TEACHER) {
+            try {
+                TeacherDAO teacherDAO = new TeacherDAO();
+                Teacher teacher = teacherDAO.findByUserName(input);
+
+                if (teacher != null) {
+                    email = teacher.getEmail();
+
+                    session.setAttribute("userId", teacher.getId());
+                    session.setAttribute("role", UserRoleEnum.TEACHER);
+                    session.setMaxInactiveInterval(60 * 15);
+                }
+            } catch (DataException | RequiredFieldException e) {
+                request.setAttribute("error", e.getMessage());
+                hasException = true;
+            } catch (NotFoundException nfe) {
+                response.sendRedirect(request.getContextPath() + "/auth/forgot-password/validate-code");
+                return;
+            }
+        }
+
+        if (hasException) {
+            request.getRequestDispatcher("/WEB-INF/views/forgotPassword/sendCode.jsp").forward(request, response);
+            return;
+        }
+
+        if (email != null && !email.isBlank()) {
+            String code = String.format("%06d", (new SecureRandom()).nextInt(1000000));
             session.setAttribute("code", code);
 
             try {
@@ -117,18 +158,16 @@ public class SendCodeServlet extends HttpServlet {
                         "<br>" +
                         "<div style=\"background-color:#DDF8FF; border-radius:20px; height:200px;" +
                         "display:flex; flex-direction:column; justify-content: space-around\"><h3 style=\"text-align:center;\">Código:</h3>" +
-                        "<h2 style=\"text-align:center;\">"+code+"</h2></div>");
-                response.sendRedirect(request.getContextPath() + "/auth/forgot-password/validate-code");
-            } catch (Exception e){
+                        "<h2 style=\"text-align:center;\">" + code + "</h2></div>");
+            } catch (Exception e) {
                 e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
                 request.setAttribute("error", "Não foi possível enviar o email nesse momento, tente novamente mais tarde");
                 request.getRequestDispatcher("/WEB-INF/views/forgotPassword/sendCode.jsp").forward(request, response);
+                return;
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-            request.setAttribute("error", "Usuário não encontrado, tente novamente");
-            request.getRequestDispatcher("/WEB-INF/views/forgotPassword/sendCode.jsp").forward(request, response);
         }
+
+        response.sendRedirect(request.getContextPath() + "/auth/forgot-password/validate-code");
     }
 }

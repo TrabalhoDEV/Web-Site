@@ -13,7 +13,7 @@ import java.util.Date;
 public class SubjectDAO implements GenericDAO<Subject> {
 
     @Override
-    public Map<Integer, Subject> findMany(int skip, int take) throws DataAccessException{
+    public Map<Integer, Subject> findMany(int skip, int take) throws DataException {
         Map<Integer, Subject> subjects = new HashMap<>();
 
         try(Connection conn = PostgreConnection.getConnection();
@@ -40,7 +40,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
     }
 
     @Override
-    public Subject findById(int id) throws DataAccessException, NotFoundException, InvalidNumberException{
+    public Subject findById(int id) throws DataException, NotFoundException, InvalidNumberException{
         if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
 
         try(Connection conn = PostgreConnection.getConnection();
@@ -57,12 +57,12 @@ public class SubjectDAO implements GenericDAO<Subject> {
             } else throw new NotFoundException("matéria", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao busca matéria");
+            throw new DataException("Erro ao busca matéria");
         }
     }
 
     @Override
-    public int totalCount() throws DataAccessException{
+    public int totalCount() throws DataException {
         int totalCount = -1;
 
         try(Connection conn = PostgreConnection.getConnection();
@@ -74,7 +74,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
             }
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao contar matérias");
+            throw new DataException("Erro ao contar matérias");
         }
 
         return totalCount;
@@ -83,7 +83,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
 
     @Override
-    public void create(Subject subject) throws DataAccessException, RequiredFieldException, InvalidDateException{
+    public void create(Subject subject) throws DataException, RequiredFieldException, InvalidDateException{
         if (subject.getName() == null || subject.getName().isEmpty()) throw new RequiredFieldException("nome");
         if (subject.getDeadline() == null) throw new RequiredFieldException("data final");
         if (subject.getDeadline().before(new Date())) throw new InvalidDateException("data final", "Data final deve ser depois da data de hoje");
@@ -97,14 +97,14 @@ public class SubjectDAO implements GenericDAO<Subject> {
             pstmt.executeUpdate();
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao criar matéria", sqle);
+            throw new DataException("Erro ao criar matéria", sqle);
         }
     }
 
 
 
     @Override
-    public void update(Subject subject) throws NotFoundException, DataAccessException, InvalidNumberException, RequiredFieldException, InvalidDateException {
+    public void update(Subject subject) throws NotFoundException, DataException, InvalidNumberException, RequiredFieldException, InvalidDateException {
         if (subject.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
         if (subject.getDeadline() == null) throw new RequiredFieldException("data final");
         if (subject.getDeadline().before(new Date())) throw new InvalidDateException("data final", "Data final deve ser depois da data de hoje");
@@ -119,12 +119,12 @@ public class SubjectDAO implements GenericDAO<Subject> {
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("matéria", "id", String.valueOf(subject.getId()));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao atualizar matéria", sqle);
+            throw new DataException("Erro ao atualizar matéria", sqle);
         }
     }
 
     @Override
-    public void delete(int id) throws DataAccessException, NotFoundException, InvalidNumberException {
+    public void delete(int id) throws DataException, NotFoundException, InvalidNumberException {
         if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
 
         try(Connection conn = PostgreConnection.getConnection();
@@ -134,7 +134,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("matéria", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao deletar matéria", sqle);
+            throw new DataException("Erro ao deletar matéria", sqle);
         }
     }
 }
