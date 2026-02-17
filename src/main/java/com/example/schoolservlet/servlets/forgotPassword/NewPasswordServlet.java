@@ -3,11 +3,7 @@ package com.example.schoolservlet.servlets.forgotPassword;
 import com.example.schoolservlet.daos.AdminDAO;
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.TeacherDAO;
-import com.example.schoolservlet.exceptions.DataAccessException;
-import com.example.schoolservlet.exceptions.NotFoundException;
-import com.example.schoolservlet.exceptions.RequiredFieldException;
-import com.example.schoolservlet.exceptions.ValidationException;
-import com.example.schoolservlet.utils.InputNormalizer;
+import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PasswordValidationEnum;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
@@ -16,8 +12,6 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @WebServlet(name = "forget-password-new-password", value = "/auth/forgot-password/new-password")
 public class NewPasswordServlet extends HttpServlet {
@@ -91,20 +85,16 @@ public class NewPasswordServlet extends HttpServlet {
             } else if (role == UserRoleEnum.STUDENT) {
                 StudentDAO studentDAO = new StudentDAO();
 
-                if (studentDAO.updatePassword(userId, newPassword)) {
-                    response.sendRedirect(request.getContextPath() + "/auth");
-                    return;
-                } else {
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    request.setAttribute("error", "Não foi possível alterar a senha, tente novamente mais tarde");
-                }
+                studentDAO.updatePassword(userId, newPassword);
+                response.sendRedirect(request.getContextPath() + "/auth");
+                return;
             }
-        } catch (DataAccessException dae){
+        } catch (DataException dae){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", dae.getMessage());
-        } catch (NotFoundException nfe){
+        } catch (NotFoundException | InvalidNumberException e){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", nfe.getMessage());
+            request.setAttribute("error", e.getMessage());
         }
 
         request.getRequestDispatcher("/WEB-INF/views/forgotPassword/newPassword.jsp").forward(request, response);

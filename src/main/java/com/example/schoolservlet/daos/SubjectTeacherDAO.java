@@ -1,6 +1,9 @@
 package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
+import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.InvalidNumberException;
+import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.models.SubjectTeacher;
 import com.example.schoolservlet.utils.PostgreConnection;
 
@@ -14,7 +17,10 @@ import java.util.Map;
 public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
 
     @Override
-    public boolean create(SubjectTeacher subjectTeacher) {
+    public void create(SubjectTeacher subjectTeacher) throws DataException, InvalidNumberException {
+        if (subjectTeacher.getIdSubject() <= 0) throw new InvalidNumberException("id da matéria", "ID da matéria deve ser maior do que 0");
+        if (subjectTeacher.getIdTeacher() <= 0) throw new InvalidNumberException("id do professor", "ID do professor deve ser maior do que 0");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
                     "INSERT INTO subject_teacher (id_subject, id_teacher) VALUES (?, ?)"
@@ -23,16 +29,15 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
             pstmt.setInt(1, subjectTeacher.getIdSubject());
             pstmt.setInt(2, subjectTeacher.getIdTeacher());
 
-            return pstmt.executeUpdate() > 0;
-
+            pstmt.executeUpdate();
         } catch(SQLException sqle){
             sqle.printStackTrace();
-            return false;
+            throw new DataException("Erro ao criar relação de matéria com professor", sqle);
         }
     }
 
     @Override
-    public Map<Integer, SubjectTeacher> findMany(int skip, int take) {
+    public Map<Integer, SubjectTeacher> findMany(int skip, int take) throws DataException {
         Map<Integer, SubjectTeacher> subjectTeacherMap = new HashMap<>();
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -54,6 +59,7 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
 
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao listar relações entre professores e matérias", sqle);
         }
 
         return subjectTeacherMap;
@@ -87,37 +93,45 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
     }
 
     @Override
-    public boolean update(SubjectTeacher subjectTeacher) {
+    public void update(SubjectTeacher subjectTeacher) throws DataException, NotFoundException, InvalidNumberException {
+        if (subjectTeacher.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+        if (subjectTeacher.getIdSubject() <= 0) throw new InvalidNumberException("id_subject", "ID da matéria deve ser maior do que 0");
+        if (subjectTeacher.getIdTeacher() <= 0) throw new InvalidNumberException("id_teacher", "ID do professor deve ser maior do que 0");
+
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
                      "UPDATE subject_teacher SET id_subject = ?, id_teacher = ? WHERE id = ?"
-             )){
+             )) {
             pstmt.setInt(1, subjectTeacher.getIdSubject());
             pstmt.setInt(2, subjectTeacher.getIdTeacher());
             pstmt.setInt(3, subjectTeacher.getId());
 
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException sqle){
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("subject_teacher", "id", String.valueOf(subjectTeacher.getId()));
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-            return false;
+            throw new DataException("Erro ao atualizar subject_teacher", sqle);
         }
     }
 
     @Override
-    public boolean delete(int id) {
-        try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM subject_teacher WHERE id = ?")){
+    public void delete(int id) throws DataException, NotFoundException, InvalidNumberException {
+        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "DELETE FROM subject_teacher WHERE id = ?"
+             )) {
             pstmt.setInt(1, id);
 
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException sqle){
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("subject_teacher", "id", String.valueOf(id));
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
-            return false;
+            throw new DataException("Erro ao deletar subject_teacher", sqle);
         }
     }
 
     @Override
-    public int totalCount(){
+    public int totalCount() throws DataException {
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) AS totalCount FROM subject_teacher");
             ResultSet rs = pstmt.executeQuery()){
@@ -127,6 +141,7 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
             }
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao contar relações entre professores e matérias", sqle);
         }
 
         return -1;

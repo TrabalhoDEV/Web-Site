@@ -1,7 +1,7 @@
 package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
-import com.example.schoolservlet.exceptions.DataAccessException;
+import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.InvalidNumberException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.RequiredFieldException;
@@ -145,7 +145,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
     }
 
     @Override
-    public void create(StudentSubject studentSubject) throws DataAccessException, RequiredFieldException {
+    public void create(StudentSubject studentSubject) throws DataException, RequiredFieldException {
         if (studentSubject.getStudentId() == 0) throw new RequiredFieldException("id do aluno");
         if (studentSubject.getSubjectId() == 0) throw new RequiredFieldException("id da matéria");
         try(Connection conn = PostgreConnection.getConnection();
@@ -169,12 +169,12 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
             pstmt.executeUpdate();
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao atribuir uma matéria a um usuário");
+            throw new DataException("Erro ao atribuir uma matéria a um usuário");
         }
     }
 
     @Override
-    public void update(StudentSubject studentSubject) throws InvalidNumberException, NotFoundException, DataAccessException{
+    public void update(StudentSubject studentSubject) throws InvalidNumberException, NotFoundException, DataException {
         if (studentSubject.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
 
         try(Connection conn = PostgreConnection.getConnection();
@@ -198,22 +198,22 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("matérias por aluno", "id", String.valueOf(studentSubject.getId()));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao atualizar um dado de uma matéria de um aluno");
+            throw new DataException("Erro ao atualizar um dado de uma matéria de um aluno");
         }
     }
 
     @Override
-    public void delete(int id) throws NotFoundException, DataAccessException, InvalidNumberException {
+    public void delete(int id) throws NotFoundException, DataException, InvalidNumberException {
         if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM student_subject WHERE id = ?")){
             pstmt.setInt(1, id);
 
-            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("matérias do aluno", "id", String.valueOf(id));
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("matérias por aluno", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao deletar matéria de um aluno");
+            throw new DataException("Erro ao deletar matéria de um aluno");
         }
     }
 }

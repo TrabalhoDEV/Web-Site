@@ -1,12 +1,11 @@
 package com.example.schoolservlet.servlets.auth;
 
 import com.example.schoolservlet.daos.AdminDAO;
-import com.example.schoolservlet.exceptions.DataAccessException;
-import com.example.schoolservlet.exceptions.RequiredFieldException;
+import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Admin;
 import com.example.schoolservlet.utils.InputValidation;
-import com.example.schoolservlet.utils.PasswordValidationEnum;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.*;
@@ -34,15 +33,15 @@ public class AdminLoginServlet extends HttpServlet {
 
 //        Getting the user input values:
         try {
-            cpf = request.getParameter("cpf").trim();
-            password = request.getParameter("password").trim();
+            cpf = request.getParameter("cpf");
+            password = request.getParameter("password");
 
 
             InputValidation.validateCpf(cpf);
             InputValidation.validateLoginPassword(password);
 
-            if (adminDAO.login(cpf, password)) {
-                Admin admin = adminDAO.findByDocument(cpf).get();
+            if (adminDAO.login(cpf.trim(), password.trim())) {
+                Admin admin = adminDAO.findByDocument(cpf);
                 AuthenticatedUser user = new AuthenticatedUser(admin.getId(), admin.getEmail(), UserRoleEnum.ADMIN);
                 session.setAttribute("user", user);
                 session.setMaxInactiveInterval(60 * 60);
@@ -59,9 +58,13 @@ public class AdminLoginServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
-        } catch (DataAccessException dae){
+        } catch (DataException dae){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", dae.getMessage());
+            request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
+        } catch (NotFoundException nfe){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            request.setAttribute("error", "Cpf e/ou senha incorretos");
             request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
         }
     }

@@ -14,12 +14,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 public class TeacherDAO implements GenericDAO<Teacher> {
     // Implement interface methods
     @Override
-    public int totalCount() throws DataAccessException {
+    public int totalCount() throws DataException {
         try(Connection conn = PostgreConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(
                         "SELECT COUNT(*) AS total_count FROM teacher");){
@@ -31,13 +30,13 @@ public class TeacherDAO implements GenericDAO<Teacher> {
 
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao contar professores", sqle);
+            throw new DataException("Erro ao contar professores", sqle);
         }
         return  -1;
     }
 
     @Override
-    public Map<Integer, Teacher> findMany(int skip, int take) throws DataAccessException{
+    public Map<Integer, Teacher> findMany(int skip, int take) throws DataException {
         Map<Integer, Teacher> teacherMap = new HashMap<>();
 
         try(Connection conn = PostgreConnection.getConnection();
@@ -58,7 +57,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             }
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao listar professores", sqle);
+            throw new DataException("Erro ao listar professores", sqle);
         }
         return teacherMap;
     }
@@ -86,7 +85,8 @@ public class TeacherDAO implements GenericDAO<Teacher> {
         return null;
     }
 
-    public Teacher findByUserName(String userName) {
+    public Teacher findByUserName(String userName) throws DataException, NotFoundException, RequiredFieldException{
+        if (userName == null || userName.isEmpty()) throw new RequiredFieldException("usuário");
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT id, name, email, username FROM teacher WHERE userName = ?")){
@@ -100,16 +100,15 @@ public class TeacherDAO implements GenericDAO<Teacher> {
                         rs.getString("email"),
                         rs.getString("username")
                 );
-            }
-
+            } else throw new NotFoundException("professor", "usuário", userName);
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao buscar professor pelo usuário", sqle);
         }
-        return null;
     }
 
     @Override
-    public void delete(int id) throws DataAccessException, NotFoundException, InvalidNumberException{
+    public void delete(int id) throws DataException, NotFoundException, InvalidNumberException{
         if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");;
 
         try(Connection conn = PostgreConnection.getConnection();
@@ -121,12 +120,12 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("professor", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao deletar professor", sqle);
+            throw new DataException("Erro ao deletar professor", sqle);
         }
     }
 
     @Override
-    public void create(Teacher teacher) throws DataAccessException, RequiredFieldException {
+    public void create(Teacher teacher) throws DataException, RequiredFieldException {
         if (teacher.getName() == null || teacher.getName().isEmpty()) throw new RequiredFieldException("nome");
         if (teacher.getEmail() == null || teacher.getEmail().isEmpty()) throw new RequiredFieldException("email");
         if (teacher.getUsername() == null || teacher.getUsername().isEmpty()) throw new RequiredFieldException("usuário");
@@ -144,12 +143,12 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             pstmt.executeUpdate();
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao criar professor", sqle);
+            throw new DataException("Erro ao criar professor", sqle);
         }
     }
 
     @Override
-    public void update(Teacher teacher) throws DataAccessException, NotFoundException, InvalidNumberException, RequiredFieldException {
+    public void update(Teacher teacher) throws DataException, NotFoundException, InvalidNumberException, RequiredFieldException {
         if (teacher.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
         if (teacher.getName() == null || teacher.getName().isEmpty()) throw new RequiredFieldException("nome");
         if (teacher.getEmail() == null || teacher.getEmail().isEmpty()) throw new RequiredFieldException("email");
@@ -167,7 +166,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("professor", "id", String.valueOf(teacher.getId()));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataAccessException("Erro ao atualizar professor", sqle);
+            throw new DataException("Erro ao atualizar professor", sqle);
         }
     }
 
