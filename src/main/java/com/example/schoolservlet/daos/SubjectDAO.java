@@ -4,6 +4,7 @@ import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.utils.Constants;
+import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 import java.sql.*;
 import java.util.HashMap;
@@ -34,14 +35,15 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao listar matérias", sqle);
         }
 
         return subjects;
     }
 
     @Override
-    public Subject findById(int id) throws DataException, NotFoundException, InvalidNumberException{
-        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    public Subject findById(int id) throws DataException, NotFoundException, ValidationException{
+        InputValidation.validateId(id, "id");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM subject WHERE id = ?")) {
@@ -63,21 +65,18 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
     @Override
     public int totalCount() throws DataException {
-        int totalCount = -1;
-
         try(Connection conn = PostgreConnection.getConnection();
             Statement stmt = conn.createStatement()){
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS totalCount FROM subject");
 
             if (rs.next()){
-                totalCount = rs.getInt("totalCount");
+                return rs.getInt("totalCount");
             }
+            return -1;
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao contar matérias");
         }
-
-        return totalCount;
     }
 
 
@@ -104,8 +103,8 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
 
     @Override
-    public void update(Subject subject) throws NotFoundException, DataException, InvalidNumberException, RequiredFieldException, InvalidDateException {
-        if (subject.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    public void update(Subject subject) throws NotFoundException, DataException, ValidationException {
+        InputValidation.validateId(subject.getId(), "id");
         if (subject.getDeadline() == null) throw new RequiredFieldException("data final");
         if (subject.getDeadline().before(new Date())) throw new InvalidDateException("data final", "Data final deve ser depois da data de hoje");
 
@@ -124,8 +123,8 @@ public class SubjectDAO implements GenericDAO<Subject> {
     }
 
     @Override
-    public void delete(int id) throws DataException, NotFoundException, InvalidNumberException {
-        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    public void delete(int id) throws DataException, NotFoundException, ValidationException {
+        InputValidation.validateId(id, "id");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM subject WHERE id = ?")){

@@ -1,11 +1,9 @@
 package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
-import com.example.schoolservlet.exceptions.DataException;
-import com.example.schoolservlet.exceptions.InvalidNumberException;
-import com.example.schoolservlet.exceptions.NotFoundException;
-import com.example.schoolservlet.exceptions.RequiredFieldException;
+import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.SchoolClass;
+import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 
 import java.sql.*;
@@ -56,8 +54,9 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
     }
 
     @Override
-    public SchoolClass findById(int id) throws InvalidNumberException, DataException, NotFoundException {
-        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    public SchoolClass findById(int id) throws DataException, NotFoundException, ValidationException {
+        InputValidation.validateId(id, "id");
+
         try(
                 Connection conn = PostgreConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement("SELECT id, school_year FROM school_class WHERE id = ?")
@@ -79,8 +78,8 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
     }
 
     @Override
-    public void update(SchoolClass schoolClass) throws DataException, InvalidNumberException, NotFoundException, RequiredFieldException{
-        if (schoolClass.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    public void update(SchoolClass schoolClass) throws DataException, NotFoundException, ValidationException{
+        InputValidation.validateId(schoolClass.getId(), "id");
         if (schoolClass.getSchoolYear() == null || schoolClass.getSchoolYear().isEmpty()) throw new RequiredFieldException("nome da turma");
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -97,8 +96,8 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
     }
 
     @Override
-    public void delete(int id) throws InvalidNumberException, DataException, NotFoundException {
-        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    public void delete(int id) throws DataException, NotFoundException, ValidationException {
+        InputValidation.validateId(id, "id");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM school_class WHERE id = ?")){
@@ -120,11 +119,10 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
             if (rs.next()){
                 return rs.getInt("totalCount");
             }
+            return -1;
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao contar turmas", sqle);
         }
-
-        return -1;
     }
 }

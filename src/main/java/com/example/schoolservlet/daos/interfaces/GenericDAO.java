@@ -29,26 +29,26 @@ public interface GenericDAO<T>{
      * @param id is record's id
      * @return   an object that represents the record
      */
-    T findById(int id) throws NotFoundException, DataException, InvalidNumberException;
+    T findById(int id) throws NotFoundException, DataException, ValidationException;
 
     /**
      * Method that deletes one record by its id
      * @param id is record's id
      * @return   true if the deletion happen
      */
-    void delete(int id) throws ValidationException, NotFoundException, DataException, InvalidNumberException;
+    void delete(int id) throws NotFoundException, DataException, ValidationException;
 
     /**
      * Method that deletes one record by its id
      * @param object is new record's representation
      * @return   true if the creation happen
      */
-    void create(T object) throws DataException, RequiredFieldException, InvalidDateException, InvalidNumberException;
+    void create(T object) throws DataException, ValidationException;
 
     /**
      * Method that updates a record
      * @param object is record's new representation with same id
      * @return   true if the update happen
      */
-    void update(T object) throws NotFoundException, DataException, InvalidNumberException, RequiredFieldException, InvalidDateException;
+    void update(T object) throws NotFoundException, DataException, ValidationException;
 }
