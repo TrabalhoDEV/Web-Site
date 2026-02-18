@@ -6,6 +6,7 @@ import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Admin;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputNormalizer;
+import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
@@ -18,7 +19,9 @@ import java.util.Map;
 
 public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
     @Override
-    public Admin findById(int id) throws DataException, NotFoundException{
+    public Admin findById(int id) throws DataException, NotFoundException, ValidationException{
+        InputValidation.validateId(id, "id");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM admin WHERE id = ?")){
             pstmt.setInt(1, id);
@@ -89,21 +92,18 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
 
     @Override
     public int totalCount() throws DataException {
-        int totalCount = -1;
-
         try(Connection conn = PostgreConnection.getConnection();
             Statement stmt = conn.createStatement()){
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS totalCount FROM admin");
 
             if (rs.next()){
-                totalCount = rs.getInt("totalCount");
+                return rs.getInt("totalCount");
             }
+            return -1;
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao contar admins", sqle);
         }
-
-        return totalCount;
     }
 
     @Override
@@ -125,8 +125,8 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
         }
     }
     @Override
-    public void update(Admin admin) throws NotFoundException, InvalidNumberException, DataException {
-        if (admin.getId() <= 0 ) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    public void update(Admin admin) throws NotFoundException, DataException, ValidationException {
+        InputValidation.validateId(admin.getId(), "id");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET document = ?, email = ? WHERE id = ?")){
@@ -140,14 +140,15 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
             throw new DataException("Erro ao atualizar admin", sqle);
         }
     }
-    public void updatePassword(int id, String newPassword) throws NotFoundException, DataException {
+    public void updatePassword(int id, String newPassword) throws NotFoundException, DataException, ValidationException {
+        InputValidation.validateId(id, "id");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET password = ? WHERE id = ?")){
             pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt(12)));
             pstmt.setInt(2, id);
 
             if(pstmt.executeUpdate() <= 0) throw new NotFoundException("admin", "id", String.valueOf(id));
-
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao atualizar senha de admin", sqle);
@@ -156,7 +157,7 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
 
     @Override
     public void delete(int id) throws ValidationException, NotFoundException, DataException {
-        if (id <= 0) throw new RequiredFieldException("id");
+        InputValidation.validateId(id, "id");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM admin WHERE id  = ?")){
@@ -184,12 +185,10 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
                 String hash = rs.getString("password");
                 return BCrypt.checkpw(password, hash);
             }
-
+            return false;
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new DataException("Erro ao logar admin", sqle);
         }
-
-        return false;
     }
 }

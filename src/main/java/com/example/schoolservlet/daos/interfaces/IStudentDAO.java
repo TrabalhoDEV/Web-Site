@@ -10,7 +10,7 @@ public interface IStudentDAO {
      * @param idSchoolClass is new school class' id
      * @return              true if the update happen
      */
-    void updateIdSchoolClass(int id, int idSchoolClass) throws NotFoundException, DataException, InvalidNumberException;
+    void updateIdSchoolClass(int id, int idSchoolClass) throws NotFoundException, DataException, ValidationException;
 
     /**
      * Method used to change student password
@@ -18,14 +18,14 @@ public interface IStudentDAO {
      * @param password is student's new password
      * @return         if the change happen true, else false
      */
-    void updatePassword(int id, String password) throws NotFoundException, DataException, InvalidNumberException;
+    void updatePassword(int id, String password) throws NotFoundException, DataException, ValidationException;
 
     /**
      * Method user to confirm student's enrollment, after the pre-enrollment
      * @param student is student's object with all fields
      * @return        true if the enrollment is concluded
      */
-    void enrollIn(Student student) throws NotFoundException, DataException, InvalidNumberException, ValidationException;
+    void enrollIn(Student student) throws NotFoundException, DataException, ValidationException;
 
     /**
      * Method that validates if student can be logged in
@@ -33,5 +33,5 @@ public interface IStudentDAO {
      * @param password is input's password
      * @return         true if student password matches the hash in database
      */
-    boolean login(String enrollment, String password) throws RequiredFieldException, NotFoundException, DataException;
+    boolean login(String enrollment, String password) throws NotFoundException, DataException, ValidationException;
 }

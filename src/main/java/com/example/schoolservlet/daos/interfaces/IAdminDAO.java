@@ -1,8 +1,8 @@
 package com.example.schoolservlet.daos.interfaces;
 
 import com.example.schoolservlet.exceptions.DataException;
-import com.example.schoolservlet.exceptions.RequiredFieldException;
+import com.example.schoolservlet.exceptions.ValidationException;
 
 public interface IAdminDAO {
-    boolean login(String cpf, String password) throws DataException, RequiredFieldException;
+    boolean login(String cpf, String password) throws DataException, ValidationException;
 }

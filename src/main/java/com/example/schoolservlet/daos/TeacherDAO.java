@@ -5,6 +5,7 @@ import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputNormalizer;
+import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -148,15 +149,15 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     @Override
-    public void update(Teacher teacher) throws DataException, NotFoundException, InvalidNumberException, RequiredFieldException {
-        if (teacher.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    public void update(Teacher teacher) throws DataException, NotFoundException, ValidationException {
+        InputValidation.validateId(teacher.getId(), "id");
         if (teacher.getName() == null || teacher.getName().isEmpty()) throw new RequiredFieldException("nome");
         if (teacher.getEmail() == null || teacher.getEmail().isEmpty()) throw new RequiredFieldException("email");
         if (teacher.getUsername() == null || teacher.getUsername().isEmpty()) throw new RequiredFieldException("usuário");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
-                "UPDATE teacher SET NAME = ?, EMAIL = ?, USERNAME = ? WHERE ID = ?"
+                "UPDATE teacher SET name = ?, email = ?, username = ? WHERE id = ?"
         )){
             pstmt.setString(1, teacher.getName());
             pstmt.setString(2, teacher.getName());
@@ -171,22 +172,27 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     // Auth Methods:
-    public boolean updatePassword(int id, String newPassword){
+    public void updatePassword(int id, String newPassword) throws DataException, NotFoundException, ValidationException{
+        InputValidation.validateId(id, "id");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
-                    "UPDATE teacher SET PASSWORD = ? WHERE ID = ?"
+                    "UPDATE teacher SET password = ? WHERE id = ?"
             )){
             pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt(12)));
             pstmt.setInt(2, id);
 
-            return pstmt.executeUpdate() > 0;
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("professor", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao atualizar senha", sqle);
         }
-        return false;
     }
 
-    public boolean login(String username, String password){
+    public boolean login(String username, String password) throws DataException, NotFoundException, ValidationException{
+        if (username == null || username.isBlank()) throw new RequiredFieldException("usuário");
+        if (password == null || password.isBlank()) throw new RequiredFieldException("senha");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT password FROM teacher WHERE username = ?"
@@ -196,11 +202,10 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 return BCrypt.checkpw(password, rs.getString("password"));
-            }
-
+            } else throw new NotFoundException("professor", "usuário", username);
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao logar", sqle);
         }
-        return false;
     }
 }

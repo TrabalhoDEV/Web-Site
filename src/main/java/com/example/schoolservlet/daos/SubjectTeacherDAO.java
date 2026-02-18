@@ -4,7 +4,11 @@ import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.InvalidNumberException;
 import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.models.SubjectTeacher;
+import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 
 import java.sql.Connection;
@@ -17,17 +21,17 @@ import java.util.Map;
 public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
 
     @Override
-    public void create(SubjectTeacher subjectTeacher) throws DataException, InvalidNumberException {
-        if (subjectTeacher.getIdSubject() <= 0) throw new InvalidNumberException("id da matéria", "ID da matéria deve ser maior do que 0");
-        if (subjectTeacher.getIdTeacher() <= 0) throw new InvalidNumberException("id do professor", "ID do professor deve ser maior do que 0");
+    public void create(SubjectTeacher subjectTeacher) throws DataException, ValidationException {
+        InputValidation.validateId(subjectTeacher.getTeacher().getId(), "id_teacher");
+        InputValidation.validateId(subjectTeacher.getSubject().getId(), "id_subject");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
                     "INSERT INTO subject_teacher (id_subject, id_teacher) VALUES (?, ?)"
             )){
 
-            pstmt.setInt(1, subjectTeacher.getIdSubject());
-            pstmt.setInt(2, subjectTeacher.getIdTeacher());
+            pstmt.setInt(1, subjectTeacher.getSubject().getId());
+            pstmt.setInt(2, subjectTeacher.getTeacher().getId());
 
             pstmt.executeUpdate();
         } catch(SQLException sqle){
@@ -42,7 +46,17 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
-                     "SELECT id, id_subject, id_teacher FROM subject_teacher ORDER BY id LIMIT ? OFFSET ?"
+                     "SELECT st.id, " +
+                             "st.id_subject, " +
+                             "st.id_teacher, " +
+                             "t.name AS teacher_name, " +
+                             "t.email AS teacher_email, " +
+                             "s.name AS subject_name, " +
+                             "s.deadline" +
+                             "FROM subject_teacher st " +
+                             "JOIN teacher t ON t.id = st.id_teacher " +
+                             "JOIN subject s ON s.id = id_subject " +
+                             "ORDER BY st.id LIMIT ? OFFSET ?"
              )){
             pstmt.setInt(1, take);
             pstmt.setInt(2, skip);
@@ -50,10 +64,19 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()){
+                Teacher teacher = new Teacher();
+                teacher.setId(rs.getInt("id_teacher"));
+                teacher.setName(rs.getString("teacher_name"));
+                teacher.setEmail(rs.getString("teacher_email"));
+
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id_subject"));
+                subject.setName(rs.getString("subject_name"));
+                subject.setDeadline(rs.getDate("deadline"));
                 subjectTeacherMap.put(rs.getInt("id"), new SubjectTeacher(
                         rs.getInt("id"),
-                        rs.getInt("id_subject"),
-                        rs.getInt("id_teacher")
+                        subject,
+                        teacher
                 ));
             }
 
@@ -66,11 +89,23 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
     }
 
     @Override
-    public SubjectTeacher findById(int id){
+    public SubjectTeacher findById(int id) throws DataException, ValidationException{
+        InputValidation.validateId(id, "id");
+
         try(
                 Connection conn = PostgreConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(
-                        "SELECT id, id_subject, id_teacher FROM subject_teacher WHERE id = ?"
+                        "SELECT st.id, " +
+                                "st.id_subject, " +
+                                "st.id_teacher, " +
+                                "t.name AS teacher_name, " +
+                                "t.email AS teacher_email, " +
+                                "s.name AS subject_name, " +
+                                "s.deadline" +
+                                "FROM subject_teacher st " +
+                                "JOIN teacher t ON t.id = st.id_teacher " +
+                                "JOIN subject s ON s.id = id_subject " +
+                                "WHERE st.id = ?"
                 )
         ) {
             pstmt.setInt(1, id);
@@ -78,32 +113,40 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()){
+                Teacher teacher = new Teacher();
+                teacher.setId(rs.getInt("id_teacher"));
+                teacher.setName(rs.getString("teacher_name"));
+                teacher.setEmail(rs.getString("teacher_email"));
+
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id_subject"));
+                subject.setName(rs.getString("subject_name"));
+                subject.setDeadline(rs.getDate("deadline"));
                 return new SubjectTeacher(
                         rs.getInt("id"),
-                        rs.getInt("id_subject"),
-                        rs.getInt("id_teacher")
+                        subject,
+                        teacher
                 );
             }
-
+            return null;
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+            throw new DataException("Erro ao buscar subject_teacher pelo id", sqle);
         }
-
-        return null;
     }
 
     @Override
-    public void update(SubjectTeacher subjectTeacher) throws DataException, NotFoundException, InvalidNumberException {
-        if (subjectTeacher.getId() <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
-        if (subjectTeacher.getIdSubject() <= 0) throw new InvalidNumberException("id_subject", "ID da matéria deve ser maior do que 0");
-        if (subjectTeacher.getIdTeacher() <= 0) throw new InvalidNumberException("id_teacher", "ID do professor deve ser maior do que 0");
+    public void update(SubjectTeacher subjectTeacher) throws DataException, NotFoundException, ValidationException {
+        InputValidation.validateId(subjectTeacher.getId(), "id");
+        InputValidation.validateId(subjectTeacher.getTeacher().getId(), "id_teacher");
+        InputValidation.validateId(subjectTeacher.getSubject().getId(), "id_subject");
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
                      "UPDATE subject_teacher SET id_subject = ?, id_teacher = ? WHERE id = ?"
              )) {
-            pstmt.setInt(1, subjectTeacher.getIdSubject());
-            pstmt.setInt(2, subjectTeacher.getIdTeacher());
+            pstmt.setInt(1, subjectTeacher.getSubject().getId());
+            pstmt.setInt(2, subjectTeacher.getTeacher().getId());
             pstmt.setInt(3, subjectTeacher.getId());
 
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("subject_teacher", "id", String.valueOf(subjectTeacher.getId()));
@@ -114,8 +157,8 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
     }
 
     @Override
-    public void delete(int id) throws DataException, NotFoundException, InvalidNumberException {
-        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    public void delete(int id) throws DataException, NotFoundException, ValidationException {
+        InputValidation.validateId(id, "id");
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
@@ -139,11 +182,10 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
             if (rs.next()){
                 return rs.getInt("totalCount");
             }
+            return -1;
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao contar relações entre professores e matérias", sqle);
         }
-
-        return -1;
     }
 }

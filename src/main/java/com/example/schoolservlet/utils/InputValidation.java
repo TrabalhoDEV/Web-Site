@@ -29,7 +29,8 @@ public class InputValidation {
     public static void validateEmail(String email) throws ValidationException{
         if (email == null || email.isEmpty()) throw new RequiredFieldException("email");
         if (!StandardCharsets.US_ASCII.newEncoder().canEncode(email)) throw new ValidationException("Email contém caracteres inválidos");
-        if (email.length() > Constants.MAX_EMAIL_LENGHT) throw new MaxLenghtException("email", Constants.MAX_EMAIL_LENGHT);
+        if (email.length() > Constants.MAX_EMAIL_LENGTH) throw new MaxLengthException("email", Constants.MAX_EMAIL_LENGTH);
+        if (email.length() < Constants.MIN_EMAIL_LENGTH) throw new MinLengthException("email", Constants.MIN_EMAIL_LENGTH);
         if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) throw new RegexException("email");
     }
 
@@ -41,8 +42,8 @@ public class InputValidation {
     public static void validatePassword(String password) throws ValidationException {
         if (password == null || password.isEmpty()) throw new RequiredFieldException("senha");
 
-        if (password.length() > Constants.MAX_PASSWORD_LENGTH) throw new MaxLenghtException("senha", Constants.MAX_PASSWORD_LENGTH);
-        if (password.length() < Constants.MIN_PASSWORD_LENGHT) throw new MinLenghtException("senha", Constants.MIN_PASSWORD_LENGHT);
+        if (password.length() > Constants.MAX_PASSWORD_LENGTH) throw new MaxLengthException("senha", Constants.MAX_PASSWORD_LENGTH);
+        if (password.length() < Constants.MIN_PASSWORD_LENGTH) throw new MinLengthException("senha", Constants.MIN_PASSWORD_LENGTH);
 
         boolean hasUppercase = false;
         boolean hasLowercase = false;
@@ -101,8 +102,8 @@ public class InputValidation {
      */
     public static void validateUserName(String userName) throws ValidationException{
         if (userName == null || userName.isEmpty()) throw new RequiredFieldException("usuário");
-        if (userName.length() > Constants.MAX_TEACHER_USERNAME_LENGHT) throw new MaxLenghtException("usuário", Constants.MAX_TEACHER_USERNAME_LENGHT);
-        if (userName.length() < Constants.MIN_TEACHER_USERNAME_LENGHT) throw new MinLenghtException("usuário", Constants.MIN_TEACHER_USERNAME_LENGHT);
+        if (userName.length() > Constants.MAX_TEACHER_USERNAME_LENGTH) throw new MaxLengthException("usuário", Constants.MAX_TEACHER_USERNAME_LENGTH);
+        if (userName.length() < Constants.MIN_TEACHER_USERNAME_LENGTH) throw new MinLengthException("usuário", Constants.MIN_TEACHER_USERNAME_LENGTH);
         if (!userName.matches("^[^\\s]+\\.[^\\s]+$")) throw new RegexException("usuário");
     }
 
@@ -115,4 +116,14 @@ public class InputValidation {
         return studentClass >= Constants.MIN_STUDENT_CLASS && studentClass <= Constants.MAX_STUDENT_CLASS;
     }
 
+    /**
+     * Static method that validates if ID value is greater than 0
+     * @param id is the ID that user want to find, update or delete
+     * @param field is the name of field ID, if field is ID pass id, but if field is id_table pass id_table
+     * @throws ValidationException  if id is empty or less than 0
+     */
+    public static void validateId(int id, String field) throws ValidationException{
+        if (id == 0) throw new RequiredFieldException(field);
+        if (id < 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    }
 }
