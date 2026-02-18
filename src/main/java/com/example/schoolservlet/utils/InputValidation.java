@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
  * This allows us to change business' rules of validation much easier than if we use that
  * directed in the Servlets or DAOs
  */
-public class ValidationService {
+public class InputValidation {
     /**
      * Static method that verifies if cpf is valid
      * @param cpf Is user's cpf
@@ -27,6 +27,7 @@ public class ValidationService {
     public static boolean validateEmail(String email){
         if (email == null || email.isEmpty()) return false;
         if (!StandardCharsets.US_ASCII.newEncoder().canEncode(email)) return false;
+        if (email.length() > 355) return false;
         return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
 
@@ -38,8 +39,8 @@ public class ValidationService {
     public static PasswordValidationEnum validatePassword(String password){
         if (password == null || password.isEmpty()) return PasswordValidationEnum.IS_NULL;
 
-        if (password.length()>28) return PasswordValidationEnum.MAX_LENGHT_EXCEEDED;
-        if (password.length()<8) return PasswordValidationEnum.MIN_LENGHT_NOT_REACHED;
+        if (password.length() > Constants.MAX_PASSWORD_LENGTH) return PasswordValidationEnum.MAX_LENGHT_EXCEEDED;
+        if (password.length() < Constants.MIN_PASSWORD_LENGHT) return PasswordValidationEnum.MIN_LENGHT_NOT_REACHED;
 
         boolean hasUppercase = false;
         boolean hasLowercase = false;
@@ -70,7 +71,7 @@ public class ValidationService {
      * @return      if grade is valid returns true else returns false
      */
     public static boolean validateGrade(double grade){
-        return grade >= 0 && grade <= 10;
+        return grade >= Constants.MIN_GRADE && grade <= Constants.MAX_GRADE;
     }
 
     /**
@@ -81,5 +82,16 @@ public class ValidationService {
     public static boolean validateEnrollment(String enrollment){
         if (enrollment == null || enrollment.isEmpty()) return false;
         return enrollment.matches("^\\d{6}$");
+    }
+
+    /**
+     * Static method that validates userName
+     * @param userName Is the teacher userNam
+     * @return         true if userName has a valid format
+     */
+    public static boolean validateUserName(String userName){
+        if (userName == null || userName.isEmpty()) return false;
+        if (userName.length() > 50) return false;
+        return userName.matches("^[^\\s]+\\.[^\\s]+$");
     }
 }

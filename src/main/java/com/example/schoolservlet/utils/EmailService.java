@@ -72,7 +72,7 @@ public class EmailService {
             //  Create a JSON with all information:
             String json =
                     "{"
-                            + "\"sender\": {\"name\": \"Secreatária escolar\", \"email\": \"" + BREVO_EMAIL + "\"},"
+                            + "\"sender\": {\"name\": \"Secreatária Vértice\", \"email\": \"" + BREVO_EMAIL + "\"},"
                             + "\"to\": [{\"email\": \"" + destination + "\"}],"
                             + "\"subject\": \"" + topic + "\","
                             + "\"htmlContent\": \"" + html + "\""
