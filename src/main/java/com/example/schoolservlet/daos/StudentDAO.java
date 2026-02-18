@@ -3,6 +3,7 @@ package com.example.schoolservlet.daos;
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentDAO;
 import com.example.schoolservlet.models.Student;
+import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.OutputFormatService;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
@@ -104,6 +105,9 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
             sqle.printStackTrace();
+
+            if (sqle.getSQLState().equals("23505")){throw new IllegalArgumentException(Constants.UNIQUE_VIOLATION_MESSAGE);}
+
             return false;
         }
     }

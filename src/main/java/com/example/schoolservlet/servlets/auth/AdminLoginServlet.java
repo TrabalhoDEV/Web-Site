@@ -63,7 +63,7 @@ public class AdminLoginServlet extends HttpServlet {
 
 
 //            TO DO: add context in AdminHomeServlet and change this redirect that brings all information necessarily to admin/index.jsp
-            response.sendRedirect(request.getContextPath() + "/AdminHomeServlet");
+            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp").forward(request, response);
         } else {
             request.setAttribute("error", "Cpf e/ou senha incorretos");
             request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
