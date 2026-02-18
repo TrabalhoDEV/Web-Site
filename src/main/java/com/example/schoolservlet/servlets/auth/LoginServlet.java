@@ -69,7 +69,7 @@ public class LoginServlet extends HttpServlet {
         }
 
         try {
-            InputValidation.validateLoginPassword(password);
+            InputValidation.validateIsNull("senha", password);
 
             if (role == UserRoleEnum.TEACHER) {
                 try {

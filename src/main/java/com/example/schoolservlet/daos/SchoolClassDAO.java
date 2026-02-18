@@ -8,7 +8,9 @@ import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SchoolClassDAO implements GenericDAO<SchoolClass> {
@@ -52,6 +54,28 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
         }
 
         return schoolClassMap;
+    }
+
+    public List<SchoolClass> findAll() throws DataException {
+        List<SchoolClass> schoolClasses = new ArrayList<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("SELECT id, school_year FROM school_class ORDER BY id")) {
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                schoolClasses.add(new SchoolClass(
+                        rs.getInt("id"),
+                        rs.getString("school_year")
+                ));
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar turmas", sqle);
+        }
+
+        return schoolClasses;
     }
 
     @Override
