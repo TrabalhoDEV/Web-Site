@@ -115,7 +115,7 @@ public class SendCodeServlet extends HttpServlet {
                     session.setAttribute("role", UserRoleEnum.ADMIN);
                     session.setMaxInactiveInterval(60 * 15);
                 }
-            } catch (DataException | RequiredFieldException e) {
+            } catch (DataException | ValidationException e) {
                 request.setAttribute("error", e.getMessage());
                 hasException = true;
             } catch (NotFoundException nfe){
