@@ -45,7 +45,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     }
 
     @Override
-    public Map<Integer, Student> findMany(int skip, int take) {
+    public Map<Integer, Student> findMany(int skip, int take) throws DataException{
         Map<Integer, Student> students = new HashMap<>();
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -66,11 +66,11 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
                 students.put(rs.getInt("id"), student);
             }
 
+            return students;
         } catch (SQLException sqle){
-            sqle.printStackTrace();;
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar alunos", sqle);
         }
-
-        return students;
     }
 
     @Override
@@ -92,7 +92,6 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     @Override
     public void create(Student student) throws DataException, ValidationException {
         if (student.getCpf() == null || student.getCpf().isEmpty()) throw new RequiredFieldException("cpf");
-        InputValidation.validateId(student.getId(), "id");
         InputValidation.validateId(student.getIdSchoolClass(), "id_school_class");
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -138,7 +137,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             pstmt.setInt(1, idSchoolClass);
             pstmt.setInt(2, id);
 
-            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "matrícula", String.valueOf(idSchoolClass));
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "matrícula", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao atualizar id da sala", sqle);
@@ -197,10 +196,10 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
 
     @Override
     public boolean login(String enrollment, String password) throws NotFoundException, DataException, ValidationException {
-        int id = InputNormalizer.normalizeEnrollment(enrollment);
-        InputValidation.validateId(id, "id");
         if (enrollment == null || enrollment.isEmpty()) throw new RequiredFieldException("matrícula");
         if (password == null || password.isEmpty()) throw new RequiredFieldException("senha");
+        InputValidation.validateEnrollment(enrollment);
+        int id = InputNormalizer.normalizeEnrollment(enrollment);
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT password FROM student WHERE id = ?")){

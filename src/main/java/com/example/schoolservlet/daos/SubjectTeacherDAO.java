@@ -8,6 +8,7 @@ import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.models.SubjectTeacher;
 import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 
@@ -52,14 +53,14 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
                              "t.name AS teacher_name, " +
                              "t.email AS teacher_email, " +
                              "s.name AS subject_name, " +
-                             "s.deadline" +
+                             "s.deadline " +
                              "FROM subject_teacher st " +
                              "JOIN teacher t ON t.id = st.id_teacher " +
-                             "JOIN subject s ON s.id = id_subject " +
+                             "JOIN subject s ON s.id = st.id_subject " +
                              "ORDER BY st.id LIMIT ? OFFSET ?"
              )){
-            pstmt.setInt(1, take);
-            pstmt.setInt(2, skip);
+            pstmt.setInt(1, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(2, skip < 0 ? 0 : skip);
 
             ResultSet rs = pstmt.executeQuery();
 
@@ -89,7 +90,7 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
     }
 
     @Override
-    public SubjectTeacher findById(int id) throws DataException, ValidationException{
+    public SubjectTeacher findById(int id) throws DataException, ValidationException, NotFoundException{
         InputValidation.validateId(id, "id");
 
         try(
@@ -101,10 +102,10 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
                                 "t.name AS teacher_name, " +
                                 "t.email AS teacher_email, " +
                                 "s.name AS subject_name, " +
-                                "s.deadline" +
+                                "s.deadline " +
                                 "FROM subject_teacher st " +
                                 "JOIN teacher t ON t.id = st.id_teacher " +
-                                "JOIN subject s ON s.id = id_subject " +
+                                "JOIN subject s ON s.id = st.id_subject " +
                                 "WHERE st.id = ?"
                 )
         ) {
@@ -127,8 +128,7 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
                         subject,
                         teacher
                 );
-            }
-            return null;
+            } else throw new NotFoundException("subject_teacher", "id", String.valueOf(id));
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar subject_teacher pelo id", sqle);

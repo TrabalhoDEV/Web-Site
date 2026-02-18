@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
     @Override
-    public Map<Integer, StudentSubject> findMany(int skip, int take) {
+    public Map<Integer, StudentSubject> findMany(int skip, int take) throws DataException{
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
 
         try(Connection conn = PostgreConnection.getConnection();
@@ -26,11 +26,11 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                     "ss.obs, " +
                     "ss.grade1, " +
                     "ss.grade2, " +
-                    "st.id AS student_id, " +
+                    "st.id AS id_student, " +
                     "st.name AS student_name, " +
                     "st.cpf AS student_cpf, " +
                     "st.email AS student_email, " +
-                    "sb.id AS subject_id, " +
+                    "sb.id AS id_subject, " +
                     "sb.name AS subject_name, " +
                     "sb.deadline AS subject_deadline " +
                     "FROM student_subject ss JOIN student st ON st.id = ss.student_id JOIN subject sb " +
@@ -64,11 +64,12 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                         )
                 );
             }
+
+            return studentsSubjects;
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao listar student_subject", sqle);
         }
-
-        return studentsSubjects;
     }
 
     @Override
@@ -81,11 +82,11 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                     "ss.obs, " +
                     "ss.grade1, " +
                     "ss.grade2, " +
-                    "st.id AS student_id, " +
+                    "st.id AS id_student, " +
                     "st.name AS student_name, " +
                     "st.cpf AS student_cpf, " +
                     "st.email AS student_email, " +
-                    "sb.id AS subject_id, " +
+                    "sb.id AS id_subject, " +
                     "sb.name AS subject_name, " +
                     "sb.deadline AS subject_deadline " +
                     "FROM student_subject ss JOIN student st ON st.id = ss.student_id JOIN subject sb " +
@@ -170,6 +171,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
     @Override
     public void update(StudentSubject studentSubject) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId(studentSubject.getId(), "id");
+        InputValidation.validateId(studentSubject.getSubject().getId(),"id da matéria");
+        InputValidation.validateId(studentSubject.getStudent().getId(), "id do aluno");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE student_subject SET " +

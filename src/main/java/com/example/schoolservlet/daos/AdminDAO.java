@@ -43,7 +43,7 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
         }
     }
 
-    public Admin findByDocument(String document) throws DataException, RequiredFieldException, NotFoundException{
+    public Admin findByDocument(String document) throws DataException, NotFoundException, ValidationException{
         if (document == null || document.isEmpty()) throw new RequiredFieldException("cpf");
 
         try(Connection conn = PostgreConnection.getConnection();
@@ -57,7 +57,7 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
                 admin.setDocument(rs.getString("document"));
                 admin.setEmail(rs.getString("email"));
                 return admin;
-            } else throw new NotFoundException("admin", "id", document);
+            } else throw new NotFoundException("admin", "document", document);
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar admin", sqle);

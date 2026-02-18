@@ -59,7 +59,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
             } else throw new NotFoundException("matéria", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            throw new DataException("Erro ao busca matéria");
+            throw new DataException("Erro ao buscar matéria", sqle);
         }
     }
 
@@ -91,7 +91,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO subject" +
                     "(name, deadline) VALUES (?, ?)")){
             pstmt.setString(1, subject.getName());
-            pstmt.setDate(2, (java.sql.Date) subject.getDeadline());
+            pstmt.setDate(2, new java.sql.Date(subject.getDeadline().getTime()));
 
             pstmt.executeUpdate();
         } catch (SQLException sqle){
@@ -104,6 +104,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
     @Override
     public void update(Subject subject) throws NotFoundException, DataException, ValidationException {
+        if (subject.getName() == null || subject.getName().isEmpty()) throw new RequiredFieldException("nome");
         InputValidation.validateId(subject.getId(), "id");
         if (subject.getDeadline() == null) throw new RequiredFieldException("data final");
         if (subject.getDeadline().before(new Date())) throw new InvalidDateException("data final", "Data final deve ser depois da data de hoje");
@@ -112,7 +113,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
             PreparedStatement pstmt = conn.prepareStatement("UPDATE subject " +
                     "SET name = ?, deadline = ? WHERE id = ?")){
             pstmt.setString(1, subject.getName());
-            pstmt.setDate(2, (java.sql.Date) subject.getDeadline());
+            pstmt.setDate(2, new java.sql.Date(subject.getDeadline().getTime()));
             pstmt.setInt(3, subject.getId());
 
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("matéria", "id", String.valueOf(subject.getId()));
