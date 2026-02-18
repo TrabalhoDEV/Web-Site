@@ -1,10 +1,12 @@
 package com.example.schoolservlet.servlets.admin;
 
+import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.StudentDAO;
-import com.example.schoolservlet.exceptions.DataAccessException;
-import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.exceptions.*;
+import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.Constants;
+import com.example.schoolservlet.utils.FieldAlreadyUsedValidation;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
@@ -18,17 +20,21 @@ import jakarta.servlet.http.HttpSession;
 
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Servlet responsible for registering new students in the system.
  * This endpoint handles student registration with CPF and school year/grade validation.
  * Only administrators are allowed to access this functionality.
  */
-@WebServlet("/admin/sign-student")
-public class SignStudentServlet extends HttpServlet {
+@WebServlet(name = "admin-add-student",value = "/admin/add-student")
+public class AddStudentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        getAllData(request, response);
 
+        request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
+                .forward(request, response);
     }
 
     /**
@@ -64,26 +70,41 @@ public class SignStudentServlet extends HttpServlet {
 
         // ============ PARAMETER EXTRACTION ============
         // Retrieve CPF and school grade from request parameters
-        String studentCpfParam = request.getParameter("cpf");
+        String cpf = request.getParameter("cpf");
         String studentClassParam = request.getParameter("anoEscolar");
 
         // ============ PARAMETER VALIDATION ============
         // Validate that both parameters are present and not empty
-        if (studentCpfParam == null || studentCpfParam.isBlank() || studentClassParam == null || studentClassParam.isBlank()) {
-            request.setAttribute("success", false);
-            request.setAttribute("error", Constants.BLANK_ARGUMENT_MESSAGE);
+        try {
+            InputValidation.validateIsNull("cpf", cpf);
+            InputValidation.validateIsNull("ano escolar", studentClassParam);
+        } catch (RequiredFieldException re){
+            getAllData(request, response);
+            request.setAttribute("error", re.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
             return;
         }
 
         // Validate that anoEscolar is a valid integer
-        int studentClass;
+        int studentClassId = 0;
         try {
-            studentClass = Integer.parseInt(studentClassParam);
+            studentClassId = Integer.parseInt(studentClassParam);
         } catch (NumberFormatException nfe) {
-            request.setAttribute("success", false);
+            getAllData(request, response);
             request.setAttribute("error", Constants.INVALID_NUMBER_FORMAT_MESSAGE);
+            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
+                    .forward(request, response);
+            return;
+        }
+
+        try {
+            SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+            schoolClassDAO.findById(studentClassId);
+        } catch (DataException | ValidationException | NotFoundException e){
+            getAllData(request, response);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
             return;
@@ -91,25 +112,14 @@ public class SignStudentServlet extends HttpServlet {
 
         // ============ CPF NORMALIZATION & VALIDATION ============
         // Normalize the CPF format (remove special characters, etc.)
-        String studentCpf = InputNormalizer.normalizeCpf(studentCpfParam);
+        cpf = InputNormalizer.normalizeCpf(cpf);
 
         // Validate CPF using business rules
         try {
-            InputValidation.validateCpf(studentCpf);
+            InputValidation.validateCpf(cpf);
         } catch (ValidationException e){
-            request.setAttribute("success", false);
+            getAllData(request, response);
             request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
-                    .forward(request, response);
-            return;
-        }
-
-        // ============ CLASS VALIDATION ============
-        // Validate that the grade is within valid range (1st to 12th grade)
-        if (!InputValidation.validateStudentClass(studentClass)) {
-            request.setAttribute("success", false);
-            request.setAttribute("error", Constants.INVALID_STUDENT_CLASS_MESSAGE);
-
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
             return;
@@ -120,21 +130,36 @@ public class SignStudentServlet extends HttpServlet {
         Student student = new Student();
         StudentDAO studentDAO = new StudentDAO();
 
-        student.setCpf(studentCpf);
-        student.setIdSchoolClass(studentClass);
+        student.setCpf(cpf);
+        student.setIdSchoolClass(studentClassId);
 
         // Attempt to create the student in the database
         try{
             studentDAO.create(student);
             request.setAttribute("success", true);
-        } catch (DataAccessException | ValidationException e) {
-            request.setAttribute("success", false);
+        } catch (ValidationException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             request.setAttribute("error", e.getMessage());
+        } catch (DataException de){
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            request.setAttribute("error", de.getMessage());
         }
 
 
+        getAllData(request, response);
         // Forward to admin dashboard with result attributes
         request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                 .forward(request, response);
+    }
+
+    private void getAllData(HttpServletRequest request, HttpServletResponse response){
+        SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+
+        try {
+            List<SchoolClass> schoolClasses = schoolClassDAO.findAll();
+            request.setAttribute("schoolClasses", schoolClasses);
+        } catch (DataException de){
+            request.setAttribute("error", de);
+        }
     }
 }

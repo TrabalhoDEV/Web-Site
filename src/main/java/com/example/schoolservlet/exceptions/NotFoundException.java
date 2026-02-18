@@ -5,7 +5,7 @@ public class NotFoundException extends SchoolServletException{
     private String field;
     private String value;
     public NotFoundException(String table, String field, String value){
-        super(String.format("Nenhum %s contendo o campo %s de valor %s foi encontrado",table, field, value));
+        super(String.format("Nenhum(a) %s contendo o campo %s de valor %s foi encontrado(a)",table, field, value));
         this.table = table;
         this.field = field;
         this.value = value;

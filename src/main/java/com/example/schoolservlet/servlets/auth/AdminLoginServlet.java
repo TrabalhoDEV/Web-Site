@@ -38,7 +38,7 @@ public class AdminLoginServlet extends HttpServlet {
 
 
             InputValidation.validateCpf(cpf);
-            InputValidation.validateLoginPassword(password);
+            InputValidation.validateIsNull("senha", password);
 
             if (adminDAO.login(cpf.trim(), password.trim())) {
                 Admin admin = adminDAO.findByDocument(cpf);
@@ -48,7 +48,7 @@ public class AdminLoginServlet extends HttpServlet {
 
 
 //            TO DO: add context in AdminHomeServlet and change this redirect that brings all information necessarily to admin/index.jsp
-                response.sendRedirect(request.getContextPath() + "/AdminHomeServlet");
+                response.sendRedirect(request.getContextPath() + "/admin/add-student");
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 request.setAttribute("error", "Cpf e/ou senha incorretos");

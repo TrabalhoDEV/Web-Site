@@ -4,11 +4,8 @@ import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Student;
-import com.example.schoolservlet.utils.Constants;
-import com.example.schoolservlet.utils.InputNormalizer;
-import com.example.schoolservlet.utils.InputValidation;
+import com.example.schoolservlet.utils.*;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
-import com.example.schoolservlet.utils.PostgreConnection;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.HashMap;
@@ -98,6 +95,9 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO student " +
                     "(status, cpf, id_school_class) " +
                     "VALUES (?, ?, ?)")){
+
+            FieldAlreadyUsedValidation.exists("student", "cpf", student.getCpf());
+            FieldAlreadyUsedValidation.exists("admin", "document", String.valueOf(student.getCpf()));
             pstmt.setInt(1, StudentStatusEnum.INACTIVE.ordinal());
             pstmt.setString(2, InputNormalizer.normalizeCpf(student.getCpf()));
             pstmt.setInt(3, student.getIdSchoolClass());
@@ -106,6 +106,8 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao criar aluno", sqle);
+        } catch (ValueAlreadyExistsException vaee){
+            throw new ValueAlreadyExistsException("cpf", student.getCpf());
         }
     }
 
