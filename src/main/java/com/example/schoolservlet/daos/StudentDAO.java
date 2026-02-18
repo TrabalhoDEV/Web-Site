@@ -104,6 +104,9 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
             sqle.printStackTrace();
+
+            if (sqle.getSQLState().equals("23505")){throw new IllegalArgumentException("Estudante já cadastrado");}
+
             return false;
         }
     }

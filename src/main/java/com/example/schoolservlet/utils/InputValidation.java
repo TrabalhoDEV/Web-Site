@@ -94,4 +94,14 @@ public class InputValidation {
         if (userName.length() > 50) return false;
         return userName.matches("^[^\\s]+\\.[^\\s]+$");
     }
+
+    /**
+     * Static method that validates userName
+     * @param studentClass Is the student's class
+     * @return             true if studentClass is between 1 and 12
+     */
+    public static boolean validateStudentClass(int studentClass) {
+        return studentClass >= 1 && studentClass <= 12;
+    }
+
 }

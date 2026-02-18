@@ -42,14 +42,14 @@ public class SignStudentServlet extends HttpServlet {
 
             // Only administrators can register students
             if (user.role() != UserRoleEnum.ADMIN) {
-                request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
+                request.getRequestDispatcher("/pages/admin/login.jsp")
                         .forward(request, response);
                 return;
             }
 
         } catch (NullPointerException npe) {
             // User not authenticated or session attribute missing
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
+            request.getRequestDispatcher("/pages/admin/login.jsp")
                     .forward(request, response);
             return;
         }
@@ -57,11 +57,11 @@ public class SignStudentServlet extends HttpServlet {
         // ============ PARAMETER EXTRACTION ============
         // Retrieve CPF and school grade from request parameters
         String studentCpfParam = request.getParameter("cpf");
-        String studentGradeParam = request.getParameter("anoEscolar");
+        String studentClassParam = request.getParameter("anoEscolar");
 
         // ============ PARAMETER VALIDATION ============
         // Validate that both parameters are present and not empty
-        if (studentCpfParam == null || studentCpfParam.trim().isEmpty() || studentGradeParam == null || studentGradeParam.trim().isEmpty()) {
+        if (studentCpfParam == null || studentCpfParam.isBlank() || studentClassParam == null || studentClassParam.isBlank()) {
             request.setAttribute("success", false);
             request.setAttribute("error", "Parâmetros inválidos");
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
@@ -70,9 +70,9 @@ public class SignStudentServlet extends HttpServlet {
         }
 
         // Validate that anoEscolar is a valid integer
-        int studentGrade;
+        int studentClass;
         try {
-            studentGrade = Integer.parseInt(studentGradeParam);
+            studentClass = Integer.parseInt(studentClassParam);
         } catch (NumberFormatException nfe) {
             request.setAttribute("success", false);
             request.setAttribute("error", "Série deve ser um número válido");
@@ -95,9 +95,9 @@ public class SignStudentServlet extends HttpServlet {
             return;
         }
 
-        // ============ GRADE VALIDATION ============
+        // ============ CLASS VALIDATION ============
         // Validate that the grade is within valid range (1st to 12th grade)
-        if (studentGrade < 1 || studentGrade > 12) {
+        if (!InputValidation.validateStudentClass(studentClass)) {
             request.setAttribute("success", false);
             request.setAttribute("error", "Série inválida");
 
@@ -112,15 +112,21 @@ public class SignStudentServlet extends HttpServlet {
         StudentDAO studentDAO = new StudentDAO();
 
         student.setCpf(studentCpf);
-        student.setIdSchoolClass(studentGrade);
+        student.setIdSchoolClass(studentClass);
 
         // Attempt to create the student in the database
-        if (studentDAO.create(student)) {
-            request.setAttribute("success", true);
-        } else {
+        try{
+            if (studentDAO.create(student)) {
+                request.setAttribute("success", true);
+            } else {
+                request.setAttribute("success", false);
+                request.setAttribute("error", "Erro ao cadastrar aluno");
+            }
+        } catch (IllegalArgumentException iae) {
             request.setAttribute("success", false);
-            request.setAttribute("error", "Erro ao cadastrar aluno");
+            request.setAttribute("error", iae.getMessage());
         }
+
 
         // Forward to admin dashboard with result attributes
         request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
