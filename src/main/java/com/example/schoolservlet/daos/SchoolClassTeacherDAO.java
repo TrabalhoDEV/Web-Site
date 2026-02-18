@@ -37,8 +37,6 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
 
                 schoolClassTeacher = new SchoolClassTeacher();
                 schoolClassTeacher.setId(rs.getInt("id"));
-                schoolClassTeacher.setTeacherId(teacher.getId());
-                schoolClassTeacher.setSchoolClassId(schoolClass.getId());
                 schoolClassTeacher.setSchoolClass(schoolClass);
                 schoolClassTeacher.setTeacher(teacher);
             }
@@ -58,7 +56,7 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
                     "t.email, "+
                     "sc.school_year FROM school_class_teacher sct " +
                     "JOIN teacher t ON sct.id_teacher = t.id " +
-                    "JOIN school_class sc ON sc.id  = sct.id_school_class ORDER BY id LIMIT ? OFFSET ?")){
+                    "JOIN school_class sc ON sc.id  = sct.id_school_class ORDER BY sct.id LIMIT ? OFFSET ?")){
             pstmt.setInt(1, take);
             pstmt.setInt(2, skip);
 
@@ -76,8 +74,6 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
 
                 SchoolClassTeacher schoolClassTeacher = new SchoolClassTeacher();
                 schoolClassTeacher.setId(rs.getInt("id"));
-                schoolClassTeacher.setTeacherId(teacher.getId());
-                schoolClassTeacher.setSchoolClassId(schoolClass.getId());
                 schoolClassTeacher.setSchoolClass(schoolClass);
                 schoolClassTeacher.setTeacher(teacher);
 
@@ -113,8 +109,8 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO school_class_teacher (id_teacher, id_school_class) " +
                     "VALUES (?, ?)")){
-            pstmt.setInt(1, schoolClassTeacher.getTeacherId());
-            pstmt.setInt(2, schoolClassTeacher.getSchoolClassId());
+            pstmt.setInt(1, schoolClassTeacher.getTeacher().getId());
+            pstmt.setInt(2, schoolClassTeacher.getSchoolClass().getId());
 
             return pstmt.executeUpdate() > 0;
         } catch (SQLException sqle){
@@ -128,8 +124,8 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("UPDATE school_class_teacher SET id_teacher = ?, " +
                      "id_school_class = ? WHERE id = ?")){
-            pstmt.setInt(1, schoolClassTeacher.getTeacherId());
-            pstmt.setInt(2, schoolClassTeacher.getSchoolClassId());
+            pstmt.setInt(1, schoolClassTeacher.getTeacher().getId());
+            pstmt.setInt(2, schoolClassTeacher.getSchoolClass().getId());
             pstmt.setInt(3, schoolClassTeacher.getId());
 
             return pstmt.executeUpdate() > 0;
