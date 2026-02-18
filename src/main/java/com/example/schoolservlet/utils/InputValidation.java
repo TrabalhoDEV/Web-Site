@@ -136,4 +136,13 @@ public class InputValidation {
         return studentClass >= Constants.MIN_STUDENT_CLASS && studentClass <= Constants.MAX_STUDENT_CLASS;
     }
 
+     * Statich method that validates if ID value is greater than 0
+     * @param id is the ID that user want to find, update or delete
+     * @param field is the name of field ID, if field is ID pass id, but if field is id_table pass id_table
+     * @throws ValidationException  if id is empty or less than 0
+     */
+    public static void validateId(int id, String field) throws ValidationException{
+        if (id == 0) throw new RequiredFieldException(field);
+        if (id < 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
+    }
 }
