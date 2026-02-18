@@ -126,4 +126,14 @@ public class InputValidation {
         if (id == 0) throw new RequiredFieldException(field);
         if (id < 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
     }
+
+    /**
+     * Static method that validates userName
+     * @param studentClass Is the student's class
+     * @return             true if studentClass is between 1 and 12
+     */
+    public static boolean validateStudentClass(int studentClass) {
+        return studentClass >= Constants.MIN_STUDENT_CLASS && studentClass <= Constants.MAX_STUDENT_CLASS;
+    }
+
 }
