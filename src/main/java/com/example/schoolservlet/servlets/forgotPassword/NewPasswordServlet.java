@@ -75,13 +75,9 @@ public class NewPasswordServlet extends HttpServlet {
             } else if (role == UserRoleEnum.TEACHER) {
                 TeacherDAO teacherDAO = new TeacherDAO();
 
-                if (teacherDAO.updatePassword(userId, newPassword)) {
-                    response.sendRedirect(request.getContextPath() + "/auth");
-                    return;
-                } else {
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    request.setAttribute("error", "Não foi possível atualizar a senha, tente novamente mais tarde");
-                }
+                teacherDAO.updatePassword(userId, newPassword);
+                response.sendRedirect(request.getContextPath() + "/auth");
+                return;
             } else if (role == UserRoleEnum.STUDENT) {
                 StudentDAO studentDAO = new StudentDAO();
 
@@ -92,7 +88,7 @@ public class NewPasswordServlet extends HttpServlet {
         } catch (DataException dae){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", dae.getMessage());
-        } catch (NotFoundException | InvalidNumberException e){
+        } catch (NotFoundException | ValidationException e){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", e.getMessage());
         }
