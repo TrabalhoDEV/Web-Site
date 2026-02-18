@@ -64,7 +64,8 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     @Override
-    public Teacher findById(int id) {
+    public Teacher findById(int id) throws DataException, NotFoundException, ValidationException{
+        InputValidation.validateId(id, "id");
         try(Connection conn = PostgreConnection.getConnection();
         PreparedStatement pstmt = conn.prepareStatement(
                 "SELECT id, name, email, username FROM teacher WHERE id = ?")){
@@ -78,21 +79,21 @@ public class TeacherDAO implements GenericDAO<Teacher> {
                         rs.getString("email"),
                         rs.getString("username")
                 );
-            }
-
+            } else throw new NotFoundException("professor", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao buscar professor", sqle);
         }
-        return null;
     }
 
-    public Teacher findByUserName(String userName) throws DataException, NotFoundException, RequiredFieldException{
-        if (userName == null || userName.isEmpty()) throw new RequiredFieldException("usuário");
+    public Teacher findByUserName(String username) throws DataException, NotFoundException, RequiredFieldException{
+        if (username == null || username.isEmpty()) throw new RequiredFieldException("usuário");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
-                    "SELECT id, name, email, username FROM teacher WHERE userName = ?")){
+                    "SELECT id, name, email, username FROM teacher WHERE username = ?")){
 
-            pstmt.setString(1, InputNormalizer.normalizeUserName(userName));
+            pstmt.setString(1, InputNormalizer.normalizeUserName(username));
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()){
                 return new Teacher(
@@ -101,7 +102,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
                         rs.getString("email"),
                         rs.getString("username")
                 );
-            } else throw new NotFoundException("professor", "usuário", userName);
+            } else throw new NotFoundException("professor", "usuário", username);
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar professor pelo usuário", sqle);
@@ -109,8 +110,8 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     @Override
-    public void delete(int id) throws DataException, NotFoundException, InvalidNumberException{
-        if (id <= 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");;
+    public void delete(int id) throws DataException, NotFoundException, ValidationException{
+        InputValidation.validateId(id, "id");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(

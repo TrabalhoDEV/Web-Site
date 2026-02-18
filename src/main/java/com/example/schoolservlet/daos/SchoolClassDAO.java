@@ -3,6 +3,7 @@ package com.example.schoolservlet.daos;
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.SchoolClass;
+import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 
@@ -33,8 +34,8 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("SELECT id, school_year FROM school_class ORDER BY id LIMIT ? OFFSET ?")){
-            pstmt.setInt(1, take);
-            pstmt.setInt(2, skip);
+            pstmt.setInt(1, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(2, skip < 0 ? 0 : skip);
 
             ResultSet rs = pstmt.executeQuery();
 
