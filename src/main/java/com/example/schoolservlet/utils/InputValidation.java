@@ -101,7 +101,7 @@ public class InputValidation {
      * @return             true if studentClass is between 1 and 12
      */
     public static boolean validateStudentClass(int studentClass) {
-        return studentClass >= 1 && studentClass <= 12;
+        return studentClass >= Constants.MIN_STUDENT_CLASS && studentClass <= Constants.MAX_STUDENT_CLASS;
     }
 
 }

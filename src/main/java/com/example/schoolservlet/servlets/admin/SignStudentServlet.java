@@ -2,6 +2,7 @@ package com.example.schoolservlet.servlets.admin;
 
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.models.Student;
+import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
@@ -49,6 +50,7 @@ public class SignStudentServlet extends HttpServlet {
 
         } catch (NullPointerException npe) {
             // User not authenticated or session attribute missing
+            request.setAttribute("error", Constants.EXPIRED_SESSION_MESSAGE);
             request.getRequestDispatcher("/pages/admin/login.jsp")
                     .forward(request, response);
             return;
@@ -63,7 +65,7 @@ public class SignStudentServlet extends HttpServlet {
         // Validate that both parameters are present and not empty
         if (studentCpfParam == null || studentCpfParam.isBlank() || studentClassParam == null || studentClassParam.isBlank()) {
             request.setAttribute("success", false);
-            request.setAttribute("error", "Parâmetros inválidos");
+            request.setAttribute("error", Constants.BLANK_ARGUMENT_MESSAGE);
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
             return;
@@ -75,7 +77,7 @@ public class SignStudentServlet extends HttpServlet {
             studentClass = Integer.parseInt(studentClassParam);
         } catch (NumberFormatException nfe) {
             request.setAttribute("success", false);
-            request.setAttribute("error", "Série deve ser um número válido");
+            request.setAttribute("error", Constants.INVALID_NUMBER_FORMAT_MESSAGE);
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
             return;
@@ -88,7 +90,7 @@ public class SignStudentServlet extends HttpServlet {
         // Validate CPF using business rules
         if (!InputValidation.validateCpf(studentCpf)) {
             request.setAttribute("success", false);
-            request.setAttribute("error", "CPF Invalido");
+            request.setAttribute("error", Constants.INVALID_CPF_MESSAGE);
 
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
@@ -99,7 +101,7 @@ public class SignStudentServlet extends HttpServlet {
         // Validate that the grade is within valid range (1st to 12th grade)
         if (!InputValidation.validateStudentClass(studentClass)) {
             request.setAttribute("success", false);
-            request.setAttribute("error", "Série inválida");
+            request.setAttribute("error", Constants.INVALID_STUDENT_CLASS_MESSAGE);
 
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
@@ -120,7 +122,7 @@ public class SignStudentServlet extends HttpServlet {
                 request.setAttribute("success", true);
             } else {
                 request.setAttribute("success", false);
-                request.setAttribute("error", "Erro ao cadastrar aluno");
+                request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
             }
         } catch (IllegalArgumentException iae) {
             request.setAttribute("success", false);
