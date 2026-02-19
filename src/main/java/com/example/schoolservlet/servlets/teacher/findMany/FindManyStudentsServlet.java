@@ -1,4 +1,4 @@
-package com.example.schoolservlet.servlets.teacher;
+package com.example.schoolservlet.servlets.teacher.findMany;
 
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.exceptions.DataException;
@@ -6,9 +6,12 @@ import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.Map;
