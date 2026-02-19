@@ -1,7 +1,9 @@
 package com.example.schoolservlet.daos.interfaces;
 
 import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.models.Admin;
 
 /**
  * Interface for managing operations in database's table admin
@@ -17,4 +19,14 @@ public interface IAdminDAO {
      * @throws ValidationException if the CPF or password fail format or business rule validation
      */
     boolean login(String cpf, String password) throws DataException, ValidationException;
+
+    /**
+     * Finds an administrator by their document number
+     * @param document the cpf to search for
+     * @return         a record that represents admin entity
+     * @throws DataException       if a database or persistence error occurs
+     * @throws NotFoundException   if no administrator is found with the given document
+     * @throws ValidationException if the document fails format or business rule validation
+     */
+    Admin findByDocument(String document) throws DataException, NotFoundException, ValidationException;
 }

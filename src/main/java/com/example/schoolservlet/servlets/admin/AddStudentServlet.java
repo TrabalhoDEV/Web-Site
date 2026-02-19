@@ -62,7 +62,7 @@ public class AddStudentServlet extends HttpServlet {
 
         } catch (NullPointerException npe) {
             // User not authenticated or session attribute missing
-            request.setAttribute("error", Constants.EXPIRED_SESSION_MESSAGE);
+            request.setAttribute("error", "Sessão expirada, faça login novamente");
             request.getRequestDispatcher("/pages/admin/login.jsp")
                     .forward(request, response);
             return;
@@ -92,7 +92,7 @@ public class AddStudentServlet extends HttpServlet {
             studentClassId = Integer.parseInt(studentClassParam);
         } catch (NumberFormatException nfe) {
             getAllData(request, response);
-            request.setAttribute("error", Constants.INVALID_NUMBER_FORMAT_MESSAGE);
+            request.setAttribute("error", "ID precisa ser um valor numérico inteiro");
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
             return;

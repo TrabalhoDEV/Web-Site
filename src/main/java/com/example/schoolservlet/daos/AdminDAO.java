@@ -43,6 +43,7 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
         }
     }
 
+    @Override
     public Admin findByDocument(String document) throws DataException, NotFoundException, ValidationException{
         if (document == null || document.isEmpty()) throw new RequiredFieldException("cpf");
 
