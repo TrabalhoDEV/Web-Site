@@ -1,18 +1,21 @@
-package com.example.schoolservlet.servlets.admin;
+package com.example.schoolservlet.servlets.admin.findMany;
 
+import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+
 import java.io.IOException;
 import java.util.Map;
 
-@WebServlet(name = "admin-find-many-students", value = "/admin/students")
-public class FindManyStudentsServlet extends HttpServlet {
+@WebServlet(name = "admin-find-many-school-classes", value = "/admin/school-class/find-many")
+public class FindManySchoolClassesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -32,13 +35,13 @@ public class FindManyStudentsServlet extends HttpServlet {
             page = 1;
         }
 
-        StudentDAO studentDAO = new StudentDAO();
+        SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
         try{
-            totalCount = studentDAO.totalCount();
+            totalCount = schoolClassDAO.totalCount();
         } catch (DataException de){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/list.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/school-class.jsp")
                     .forward(request, response);
             return;
         }
@@ -49,22 +52,22 @@ public class FindManyStudentsServlet extends HttpServlet {
 
         skip = take * (page - 1);
 
-        Map<Integer, Student> studentMap;
+        Map<Integer, SchoolClass> schoolClassMap;
 
         try {
-            studentMap = studentDAO.findMany(skip, take);
+            schoolClassMap = schoolClassDAO.findMany(skip, take);
         } catch (DataException de){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/list.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/school-class.jsp")
                     .forward(request, response);
             return;
         }
 
-        request.setAttribute("studentMap", studentMap);
+        request.setAttribute("schoolClassMap", schoolClassMap);
         request.setAttribute("page", page);
 
-        request.getRequestDispatcher("/WEB-INF/views/admin/list.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/admin/findMany/school-class.jsp").forward(request, response);
     }
 
     @Override

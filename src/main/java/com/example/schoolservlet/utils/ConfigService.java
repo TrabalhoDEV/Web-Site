@@ -9,8 +9,10 @@ public class ConfigService {
         if (value != null && !value.isBlank()) return value;
 
         // If not found, tries to find in .env file
-        value = dotenv.get(variable);
-        if (value != null && !value.isBlank()) return value;
+        if (dotenv != null) {
+            value = dotenv.get(variable);
+            if (value != null && !value.isBlank()) return value;
+        }
 
         // Return null if the variable is not founded
         return null;
