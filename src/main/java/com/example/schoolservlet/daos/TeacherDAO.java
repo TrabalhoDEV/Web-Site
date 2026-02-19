@@ -161,7 +161,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
                 "UPDATE teacher SET name = ?, email = ?, username = ? WHERE id = ?"
         )){
             pstmt.setString(1, teacher.getName());
-            pstmt.setString(2, teacher.getName());
+            pstmt.setString(2, teacher.getEmail());
             pstmt.setString(3, teacher.getUsername());
             pstmt.setInt(4, teacher.getId());
 
