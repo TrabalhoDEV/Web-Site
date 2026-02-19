@@ -39,6 +39,7 @@ public class LoginServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             request.setAttribute("error", "Matrícula/usuário é obrigatório");
             request.getRequestDispatcher("index.jsp").forward(request, response);
+            return;
         }
 
         identifier = identifier.trim();
