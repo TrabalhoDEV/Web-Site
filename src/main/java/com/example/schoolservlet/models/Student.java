@@ -93,4 +93,17 @@ public class Student {
     public void setIdSchoolClass(int idSchoolClass) {
         this.idSchoolClass = idSchoolClass;
     }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", cpf='" + cpf + '\'' +
+                ", status=" + status +
+                ", idSchoolClass=" + idSchoolClass +
+                '}';
+    }
 }
