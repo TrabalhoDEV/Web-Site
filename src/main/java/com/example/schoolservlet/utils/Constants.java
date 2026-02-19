@@ -40,7 +40,7 @@ public class Constants {
     public static final int DEFAULT_TAKE = 6;
 
 // STRINGS
-    public static final String EXPIRED_SESSION_MESSAGE = "Acesso expirado. Faça login como administrador.";
+    public static final String EXPIRED_SESSION_MESSAGE = "Acesso expirado. Faça login novamente.";
     public static final String BLANK_ARGUMENT_MESSAGE = "Argumento ilegal: nenhum campo pode ser vazio.";
     public static final String INVALID_NUMBER_FORMAT_MESSAGE = "Argumento ilegal: formato numérico inválido.";
     public static final String INVALID_CPF_MESSAGE = "Argumento ilegal: CPF inválido.";
