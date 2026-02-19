@@ -57,6 +57,7 @@
         <!-- Submit button to send the form -->
         <input type="submit" value="Enviar">
     </form>
-<a href="${pageContext.request.contextPath}/admin/students">Ver alunos</a>
+<a href="${pageContext.request.contextPath}/admin/student/find-many">Ver alunos</a>
+<a href="${pageContext.request.contextPath}/admin/school-class/find-many">Ver turmas</a>
 </body>
 </html>
