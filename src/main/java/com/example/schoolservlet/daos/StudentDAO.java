@@ -46,7 +46,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         Map<Integer, Student> students = new HashMap<>();
 
         try (Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM student ORDER BY id LIMIT ? OFFSET ?")){
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM student ORDER BY status DESC LIMIT ? OFFSET ?")){
             pstmt.setInt(1, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
             pstmt.setInt(2, skip < 0 ? 0 : skip);
 
@@ -70,6 +70,45 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         }
     }
 
+    public Map<Integer, Student> findManyByTeacherId(int skip, int take, int idTeacher) throws DataException{
+        Map<Integer, Student> students = new HashMap<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("SELECT s.id AS id_student, " +
+                     "s.name," +
+                     "s.cpf, " +
+                     "s.email, " +
+                     "s.id_school_class, " +
+                     "s.status, " +
+                     "sc.school_year, " +
+                     "sct.* FROM student s " +
+                     "JOIN school_class sc ON sc.id = s.id_school_class " +
+                     "JOIN school_class_teacher sct ON sct.id_school_class = sc.id " +
+                     "AND sct.id_teacher = ? ORDER BY status DESC LIMIT ? OFFSET ?")){
+            pstmt.setInt(1, idTeacher);
+            pstmt.setInt(2, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(3, skip < 0 ? 0 : skip);
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()){
+                Student student = new Student();
+                student.setId(rs.getInt("id_student"));
+                student.setIdSchoolClass(rs.getInt("id_school_class"));
+                student.setCpf(rs.getString("cpf"));
+                student.setName(rs.getString("name"));
+                student.setEmail(rs.getString("email"));
+                student.setStatus(StudentStatusEnum.values()[rs.getInt("status") - 1]);
+
+                students.put(rs.getInt("id_student"), student);
+            }
+
+            return students;
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar alunos", sqle);
+        }
+    }
+
     @Override
     public int totalCount() throws DataException{
         try(Connection conn = PostgreConnection.getConnection();
@@ -78,6 +117,24 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
 
             if (rs.next()){
                 return rs.getInt("totalCount");
+            }
+            return -1;
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar alunos", sqle);
+        }
+    }
+
+    public int countByTeacherId(int idTeacher) throws DataException{
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) AS count_by_id_teacher FROM student s " +
+                    "JOIN school_class sc ON sc.id = s.id_school_class " +
+                    "JOIN school_class_teacher sct ON sct.id_school_class = sc.id AND sct.id_teacher = ?;")){
+            pstmt.setInt(1, idTeacher);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()){
+                return rs.getInt("count_by_id_teacher");
             }
             return -1;
         } catch (SQLException sqle){

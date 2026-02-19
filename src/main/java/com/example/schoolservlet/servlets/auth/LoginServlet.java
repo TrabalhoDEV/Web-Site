@@ -84,7 +84,7 @@ public class LoginServlet extends HttpServlet {
                         session.setAttribute("user", user);
                         session.setMaxInactiveInterval(60 * 60);
 
-                        response.sendRedirect(request.getContextPath() + "/teacher/home");
+                        response.sendRedirect(request.getContextPath() + "/teacher/students");
                         return;
                     } else {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
