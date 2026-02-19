@@ -31,10 +31,9 @@ public class OutputFormatService {
      * @param word Is the word to capitalize
      * @return     The word capitalized
      */
-    private static String capitalizeOne(String word){
-        return word.substring(0, 1).toUpperCase();
+    private static String capitalizeOne(String word) {
+        return word.substring(0, 1).toUpperCase() + word.substring(1);
     }
-
     /**
      * Static method that capitalize the observation in the database
      * @param obs Is the observation in database
