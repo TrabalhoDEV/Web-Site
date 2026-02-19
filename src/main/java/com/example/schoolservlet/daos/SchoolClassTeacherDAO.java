@@ -1,9 +1,13 @@
 package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
+import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.SchoolClassTeacher;
 import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 import java.sql.*;
 import java.util.HashMap;
@@ -11,8 +15,8 @@ import java.util.Map;
 
 public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
     @Override
-    public SchoolClassTeacher findById(int id){
-        SchoolClassTeacher schoolClassTeacher = null;
+    public SchoolClassTeacher findById(int id) throws ValidationException, NotFoundException, DataException{
+        InputValidation.validateId( id, "id");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT sct.*, "+
@@ -35,21 +39,18 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
                 teacher.setName(rs.getString("name"));
                 teacher.setEmail(rs.getString("email"));
 
-                schoolClassTeacher = new SchoolClassTeacher();
-                schoolClassTeacher.setId(rs.getInt("id"));
-                schoolClassTeacher.setSchoolClass(schoolClass);
-                schoolClassTeacher.setTeacher(teacher);
-            }
+                return new SchoolClassTeacher(rs.getInt("id"), schoolClass, teacher);
+            } else throw new NotFoundException("school_class_teacher", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao deletar school_class_teacher", sqle);
         }
-
-        return schoolClassTeacher;
     }
 
     @Override
-    public Map<Integer, SchoolClassTeacher> findMany(int skip, int take){
+    public Map<Integer, SchoolClassTeacher> findMany(int skip, int take) throws DataException{
         Map<Integer, SchoolClassTeacher> schoolClassTeacherMap = new HashMap<>();
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT sct.*, "+
                     "t.name, " +
@@ -79,48 +80,54 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
 
                 schoolClassTeacherMap.put(rs.getInt("id"), schoolClassTeacher);
             }
+
+            return schoolClassTeacherMap;
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao listar", sqle);
         }
-
-        return schoolClassTeacherMap;
     }
 
     @Override
-    public int totalCount(){
-        int totalCount = -1;
-
+    public int totalCount() throws DataException{
         try(Connection conn = PostgreConnection.getConnection();
             Statement stmt = conn.createStatement()){
             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS totalCount FROM school_class_teacher");
 
             if (rs.next()){
-                totalCount = rs.getInt("totalCount");
+                return rs.getInt("totalCount");
             }
+            return -1;
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao contar school_class_teacher", sqle);
         }
-
-        return totalCount;
     }
 
     @Override
-    public boolean create(SchoolClassTeacher schoolClassTeacher){
+    public void create(SchoolClassTeacher schoolClassTeacher) throws DataException, ValidationException{
+        InputValidation.validateId(schoolClassTeacher.getSchoolClass().getId(), "id da turma");
+        InputValidation.validateId(schoolClassTeacher.getTeacher().getId(), "id do professor");
+
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO school_class_teacher (id_teacher, id_school_class) " +
                     "VALUES (?, ?)")){
             pstmt.setInt(1, schoolClassTeacher.getTeacher().getId());
             pstmt.setInt(2, schoolClassTeacher.getSchoolClass().getId());
 
-            return pstmt.executeUpdate() > 0;
+            pstmt.executeUpdate();
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            return false;
+            throw new DataException("Erro ao contar school_class_teacher", sqle);
         }
     }
 
     @Override
-    public boolean update(SchoolClassTeacher schoolClassTeacher){
+    public void update(SchoolClassTeacher schoolClassTeacher) throws DataException, ValidationException, NotFoundException{
+        InputValidation.validateId(schoolClassTeacher.getId(), "id");
+        InputValidation.validateId(schoolClassTeacher.getSchoolClass().getId(), "id da turma");
+        InputValidation.validateId(schoolClassTeacher.getTeacher().getId(), "id do professor");
+
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("UPDATE school_class_teacher SET id_teacher = ?, " +
                      "id_school_class = ? WHERE id = ?")){
@@ -128,23 +135,25 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
             pstmt.setInt(2, schoolClassTeacher.getSchoolClass().getId());
             pstmt.setInt(3, schoolClassTeacher.getId());
 
-            return pstmt.executeUpdate() > 0;
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("school_class_teacher", "id", String.valueOf(schoolClassTeacher.getId()));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            return false;
+            throw new DataException("Erro ao deletar school_class_teacher", sqle);
         }
     }
 
     @Override
-    public boolean delete(int id){
+    public void delete(int id) throws NotFoundException, DataException, ValidationException {
+        InputValidation.validateId( id, "id");
+
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM school_class_teacher WHERE id = ?")){
             pstmt.setInt(1, id);
 
-            return pstmt.executeUpdate() > 0;
+            if (pstmt.executeUpdate() <=0) throw new NotFoundException("school_class_teacher", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
-            return false;
+            throw new DataException("Erro ao deletar school_class_teacher", sqle);
         }
     }
 }
