@@ -118,6 +118,12 @@ public class InputValidation {
         return studentClass >= Constants.MIN_STUDENT_CLASS && studentClass <= Constants.MAX_STUDENT_CLASS;
     }
 
+    /**
+     * Static method that validates if a field is null
+     * @param field    is field's name
+     * @param input    is field's value
+     * @throws RequiredFieldException if value is blank
+     */
     public static void validateIsNull(String field, String input) throws RequiredFieldException{
         if (input == null || input.isBlank()) throw new RequiredFieldException(field);
     }
