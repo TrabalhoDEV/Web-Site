@@ -3,9 +3,7 @@ package com.example.schoolservlet.models;
 public class StudentSubject {
     // Attributes:
     private int id;
-    private int studentId;
     private Student student;
-    private int subjectId;
     private Subject subject;
     private Double grade1;
     private Double grade2;
@@ -16,10 +14,10 @@ public class StudentSubject {
 
     }
 
-    public StudentSubject(int id, int studentId, int subjectId, Double grade1, Double grade2, String obs){
+    public StudentSubject(int id, String obs, Double grade1, Double grade2, Student student, Subject subject){
         this.id = id;
-        this.studentId = studentId;
-        this.subjectId = subjectId;
+        this.student = student;
+        this.subject = subject;
         this.grade1 = grade1;
         this.grade2 = grade2;
         this.obs = obs;
@@ -31,16 +29,8 @@ public class StudentSubject {
         return id;
     }
 
-    public int getStudentId() {
-        return studentId;
-    }
-
     public Student getStudent() {
         return student;
-    }
-
-    public int getSubjectId() {
-        return subjectId;
     }
 
     public Subject getSubject() {
@@ -73,16 +63,8 @@ public class StudentSubject {
         this.id = id;
     }
 
-    public void setStudentId(int studentId) {
-        this.studentId = studentId;
-    }
-
     public void setStudent(Student student) {
         this.student = student;
-    }
-
-    public void setSubjectId(int subjectId) {
-        this.subjectId = subjectId;
     }
 
     public void setSubject(Subject subject) {
@@ -99,5 +81,17 @@ public class StudentSubject {
 
     public void setObs(String obs) {
         this.obs = obs;
+    }
+
+    @Override
+    public String toString() {
+        return "StudentSubject{" +
+                "id=" + id +
+                ", student=" + student +
+                ", subject=" + subject +
+                ", grade1=" + grade1 +
+                ", grade2=" + grade2 +
+                ", obs='" + obs + '\'' +
+                '}';
     }
 }

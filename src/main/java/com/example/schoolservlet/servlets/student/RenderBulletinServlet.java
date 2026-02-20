@@ -72,13 +72,13 @@ public class RenderBulletinServlet extends HttpServlet {
 
         // Calculate pagination: extract requested page and calculate database offset
         int page = Utils.extractNextPage(request);
-        int offset = page * Constants.DEFAULT_TAKE;
+        int offset = page * Constants.MAX_TAKE;
 
         // Fetch student's subjects and grades from database with pagination
         StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
         Map<Integer, StudentSubject> studentSubjectMap = studentSubjectDAO.findMany(
                 offset,
-                Constants.DEFAULT_TAKE,
+                Constants.MAX_TAKE,
                 authenticatedUser.id()
         );
 

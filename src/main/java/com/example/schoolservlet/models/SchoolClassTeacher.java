@@ -1,26 +1,30 @@
 package com.example.schoolservlet.models;
 
-public class SubjectTeacher {
+public class SchoolClassTeacher {
+//    Atributes:
     private int id;
-    private Subject subject;
+    private SchoolClass schoolClass;
     private Teacher teacher;
 
 //    Construtors:
-    public SubjectTeacher() {}
 
-    public SubjectTeacher(int id, Subject subject, Teacher teacher) {
+    public SchoolClassTeacher() {
+    }
+
+    public SchoolClassTeacher(int id, SchoolClass schoolClass, Teacher teacher) {
         this.id = id;
-        this.subject = subject;
+        this.schoolClass = schoolClass;
         this.teacher = teacher;
     }
 
-//    Getters:
+    //    Getters:
+
     public int getId() {
         return id;
     }
 
-    public Subject getSubject() {
-        return subject;
+    public SchoolClass getSchoolClass() {
+        return schoolClass;
     }
 
     public Teacher getTeacher() {
@@ -28,13 +32,13 @@ public class SubjectTeacher {
     }
 
 //    Setters:
-
     public void setId(int id) {
         this.id = id;
     }
 
-    public void setSubject(Subject subject) {
-        this.subject = subject;
+
+    public void setSchoolClass(SchoolClass schoolClass) {
+        this.schoolClass = schoolClass;
     }
 
     public void setTeacher(Teacher teacher) {

@@ -22,6 +22,15 @@ public class ValidateCodeServlet extends HttpServlet {
         String code = null;
         HttpSession session = request.getSession(false);
 
+        if (inputCode == null || inputCode.trim().isEmpty()){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            request.setAttribute("error", "Digitar o código é obrigatório");
+            request.getRequestDispatcher("/WEB-INF/views/forgotPassword/validateCode.jsp").forward(request, response);
+            return;
+        }
+
+        inputCode = inputCode.trim();
+
         if (session == null){
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             request.setAttribute("error", "Código expirado, solicite um novo");
@@ -37,19 +46,11 @@ public class ValidateCodeServlet extends HttpServlet {
             return;
         }
 
-        if (inputCode == null || inputCode.trim().isEmpty()){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", "Digitar o código é obrigatório");
-            request.getRequestDispatcher("/WEB-INF/views/forgotPassword/validateCode.jsp").forward(request, response);
-            return;
-        }
-
-        inputCode = inputCode.trim();
-
         if (!code.equals(inputCode)){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             request.setAttribute("error", "Código incorreto, tente novamente");
             request.getRequestDispatcher("/WEB-INF/views/forgotPassword/sendCode.jsp").forward(request, response);
+            return;
         }
 
         session.removeAttribute("code");

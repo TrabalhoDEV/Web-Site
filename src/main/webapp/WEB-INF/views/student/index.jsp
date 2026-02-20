@@ -52,7 +52,7 @@
                 : Collections.emptyList();
 
         if (!observationsList.isEmpty()) {
-            if (observationsList.size() >= Constants.DEFAULT_TAKE) showNextPage = true;
+            if (observationsList.size() >= Constants.MAX_TAKE) showNextPage = true;
             for (String obs : observationsList) {
     %>
     <tr>

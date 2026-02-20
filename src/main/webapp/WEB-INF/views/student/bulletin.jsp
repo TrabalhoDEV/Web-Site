@@ -91,7 +91,7 @@
 
     <form method="get" action="<%= request.getContextPath() %>/student/bulletin" style="display:inline;">
         <input type="hidden" name="nextPage" value="<%=(int) request.getAttribute("currentPage") + 1%>">
-        <button type="submit" <%= studentSubjectMap.size() < Constants.DEFAULT_TAKE? "disabled":"" %>>Próxima</button>
+        <button type="submit" <%= studentSubjectMap.size() < Constants.MAX_TAKE? "disabled":"" %>>Próxima</button>
     </form>
 </div>
 

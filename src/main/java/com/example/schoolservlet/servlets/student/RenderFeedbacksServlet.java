@@ -93,13 +93,13 @@ public class RenderFeedbacksServlet extends HttpServlet {
 
         try {
             // Calculate offset based on page number and page size
-            int offset = currentPage * Constants.DEFAULT_TAKE;
+            int offset = currentPage * Constants.MAX_TAKE;
             
             // Query database for student's subjects and observations
             StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
             Map<Integer, StudentSubject> studentSubjectMap = studentSubjectDAO.findMany(
                     offset,
-                    Constants.DEFAULT_TAKE,
+                    Constants.MAX_TAKE,
                     authenticatedUser.id()
             );
 

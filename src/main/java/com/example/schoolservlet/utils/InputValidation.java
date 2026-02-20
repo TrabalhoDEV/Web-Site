@@ -1,5 +1,7 @@
 package com.example.schoolservlet.utils;
 
+import com.example.schoolservlet.exceptions.*;
+
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -13,10 +15,10 @@ public class InputValidation {
      * @param cpf Is user's cpf
      * @return    true if cpf's format is valid
      */
-    public static boolean validateCpf(String cpf){
-        if (cpf == null || cpf.isEmpty()) return false;
-        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(cpf)) return false;
-        return cpf.matches("\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}");
+    public static void validateCpf(String cpf) throws ValidationException{
+        validateIsNull("document", cpf);
+        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(cpf)) throw new ValidationException("CPF contém caracteres inválidos");
+        if (!cpf.matches("\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}")) throw new RegexException("cpf");
     }
 
     /**
@@ -24,23 +26,24 @@ public class InputValidation {
      * @param email Is the e-mail from the user
      * @return      true if the email's format is valid (name@domain.com)
      */
-    public static boolean validateEmail(String email){
-        if (email == null || email.isEmpty()) return false;
-        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(email)) return false;
-        if (email.length() > 355) return false;
-        return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    public static void validateEmail(String email) throws ValidationException{
+        validateIsNull("email", email);
+        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(email)) throw new ValidationException("Email contém caracteres inválidos");
+        if (email.length() > Constants.MAX_EMAIL_LENGTH) throw new MaxLengthException("email", Constants.MAX_EMAIL_LENGTH);
+        if (email.length() < Constants.MIN_EMAIL_LENGTH) throw new MinLengthException("email", Constants.MIN_EMAIL_LENGTH);
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) throw new RegexException("email");
     }
 
     /**
      * Static method that verifies password format
      * @param password the user's password
-     * @return         a {@link PasswordValidationEnum} indication which validation rule failed, or if the password is valid
+     * @throws ValidationException if the password is different of some bussiness' rule for that
      */
-    public static PasswordValidationEnum validatePassword(String password){
-        if (password == null || password.isEmpty()) return PasswordValidationEnum.IS_NULL;
+    public static void validatePassword(String password) throws ValidationException {
+        validateIsNull("senha", password);
 
-        if (password.length() > Constants.MAX_PASSWORD_LENGTH) return PasswordValidationEnum.MAX_LENGHT_EXCEEDED;
-        if (password.length() < Constants.MIN_PASSWORD_LENGHT) return PasswordValidationEnum.MIN_LENGHT_NOT_REACHED;
+        if (password.length() > Constants.MAX_PASSWORD_LENGTH) throw new MaxLengthException("senha", Constants.MAX_PASSWORD_LENGTH);
+        if (password.length() < Constants.MIN_PASSWORD_LENGTH) throw new MinLengthException("senha", Constants.MIN_PASSWORD_LENGTH);
 
         boolean hasUppercase = false;
         boolean hasLowercase = false;
@@ -58,11 +61,9 @@ public class InputValidation {
             if (hasUppercase && hasLowercase && hasDigit) break;
         }
 
-        if (!hasUppercase) return PasswordValidationEnum.MISSING_UPPERCASE;
-        if (!hasLowercase) return PasswordValidationEnum.MISSING_LOWERCASE;
-        if (!hasDigit) return PasswordValidationEnum.MISSING_NUMBER;
-
-        return PasswordValidationEnum.RIGHT;
+        if (!hasUppercase) throw new MissingSomethingException("senha", "maiúculas");
+        if (!hasLowercase) throw new MissingSomethingException("senha", "minúsculas");
+        if (!hasDigit) throw new MissingSomethingException("senha", "números");
     }
 
     /**
@@ -76,23 +77,36 @@ public class InputValidation {
 
     /**
      * Static method that validates enrollment
-     * @param enrollment Is student's enrollment
-     * @return          true if enrollment has 6 characters
+     * @param enrollment is student's enrollment
+     * @throws ValidationException if enrollment has not 6 characters or if it's empty
      */
-    public static boolean validateEnrollment(String enrollment){
-        if (enrollment == null || enrollment.isEmpty()) return false;
-        return enrollment.matches("^\\d{6}$");
+    public static void validateEnrollment(String enrollment) throws ValidationException{
+        validateIsNull("matrícula", enrollment);
+        if (!enrollment.matches("^\\d{6}$")) throw new RegexException("matrícula");
     }
 
     /**
      * Static method that validates userName
-     * @param userName Is the teacher userNam
-     * @return         true if userName has a valid format
+     * @param userName is the teacher userName
+     * @throws ValidationException if userName is empty, or has more or less characters than allowed,
+     *                             or if it has not a dot in the middle
      */
-    public static boolean validateUserName(String userName){
-        if (userName == null || userName.isEmpty()) return false;
-        if (userName.length() > 50) return false;
-        return userName.matches("^[^\\s]+\\.[^\\s]+$");
+    public static void validateUserName(String userName) throws ValidationException{
+        validateIsNull("usuário", userName);
+        if (userName.length() > Constants.MAX_TEACHER_USERNAME_LENGTH) throw new MaxLengthException("usuário", Constants.MAX_TEACHER_USERNAME_LENGTH);
+        if (userName.length() < Constants.MIN_TEACHER_USERNAME_LENGTH) throw new MinLengthException("usuário", Constants.MIN_TEACHER_USERNAME_LENGTH);
+        if (!userName.matches("^[^\\s]+\\.[^\\s]+$")) throw new RegexException("usuário");
+    }
+
+    /**
+     * Static method that validates if ID value is greater than 0
+     * @param id is the ID that user want to find, update or delete
+     * @param field is the name of field ID, if field is ID pass id, but if field is id_table pass id_table
+     * @throws ValidationException  if id is empty or less than 0
+     */
+    public static void validateId(int id, String field) throws ValidationException{
+        if (id == 0) throw new RequiredFieldException(field);
+        if (id < 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
     }
 
     /**
@@ -104,4 +118,13 @@ public class InputValidation {
         return studentClass >= Constants.MIN_STUDENT_CLASS && studentClass <= Constants.MAX_STUDENT_CLASS;
     }
 
+    /**
+     * Static method that validates if a field is null
+     * @param field    is field's name
+     * @param input    is field's value
+     * @throws RequiredFieldException if value is blank
+     */
+    public static void validateIsNull(String field, String input) throws RequiredFieldException{
+        if (input == null || input.isBlank()) throw new RequiredFieldException(field);
+    }
 }

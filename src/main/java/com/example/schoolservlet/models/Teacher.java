@@ -1,12 +1,14 @@
 package com.example.schoolservlet.models;
 
 public class Teacher {
+//    Atributes:   
     private int id;
     private String name;
     private String email;
     private String username;
     private String password;
 
+//    Construtors:
     public Teacher(int id, String name, String email, String username) {
         this.id = id;
         this.name = name;
@@ -22,6 +24,7 @@ public class Teacher {
     }
     public Teacher(){};
 
+//    Getters:
     public int getId() {
         return id;
     }
@@ -40,6 +43,11 @@ public class Teacher {
 
     public String getPassword() {
         return password;
+    }
+
+//    Setters:
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setName(String name) {
