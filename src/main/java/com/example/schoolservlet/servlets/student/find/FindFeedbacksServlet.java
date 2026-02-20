@@ -58,7 +58,10 @@ public class FindFeedbacksServlet extends HttpServlet {
             request.setAttribute("currentPage", page);
             
             // Load student feedbacks for the current page
-            loadStudentFeedbacks(request, page);
+            int totalAmountOfFeedbacks = loadStudentFeedbacks(request, page);
+
+            // Set total pages attribute for pagination controls in the view
+            request.setAttribute("totalPages", PaginationUtilities.calculateTotalPages(totalAmountOfFeedbacks, Constants.MAX_TAKE));
             
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error processing feedbacks request", e);
@@ -75,8 +78,9 @@ public class FindFeedbacksServlet extends HttpServlet {
      *
      * @param request     the HTTP request
      * @param currentPage the page number to load
+     * @return the total amount of feedbacks on the database for the authenticated student
      */
-    private void loadStudentFeedbacks(HttpServletRequest request, int currentPage) {
+    private int loadStudentFeedbacks(HttpServletRequest request, int currentPage) {
         HttpSession session = request.getSession();
         AuthenticatedUser authenticatedUser = (AuthenticatedUser) session.getAttribute("user");
 
@@ -84,7 +88,7 @@ public class FindFeedbacksServlet extends HttpServlet {
         if (authenticatedUser == null) {
             LOGGER.log(Level.WARNING, "Authenticated user not found in session");
             request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
-            return;
+            return 0;
         }
 
         LOGGER.log(Level.FINE, "Loading feedbacks for user ID: " + authenticatedUser.id());
@@ -111,6 +115,8 @@ public class FindFeedbacksServlet extends HttpServlet {
             );
             LOGGER.log(Level.INFO, "Feedbacks loaded successfully.");
 
+            return studentSubjectDAO.totalCount(authenticatedUser.id());
+
         } catch (NullPointerException npe) {
             LOGGER.log(Level.SEVERE, "Error loading feedbacks - unexpected null value", npe);
             request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
@@ -118,5 +124,6 @@ public class FindFeedbacksServlet extends HttpServlet {
             LOGGER.log(Level.SEVERE, "Error loading feedbacks", e);
             request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
         }
+        return 0;
     }
 }

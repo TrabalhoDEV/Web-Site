@@ -75,6 +75,12 @@ public class FindBulletinServlet extends HttpServlet {
         int skip = page * Constants.MAX_TAKE;
 
         try {
+            // Fetch the total amount of pages
+            int totalSubjects = new StudentSubjectDAO().totalCount(authenticatedUser.id());
+            int totalPages = PaginationUtilities.calculateTotalPages(totalSubjects, Constants.MAX_TAKE);
+            System.out.println(totalPages);
+
+
             // Fetch student's subjects and grades from database with pagination
             StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
             Map<Integer, StudentSubject> studentSubjectMap = null;
@@ -100,6 +106,7 @@ public class FindBulletinServlet extends HttpServlet {
             // Prepare request attributes for view rendering
             request.setAttribute("studentSubjectMap", studentSubjectMap);
             request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
 
             // Forward to bulletin view template for display
             request.getRequestDispatcher("/WEB-INF/views/student/bulletin.jsp").forward(request, response);
@@ -113,6 +120,19 @@ public class FindBulletinServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Handles unexpected errors by forwarding to the bulletin page with an error message.
+     * 
+     * This method:
+     * 1. Sets an error message in the request attributes
+     * 2. Initializes empty collections for the student subject map
+     * 3. Resets pagination to the first page
+     * 4. Forwards the request to the bulletin view for error display
+     * 5. Logs any exceptions that occur during the forward operation
+     * 
+     * @param request the HTTP servlet request to set error attributes on
+     * @param response the HTTP servlet response for the forward operation
+     */
     private void treatUnexpectedError(HttpServletRequest request, HttpServletResponse response) {
         request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
         request.setAttribute("studentSubjectMap", Map.of());

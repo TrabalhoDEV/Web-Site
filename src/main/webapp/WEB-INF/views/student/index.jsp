@@ -46,7 +46,6 @@
 
 
         if (observationsList != null && !observationsList.isEmpty()) {
-            if (observationsList.size() >= Constants.MAX_TAKE) showNextPage = true;
             for (String obs : observationsList) {
     %>
     <tr>
@@ -79,7 +78,7 @@
 
 <form method="get" action="<%= request.getContextPath() %>/student/home">
     <input type="hidden" name="nextPage" value="<%= currentPage+ 1%>">
-    <button type="submit" <%=!showNextPage ? "disabled": ""%>>Next</button>
+    <button type="submit" <%= (int) request.getAttribute("totalPages") <= currentPage ? "disabled": ""%>>Next</button>
 </form>
 
 </body>

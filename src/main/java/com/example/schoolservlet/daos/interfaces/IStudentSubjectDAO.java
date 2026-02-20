@@ -9,7 +9,7 @@ import java.util.Map;
  * Defines contract for accessing student subject data from the database.
  */
 public interface IStudentSubjectDAO {
-    
+
     /**
      * Retrieves a paginated collection of subjects for a specific student.
      *
@@ -20,4 +20,13 @@ public interface IStudentSubjectDAO {
      *         or an empty map if no subjects are found
      */
     Map<Integer, StudentSubject> findMany(int skip, int take, int studentId);
+
+
+    /**
+     * Retrieves the total count of subjects associated with a specific student.
+     *
+     * @param studentId the unique identifier of the student
+     * @return the total number of subjects for the given student ID
+     */
+    int totalCount(int studentId);
 }
