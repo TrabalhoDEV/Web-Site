@@ -3,10 +3,30 @@ package com.example.schoolservlet.daos.interfaces;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Student;
 
+import java.util.Map;
+
 /**
  * Interface for define a contract in database's table student operations.
  */
 public interface IStudentDAO {
+
+    /**
+     * Method that returns many records from database's table that has classes with a determined teacher
+     * @param skip  is how many records needed to skip
+     * @param take  is how many records it should return
+     * @param idTeacher is teacher's id
+     * @return      a map with key as id and value as the table's object
+     * @throws DataException if an error in database happen
+     */
+    Map<Integer, Student> findManyByTeacherId(int skip, int take, int idTeacher) throws DataException;
+
+    /**
+     * A method that count the number of records from database's table that is related with a teacher
+     * @param idTeacher is teacher's id
+     * @return      The total count
+     * @throws DataException if an error in database happen
+     */
+    int countByTeacherId(int idTeacher) throws DataException;
 
     /**
      * Updates the school class assigned to a specific student

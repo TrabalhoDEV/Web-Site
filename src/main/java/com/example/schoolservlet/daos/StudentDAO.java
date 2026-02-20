@@ -70,6 +70,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         }
     }
 
+    @Override
     public Map<Integer, Student> findManyByTeacherId(int skip, int take, int idTeacher) throws DataException{
         Map<Integer, Student> students = new HashMap<>();
 
@@ -125,6 +126,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         }
     }
 
+    @Override
     public int countByTeacherId(int idTeacher) throws DataException{
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) AS count_by_id_teacher FROM student s " +
