@@ -20,7 +20,7 @@ public class FindManySchoolClassesServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
 
-        AccessValidation.isAdmin(request, response);
+        if (!AccessValidation.isAdmin(request, response)) return;
 
         String pageParam = request.getParameter("page");
 

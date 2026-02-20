@@ -33,7 +33,7 @@ public class FindManyStudentsServlet extends HttpServlet {
             return;
         }
 
-        AccessValidation.isTeacher(request, response);
+        if (!AccessValidation.isTeacher(request, response)) return;
 
         String pageParam = request.getParameter("page");
 
