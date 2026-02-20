@@ -10,9 +10,13 @@ import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import com.example.schoolservlet.utils.PostgreConnection;
+import com.example.schoolservlet.utils.records.StudentsPerformance;
+import com.example.schoolservlet.utils.records.TeacherPendency;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -58,8 +62,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                         new StudentSubject(
                             rs.getInt("id"),
                             rs.getString("obs"),
-                            rs.getObject("grade1", Double.class),
-                            rs.getObject("grade2", Double.class),
+                                rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
+                                rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
                             student,
                             subject
                         )
@@ -175,8 +179,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                 return new StudentSubject(
                     rs.getInt("id"),
                     rs.getString("obs"),
-                    rs.getObject("grade1", Double.class),
-                    rs.getObject("grade2", Double.class),
+                        rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
+                        rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
                     student,
                     subject
                 );
@@ -184,6 +188,159 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar relação entre aluno e matéria", sqle);
+        }
+    }
+
+    @Override
+    public Map<Integer, StudentSubject> findStudentsThatRequireTeacher(int teacherId) throws DataException, ValidationException {
+        InputValidation.validateId(teacherId, "id do professor");
+        Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
+
+        String sql = "SELECT * FROM (" +
+                "SELECT ss.id, ss.obs, ss.grade1, ss.grade2, " +
+                "st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email, " +
+                "sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline, " +
+                "CASE " +
+                "WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
+                "WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
+                "ELSE ss.grade2 " +
+                "END AS media " +
+                "FROM student_subject ss " +
+                "JOIN student st ON st.id = ss.id_student " +
+                "JOIN subject sb ON sb.id = ss.id_subject " +
+                "JOIN school_class sc ON sc.id = st.id_school_class " +
+                "JOIN school_class_teacher sct ON sct.id_school_class = sc.id " +
+                "WHERE sct.id_teacher = ? " +
+                "AND (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL)" +
+                ") AS sub " +
+                "WHERE media < ? " +
+                "ORDER BY media DESC " +
+                "LIMIT ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, teacherId);
+            pstmt.setInt(2, Constants.MAX_GRADE_TO_HELP);
+            pstmt.setInt(3, Constants.STUDENTS_HELP_TAKE);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Student student = new Student();
+                student.setId(rs.getInt("id_student"));
+                student.setName(rs.getString("student_name"));
+                student.setCpf(rs.getString("student_cpf"));
+                student.setEmail(rs.getString("student_email"));
+                student.setStatus(StudentStatusEnum.ACTIVE);
+
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id_subject"));
+                subject.setName(rs.getString("subject_name"));
+                subject.setDeadline(rs.getDate("subject_deadline"));
+
+                studentsSubjects.put(rs.getInt("id"),
+                        new StudentSubject(
+                                rs.getInt("id"),
+                                rs.getString("obs"),
+                                rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
+                                rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
+                                student,
+                                subject
+                        )
+                );
+            }
+
+            return studentsSubjects;
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar alunos que precisam de atenção", sqle);
+        }
+    }
+
+    @Override
+    public StudentsPerformance studentsPerformance(int idTeacher) throws ValidationException, DataException{
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT " +
+                    "    ROUND(100.0 * SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) / COUNT(*), 0) AS approved, " +
+                    "    ROUND(100.0 * SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) / COUNT(*), 0) AS failed, " +
+                    "    ROUND(100.0 * SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) / COUNT(*), 0) AS pending " +
+                    "FROM (\n" +
+                    "    SELECT \n" +
+                    "        s.id,\n" +
+                    "        CASE\n" +
+                    "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
+                    "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
+                    "            WHEN ss.grade2 IS NOT NULL THEN ss.grade2 " +
+                    "            ELSE NULL " +
+                    "        END AS media " +
+                    "    FROM student s " +
+                    "    JOIN school_class sc ON sc.id = s.id_school_class " +
+                    "    JOIN school_class_teacher sct ON sct.id_school_class = sc.id " +
+                    "    LEFT JOIN student_subject ss ON ss.id_student = s.id " +
+                    "    WHERE sct.id_teacher = ?" +
+                    ") AS sub;")){
+            pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APROVAL);
+            pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APROVAL);
+            pstmt.setInt(3, idTeacher);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()){
+                 return new StudentsPerformance(rs.getInt("approved"),  rs.getInt("pending"), rs.getInt("failed"));
+            }
+            return new StudentsPerformance(0, 0, 0);
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar alunos", sqle);
+        }
+    }
+
+    @Override
+    public List<TeacherPendency> teacherPendency(int idTeacher) throws DataException, ValidationException{
+        InputValidation.validateId(idTeacher, "id do professor");
+        List<TeacherPendency> pendencies = new ArrayList<>();
+
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT \n" +
+                    "st.id AS id_student,\n" +
+                    "ss.grade1,\n" +
+                    "ss.grade2,\n" +
+                    "st.name AS student_name,\n" +
+                    "sb.name AS subject_name,\n" +
+                    "sb.deadline,\n" +
+                    "CASE\n" +
+                    "     WHEN sb.deadline < CURRENT_DATE THEN 'Atrasada'\n" +
+                    "     WHEN sb.deadline <= CURRENT_DATE + INTERVAL '7 days' THEN 'Perto do prazo'\n" +
+                    "     ELSE 'Dentro do prazo'\n" +
+                    "END AS status\n" +
+                    "FROM student_subject ss\n" +
+                    "JOIN student st ON st.id = ss.id_student\n" +
+                    "JOIN subject sb ON sb.id = ss.id_subject\n" +
+                    "JOIN school_class sc ON sc.id = st.id_school_class\n" +
+                    "JOIN school_class_teacher sct ON sct.id_school_class = sc.id\n" +
+                    "WHERE sct.id_teacher = ?\n" +
+                    "AND (ss.grade1 IS NULL or ss.grade2 IS NULL)\n" +
+                    "ORDER BY sb.deadline ASC LIMIT ?;")){
+            pstmt.setInt(1, idTeacher);
+            pstmt.setInt(2, Constants.PENDENCIES_TAKE);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                pendencies.add(new TeacherPendency(
+                        rs.getInt("id_student"),
+                        rs.getString("student_name"),
+                        rs.getString("subject_name"),
+                        rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
+                        rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
+                        rs.getDate("deadline"),
+                        rs.getString("status")
+                ));
+            }
+
+            return pendencies;
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar pendências", sqle);
         }
     }
 

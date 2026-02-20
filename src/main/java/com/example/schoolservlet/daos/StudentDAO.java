@@ -4,6 +4,7 @@ import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Student;
+import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.*;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import org.mindrot.jbcrypt.BCrypt;
