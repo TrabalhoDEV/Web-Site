@@ -1,5 +1,11 @@
 package com.example.schoolservlet.utils;
 
+import com.example.schoolservlet.exceptions.TransformTypeException;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  *  Class that contains static methods to normalize the user's input to the database format.
  *  This class allows us to change the business' rule easier than if we keep that validation in
@@ -66,5 +72,15 @@ public class InputNormalizer {
     public static String normalizeCpf(String cpf){
         if (cpf == null || cpf.isEmpty()) return null;
         return cpf.replaceAll("[^\\d]", "");
+    }
+
+    public static Date normalizeDate(String date) throws TransformTypeException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            return sdf.parse(date);
+        } catch (ParseException e){
+            e.printStackTrace();
+            throw new TransformTypeException("data limite", "data (ano-mês-dia)");
+        }
     }
 }
