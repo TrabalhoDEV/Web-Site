@@ -23,7 +23,7 @@ import java.io.IOException;
  * This endpoint handles teacher registration.
  * Only administrators are allowed to access this funcionality
  */
-@WebServlet(name = "admin-add-teacher", value = "/admin/add-teacher")
+@WebServlet(name = "admin-insert-teacher", value = "/admin/teacher/insert")
 public class InsertTeacherServlet extends HttpServlet {
     /**
      * Handles POST requests for teacher registration.
@@ -103,7 +103,8 @@ public class InsertTeacherServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if(!AccessValidation.isAdmin(request,response)) return;
-        request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp").forward(request, response);
+        response.setContentType("text/html");
+        if (!AccessValidation.isAdmin(request, response)) return;
+        request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request, response);
     }
 }
