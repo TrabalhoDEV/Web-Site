@@ -119,6 +119,25 @@ public class InputValidation {
     }
 
     /**
+     * Static method that verifies teacher's name format
+     * @param name the teacher's name
+     * @throws ValidationException if the name is null, smaller or greater than allowed length,
+     * or contains invalid characters according to business rules
+     */
+    public static void validateTeacherName(String name) throws ValidationException {
+        validateIsNull("nome", name);
+
+        if (name.length() > Constants.MAX_TEACHER_NAME_LENGTH)
+            throw new MaxLengthException("nome", Constants.MAX_TEACHER_NAME_LENGTH);
+
+        if (name.length() < Constants.MIN_TEACHER_NAME_LENGTH)
+            throw new MinLengthException("nome", Constants.MIN_TEACHER_NAME_LENGTH);
+
+        if (!name.matches("^[A-Za-zÀ-ÿ ]+$"))
+            throw new RegexException("nome");
+    }
+
+    /**
      * Static method that validates if a field is null
      * @param field    is field's name
      * @param input    is field's value

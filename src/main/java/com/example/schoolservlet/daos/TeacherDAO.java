@@ -190,21 +190,21 @@ public class TeacherDAO implements GenericDAO<Teacher> {
         }
     }
 
-    public boolean login(String username, String password) throws DataException, NotFoundException, ValidationException{
+    public boolean login(String username, String password) throws DataException, NotFoundException, ValidationException {
         if (username == null || username.isBlank()) throw new RequiredFieldException("usuário");
         if (password == null || password.isBlank()) throw new RequiredFieldException("senha");
 
-        try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(
-                    "SELECT password FROM teacher WHERE username = ?"
-            )){
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "SELECT password FROM teacher WHERE username = ?"
+             )) {
             pstmt.setString(1, username);
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 return BCrypt.checkpw(password, rs.getString("password"));
             } else throw new NotFoundException("professor", "usuário", username);
-        } catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new DataException("Erro ao logar", sqle);
         }
