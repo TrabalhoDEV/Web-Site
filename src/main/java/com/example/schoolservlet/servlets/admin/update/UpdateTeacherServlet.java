@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Servlet responsible for ------ teachers in the system.
+ * Servlet responsible for updating teachers in the system.
  * This endpoint handles teacher updating.
  */
 @WebServlet(name = "admin-update-teacher",value = "/admin/teacher/update")
@@ -65,6 +65,14 @@ public class UpdateTeacherServlet extends HttpServlet {
 
     }
 
+    /**
+     * Handles POSST requests for teacher updating.
+     *
+     * @param request  HTTP request containing name, email, username, password parameters
+     * @param response HTTP response object
+     * @throws ServletException if servlet processing fails
+     * @throws IOException if I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!AccessValidation.isAdmin(request, response)) return;
