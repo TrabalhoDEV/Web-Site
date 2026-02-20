@@ -1,20 +1,21 @@
-package com.example.schoolservlet.servlets.admin;
+package com.example.schoolservlet.servlets.admin.insert;
 
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.StudentDAO;
-import com.example.schoolservlet.exceptions.*;
+import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.RequiredFieldException;
+import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
-import com.example.schoolservlet.utils.*;
-import com.example.schoolservlet.utils.enums.UserRoleEnum;
-import com.example.schoolservlet.utils.records.AuthenticatedUser;
+import com.example.schoolservlet.utils.AccessValidation;
+import com.example.schoolservlet.utils.InputNormalizer;
+import com.example.schoolservlet.utils.InputValidation;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
 
 import java.io.IOException;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.List;
  * Only administrators are allowed to access this functionality.
  */
 @WebServlet(name = "admin-add-student",value = "/admin/add-student")
-public class AddStudentServlet extends HttpServlet {
+public class InsertStudentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         getAllData(request, response);
