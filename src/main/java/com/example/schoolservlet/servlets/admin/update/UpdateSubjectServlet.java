@@ -24,12 +24,14 @@ public class UpdateSubjectServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        int id = Integer.parseInt(request.getParameter("id"));
+        String idParam = request.getParameter("id");
 
         try {
             SubjectDAO subjectDAO = new SubjectDAO();
 
-            Subject subject = subjectDAO.findById(id);
+            if (idParam == null || idParam.isEmpty()) throw new InvalidNumberException(idParam,"O ID não pode estar vazio");
+
+            Subject subject = subjectDAO.findById(Integer.parseInt(idParam));
             session.setAttribute("subject", subject);
             request.setAttribute("subject", subject);
         } catch (DataException de){
@@ -46,6 +48,10 @@ public class UpdateSubjectServlet extends HttpServlet {
             nfe.printStackTrace();
             request.setAttribute("error", nfe.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
+            return;
+        } catch (NumberFormatException nfe) {
+            request.setAttribute("error", nfe.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
             return;
         }
 
