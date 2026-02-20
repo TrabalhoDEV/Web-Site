@@ -53,7 +53,6 @@
 
         if (!observationsList.isEmpty()) {
             if (observationsList.size() >= Constants.DEFAULT_TAKE) showNextPage = true;
-            System.out.println(observationsList.size());
             for (String obs : observationsList) {
     %>
     <tr>
