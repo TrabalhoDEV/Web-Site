@@ -19,9 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Servlet respnsible for registering new teachers in the system.
+ * Servlet responsible for registering new teachers in the system.
  * This endpoint handles teacher registration.
- * Only administrators are allowed to access this funcionality
+ * Only administrators are allowed to access this functionality
  */
 @WebServlet(name = "admin-insert-teacher", value = "/admin/teacher/insert")
 public class InsertTeacherServlet extends HttpServlet {
@@ -37,15 +37,10 @@ public class InsertTeacherServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!AccessValidation.isAdmin(request, response)) return;
 
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String username = request.getParameter("username");
+        String name = InputNormalizer.normalizeName(request.getParameter("name"));
+        String email = InputNormalizer.normalizeEmail(request.getParameter("email"));
+        String username = InputNormalizer.normalizeUserName(request.getParameter("username"));
         String password = request.getParameter("password");
-
-        name=InputNormalizer.normalizeName(name);
-        email=InputNormalizer.normalizeEmail(email);
-        username=InputNormalizer.normalizeUserName(username);
-
 
         try {
             InputValidation.validateTeacherName(name);
@@ -58,53 +53,48 @@ public class InsertTeacherServlet extends HttpServlet {
 
         }catch (RequiredFieldException rfe){
             request.setAttribute("error", rfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
-                    .forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
             return;
         } catch (ValueAlreadyExistsException vaee) {
             request.setAttribute("error", vaee.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
-                    .forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
             return;
         } catch (ValidationException ve){
             request.setAttribute("error",ve.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp").forward(request,response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
             return;
         }catch (DataException de) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
-                    .forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
             return;
         }
 
-
-        Teacher teacher = new Teacher();
-        teacher.setName(name);
-        teacher.setEmail(email);
-        teacher.setUsername(username);
-        teacher.setPassword(password);
-        TeacherDAO teacherDAO = new TeacherDAO();
-
         try {
+            Teacher teacher = new Teacher();
+            teacher.setName(name);
+            teacher.setEmail(email);
+            teacher.setUsername(username);
+            teacher.setPassword(password);
+            TeacherDAO teacherDAO = new TeacherDAO();
             teacherDAO.create(teacher);
             request.setAttribute("success",true);
-        } catch (ValidationException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", e.getMessage());
+        } catch (ValidationException ve) {
+            request.setAttribute("error", ve.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request, response);
+            return;
         } catch (DataException de){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", de.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request, response);
+            return;
         }
 
-        request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
-                .forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
         if (!AccessValidation.isAdmin(request, response)) return;
-        request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
     }
 }

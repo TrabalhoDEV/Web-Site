@@ -5,15 +5,16 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
-import com.example.schoolservlet.utils.enums.UserRoleEnum;
-import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
-
+/**
+ * Servlet responsible for listing multiple teachers in the system with pagination.
+ * This endpoint is only accessible by administrators.
+ */
 @WebServlet(name = "admin-find-many-teachers", value = "/admin/teacher/find-many")
 public class FindManyTeacherServlet extends HttpServlet {
     @Override
