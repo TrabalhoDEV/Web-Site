@@ -14,6 +14,18 @@
 <body>
 
 <h1>Seja bem vindo:)</h1>
+
+<aside>
+    <nav>
+        <ul>
+            <li>
+                <form>
+                    <button type="submit" formaction="<%= request.getContextPath() %>/student/bulletin">Minhas matérias</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+</aside>
 <h2>Feedbacks de seus professores: </h2>
 
 <%
@@ -40,7 +52,8 @@
                 : Collections.emptyList();
 
         if (!observationsList.isEmpty()) {
-            if (observationsList.size() > Constants.DEFAULT_TAKE) showNextPage = true;
+            if (observationsList.size() >= Constants.DEFAULT_TAKE) showNextPage = true;
+            System.out.println(observationsList.size());
             for (String obs : observationsList) {
     %>
     <tr>
@@ -62,17 +75,17 @@
 <br>
 
 <%
-    Integer currentPage = (Integer) request.getAttribute("page");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
     if (currentPage == null) currentPage = 0;
 %>
 
 <form method="get" action="<%= request.getContextPath() %>/student/home">
-    <input type="hidden" name="pageDirection" value="-1">
+    <input type="hidden" name="nextPage" value="<%= currentPage- 1%>">
     <button type="submit" <%= currentPage <= 0 ? "disabled" : "" %>>Previous</button>
 </form>
 
 <form method="get" action="<%= request.getContextPath() %>/student/home">
-    <input type="hidden" name="pageDirection" value="1">
+    <input type="hidden" name="nextPage" value="<%= currentPage+ 1%>">
     <button type="submit" <%=!showNextPage ? "disabled": ""%>>Next</button>
 </form>
 

@@ -74,7 +74,7 @@ public class StudentSubject {
     }
 
     public void setStudentId(int studentId) {
-        this.studentId = StudentSubject.this.studentId;
+        this.studentId = studentId;
     }
 
     public void setStudent(Student student) {

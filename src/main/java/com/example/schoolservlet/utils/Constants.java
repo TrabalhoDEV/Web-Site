@@ -38,6 +38,7 @@ public class Constants {
 
 //    PAGES constratins:
     public static final int DEFAULT_TAKE = 6;
+    public static final int MIN_PAGE = 0;
 
 // STRINGS
     public static final String EXPIRED_SESSION_MESSAGE = "Acesso expirado. Faça login novamente.";

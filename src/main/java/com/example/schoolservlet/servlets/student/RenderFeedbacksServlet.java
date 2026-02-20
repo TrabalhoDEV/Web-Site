@@ -53,18 +53,14 @@ public class RenderFeedbacksServlet extends HttpServlet {
         }
 
         try {
-            // Extract current page number from request
-            int currentPage = extractCurrentPage(request);
-            
-            // Process page navigation if requested
-            int pageDirection = extractPageDirection(request);
-            currentPage = calculateNewPage(currentPage, pageDirection);
+            // Extract next page number from request
+            int page = Utils.extractNextPage(request);
             
             // Update page attribute in request
-            request.setAttribute("page", currentPage);
+            request.setAttribute("currentPage", page);
             
             // Load student feedbacks for the current page
-            loadStudentFeedbacks(request, currentPage);
+            loadStudentFeedbacks(request, page);
             
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error processing feedbacks request", e);
@@ -73,75 +69,6 @@ public class RenderFeedbacksServlet extends HttpServlet {
 
         // Forward to view
         request.getRequestDispatcher("/WEB-INF/views/student/index.jsp").forward(request, response);
-    }
-
-    /**
-     * Extracts the current page number from request attributes.
-     * Returns 0 (first page) if not defined or invalid.
-     *
-     * @param request the HTTP request
-     * @return current page number (minimum 0)
-     */
-    private int extractCurrentPage(HttpServletRequest request) {
-        String pageAttr = (String) request.getAttribute("page");
-        int page = MIN_PAGE;
-
-        if (pageAttr != null && !pageAttr.isBlank()) {
-            try {
-                page = Integer.parseInt(pageAttr);
-                // Ensure page number is never negative
-                page = Math.max(page, MIN_PAGE);
-                LOGGER.log(Level.FINE, "Page extracted from attribute: " + page);
-            } catch (NumberFormatException e) {
-                LOGGER.log(Level.WARNING, "Invalid page value: " + pageAttr + ". Using default page.");
-                page = MIN_PAGE;
-            }
-        }
-
-        return page;
-    }
-
-    /**
-     * Extracts the pagination navigation direction from request parameters.
-     * Returns 1 (next), -1 (previous) or 0 (no change).
-     *
-     * @param request the HTTP request
-     * @return navigation direction: 1, -1 or 0
-     */
-    private int extractPageDirection(HttpServletRequest request) {
-        String pageDirectionParam = request.getParameter("pageDirection");
-        
-        if (pageDirectionParam != null && !pageDirectionParam.isBlank()) {
-            try {
-                int direction = Integer.parseInt(pageDirectionParam);
-                if (direction == 1 || direction == -1) {
-                    return direction;
-                }
-            } catch (NumberFormatException e) {
-                LOGGER.log(Level.WARNING, "Invalid page direction value: " + pageDirectionParam);
-            }
-        }
-        
-        return 0;
-    }
-
-    /**
-     * Calculates the new page number based on navigation direction.
-     * Ensures page number never becomes negative.
-     *
-     * @param currentPage   the current page number
-     * @param pageDirection navigation direction (1, -1 or 0)
-     * @return new page number
-     */
-    private int calculateNewPage(int currentPage, int pageDirection) {
-        int newPage = currentPage + pageDirection;
-        newPage = Math.max(newPage, MIN_PAGE);
-        
-        if (pageDirection != 0) {
-            LOGGER.log(Level.FINE, "Page updated from " + currentPage + " to " + newPage);
-        }
-        
-        return newPage;
     }
 
     /**
