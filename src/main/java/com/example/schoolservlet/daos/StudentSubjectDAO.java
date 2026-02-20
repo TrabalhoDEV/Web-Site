@@ -158,7 +158,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                     "sb.name AS subject_name, " +
                     "sb.deadline AS subject_deadline " +
                     "FROM student_subject ss JOIN student st ON st.id = ss.id_student JOIN subject sb " +
-                    "ON sb.id = ss.id_subject WHERE ss.id = ?")){
+                    "ON sb.id = ss.subject_id WHERE ss.id = ?")){
             pstmt.setInt(1, id);
 
             ResultSet rs = pstmt.executeQuery();
