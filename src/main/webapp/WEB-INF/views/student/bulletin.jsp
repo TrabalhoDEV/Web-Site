@@ -17,11 +17,7 @@
 <aside>
     <nav>
         <ul>
-            <li>
-                <form>
-                    <button type="submit" formaction="<%= request.getContextPath() %>/student/home">Home</button>
-                </form>
-            </li>
+            <li><a href="<%= request.getContextPath() %>/student/home">Home</a></li>
         </ul>
     </nav>
 </aside>

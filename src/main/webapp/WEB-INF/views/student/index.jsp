@@ -18,11 +18,7 @@
 <aside>
     <nav>
         <ul>
-            <li>
-                <form>
-                    <button type="submit" formaction="<%= request.getContextPath() %>/student/bulletin">Minhas matérias</button>
-                </form>
-            </li>
+            <li><a href="<%= request.getContextPath() %>/student/bulletin">Minhas matérias</a></li>
         </ul>
     </nav>
 </aside>
@@ -46,12 +42,10 @@
     <tbody>
     <%
         boolean showNextPage = false;
-        Object attr = request.getAttribute("observationsList");
-        List<String> observationsList = attr instanceof List<?>
-                ? (List<String>) attr
-                : Collections.emptyList();
+        List<String> observationsList = (List<String>) request.getAttribute("observationsList");
 
-        if (!observationsList.isEmpty()) {
+
+        if (observationsList != null && !observationsList.isEmpty()) {
             if (observationsList.size() >= Constants.MAX_TAKE) showNextPage = true;
             for (String obs : observationsList) {
     %>

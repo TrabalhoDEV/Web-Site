@@ -1,6 +1,7 @@
 package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
+import com.example.schoolservlet.daos.interfaces.IStudentSubjectDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.StudentSubject;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
+public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSubjectDAO {
     @Override
     public Map<Integer, StudentSubject> findMany(int skip, int take) throws DataException{
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
@@ -72,36 +73,39 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
         }
     }
 
+    @Override
     public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) {
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
 
-        try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("SELECT " +
-                    "ss.id, " +
-                    "ss.obs, " +
-                    "ss.grade1, " +
-                    "ss.grade2, " +
-                    "st.id AS student_id, " +
-                    "st.name AS student_name, " +
-                    "st.cpf AS student_cpf, " +
-                    "st.email AS student_email, " +
-                    "sb.id AS subject_id, " +
-                    "sb.name AS subject_name, " +
-                    "sb.deadline AS subject_deadline " +
-                    "FROM student_subject ss JOIN student st ON st.id = ss.id_student JOIN subject sb " +
-                    "ON sb.id = ss.id_subject " +
-                    "WHERE st.ID = ? " +
-                    "ORDER BY ss.id LIMIT ? OFFSET ?")
-        ){
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("SELECT " +
+                     "ss.id, " +
+                     "ss.obs, " +
+                     "ss.grade1, " +
+                     "ss.grade2, " +
+                     "st.id AS student_id, " +
+                     "st.name AS student_name, " +
+                     "st.cpf AS student_cpf, " +
+                     "st.email AS student_email, " +
+                     "sb.id AS subject_id, " +
+                     "sb.name AS subject_name, " +
+                     "sb.deadline AS subject_deadline " +
+                     "FROM student_subject ss JOIN student st ON st.id = ss.id_student JOIN subject sb " +
+                     "ON sb.id = ss.id_subject " +
+                     "WHERE st.ID = ? " +
+                     "ORDER BY ss.id LIMIT ? OFFSET ?")
+        ) {
+
+            int limit = take < 0 ? 0 : Math.min(take, Constants.MAX_TAKE);
+            int offset = Math.max(skip, 0);
+
             pstmt.setInt(1, studentId);
-            pstmt.setInt(2, take);
-            pstmt.setInt(3, skip);
+            pstmt.setInt(2, limit);
+            pstmt.setInt(3, offset);
 
             ResultSet rs = pstmt.executeQuery();
-            StudentDAO studentDAO = new StudentDAO();
-            SubjectDAO subjectDAO = new SubjectDAO();
 
-            while (rs.next()){
+            while (rs.next()) {
                 Student student = new Student();
                 student.setId(rs.getInt("student_id"));
                 student.setName(rs.getString("student_name"));
@@ -110,7 +114,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                 student.setStatus(StudentStatusEnum.ACTIVE);
 
                 Subject subject = new Subject();
-                subject.setId(rs.getInt("student_id"));
+                subject.setId(rs.getInt("subject_id"));
                 subject.setName(rs.getString("subject_name"));
                 subject.setDeadline(rs.getDate("subject_deadline"));
 
@@ -123,15 +127,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject> {
                 studentSubject.setSubject(subject);
 
                 studentsSubjects.put(studentSubject.getId(), studentSubject);
-
-                try{
-                    studentSubject.setStudent(studentDAO.findById(rs.getInt("student_id")));
-                    studentSubject.setSubject(subjectDAO.findById(rs.getInt("subject_id")));
-                } catch (DataException | NotFoundException | ValidationException e){
-                    e.printStackTrace();
-                }
             }
-        } catch (SQLException sqle){
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
 
