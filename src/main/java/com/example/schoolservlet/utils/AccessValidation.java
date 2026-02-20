@@ -11,53 +11,60 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 public class AccessValidation {
-    public static void isAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public static boolean isAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
             HttpSession session = request.getSession(false);
             AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
 
             if (user.role() != UserRoleEnum.ADMIN) {
                 request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
-                return;
+                return false;
             }
 
+            return true;
         } catch (NullPointerException npe) {
-            request.setAttribute("error", Constants.EXPIRED_SESSION_MESSAGE);
+            request.setAttribute("error", "Sessão expirada, faça login novamente");
             request.getRequestDispatcher("/pages/admin/login.jsp")
                     .forward(request, response);
-            return;
+            return false;
         }
     }
 
-    public static void isTeacher(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public static boolean isTeacher(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
             HttpSession session = request.getSession(false);
             AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
 
             if (user.role() != UserRoleEnum.TEACHER) {
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
+                return false;
             }
 
+            return true;
         } catch (NullPointerException npe) {
-            request.setAttribute("error", Constants.EXPIRED_SESSION_MESSAGE);
+            request.setAttribute("error","Sessão expirada, faça login novamente");
             request.getRequestDispatcher("/index.jsp")
                     .forward(request, response);
+            return false;
         }
     }
 
-    public static void isStudent(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public static boolean isStudent(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
             HttpSession session = request.getSession(false);
             AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
 
             if (user.role() != UserRoleEnum.STUDENT) {
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
+                return false;
             }
 
+            return true;
         } catch (NullPointerException npe) {
-            request.setAttribute("error", Constants.EXPIRED_SESSION_MESSAGE);
+            request.setAttribute("error", "Sessão expirada, faça login novamente");
             request.getRequestDispatcher("/index.jsp")
                     .forward(request, response);
+            return false;
         }
     }
 }
