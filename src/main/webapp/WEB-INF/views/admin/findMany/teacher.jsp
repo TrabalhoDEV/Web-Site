@@ -37,6 +37,6 @@
 <%} else {%>
 <p>Nenhum professor foi encontrado</p>
 <%}%>
-<a href="admin/insert-teacher">Adicionar professor</a>
+<a href="admin/teacher/insert">Adicionar professor</a>
 </body>
 </html>

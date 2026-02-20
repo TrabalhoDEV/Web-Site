@@ -3,6 +3,7 @@ package com.example.schoolservlet.servlets.admin.findMany;
 import com.example.schoolservlet.daos.TeacherDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
@@ -19,24 +20,7 @@ public class FindManyTeacherServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
 
-        try {
-            HttpSession session = request.getSession();
-            AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
-
-            // Only administrators can register students
-            if (user.role() != UserRoleEnum.ADMIN) {
-                request.getRequestDispatcher("/pages/admin/login.jsp")
-                        .forward(request, response);
-                return;
-            }
-
-        } catch (NullPointerException npe) {
-            // User not authenticated or session attribute missing
-            request.setAttribute("error", "Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/pages/admin/login.jsp")
-                    .forward(request, response);
-            return;
-        }
+        if (!AccessValidation.isAdmin(request, response)) return;
 
         String pageParam = request.getParameter("page");
 
