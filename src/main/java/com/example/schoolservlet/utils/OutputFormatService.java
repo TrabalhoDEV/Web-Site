@@ -1,5 +1,7 @@
 package com.example.schoolservlet.utils;
 
+import java.util.Date;
+
 /**
  * Public class that has static methods to format the data in the database to the output.
  */
@@ -32,7 +34,7 @@ public class OutputFormatService {
      * @return     The word capitalized
      */
     private static String capitalizeOne(String word){
-        return word.substring(0, 1).toUpperCase();
+        return word.substring(0, 1).toUpperCase() + word.substring(1);
     }
 
     /**
@@ -53,5 +55,10 @@ public class OutputFormatService {
     public static String formatCpf(String cpf){
         if (cpf.isEmpty()) return null;
         return cpf.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
+    }
+
+    public static String formatDate(Date date) {
+        if (date == null) return "-";
+        return new java.text.SimpleDateFormat("dd/MM").format(date);
     }
 }
