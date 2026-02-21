@@ -49,7 +49,7 @@ public class UpdateTeacherServlet extends HttpServlet {
             return;
         } catch (NotFoundException nfe){
             request.setAttribute("error", nfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findmany/teacher.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
             return;
         } catch (ValidationException ve){
             request.setAttribute("error", ve.getMessage());
@@ -118,7 +118,7 @@ public class UpdateTeacherServlet extends HttpServlet {
             return;
         } catch (NotFoundException nfe){
             request.setAttribute("error", nfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
             return;
         } catch (ValueAlreadyExistsException vaee){
             request.setAttribute("error", vaee.getMessage());
