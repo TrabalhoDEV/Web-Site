@@ -39,8 +39,11 @@ public class SendCodeServlet extends HttpServlet {
 //        Catching user's input:
         input = request.getParameter("input");
 
-        if (input == null || input.isBlank()) {
-            request.setAttribute("error", "Campo não pode ser vazio");
+        try {
+            InputValidation.validateIsNull("identificador", input);
+        } catch (ValidationException e){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/forgotPassword/sendCode.jsp").forward(request, response);
             return;
         }
@@ -50,34 +53,22 @@ public class SendCodeServlet extends HttpServlet {
         try {
             InputValidation.validateEnrollment(input);
             role = UserRoleEnum.STUDENT;
-        } catch (ValidationException e) {
-            if (role == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                request.setAttribute("error", e.getMessage());
-                hasException = true;
-            }
-        }
+        } catch (ValidationException e) {}
 
         try {
             InputValidation.validateCpf(input);
             role = UserRoleEnum.ADMIN;
-        } catch (ValidationException e) {
-            if (role == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                request.setAttribute("error", e.getMessage());
-                hasException = true;
-            }
-        }
+        } catch (ValidationException e) {}
 
         try{
             InputValidation.validateUserName(input);
             role = UserRoleEnum.TEACHER;
-        } catch (ValidationException e) {
-            if (role == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                request.setAttribute("error", e.getMessage());
-                hasException = true;
-            }
+        } catch (ValidationException e) {}
+
+        if (role == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            request.setAttribute("error", "Identificador inválido");
+            hasException = true;
         }
 
         if (role == UserRoleEnum.STUDENT) {
