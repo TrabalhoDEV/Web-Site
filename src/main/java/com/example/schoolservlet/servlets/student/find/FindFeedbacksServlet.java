@@ -1,6 +1,7 @@
 package com.example.schoolservlet.servlets.student.find;
 
 import com.example.schoolservlet.daos.StudentSubjectDAO;
+import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
@@ -119,6 +120,9 @@ public class FindFeedbacksServlet extends HttpServlet {
 
         } catch (NullPointerException npe) {
             LOGGER.log(Level.SEVERE, "Error loading feedbacks - unexpected null value", npe);
+            request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
+        } catch (DataException de) {
+            LOGGER.log(Level.SEVERE, "Error processing feedbacks request: ", de);
             request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error loading feedbacks", e);

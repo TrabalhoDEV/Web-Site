@@ -1,6 +1,7 @@
 package com.example.schoolservlet.servlets.student.find;
 
 import com.example.schoolservlet.daos.StudentSubjectDAO;
+import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
@@ -78,7 +79,6 @@ public class FindBulletinServlet extends HttpServlet {
             // Fetch the total amount of pages
             int totalSubjects = new StudentSubjectDAO().totalCount(authenticatedUser.id());
             int totalPages = PaginationUtilities.calculateTotalPages(totalSubjects, Constants.MAX_TAKE);
-            System.out.println(totalPages);
 
 
             // Fetch student's subjects and grades from database with pagination
@@ -91,9 +91,13 @@ public class FindBulletinServlet extends HttpServlet {
                         Constants.MAX_TAKE,
                         authenticatedUser.id()
                 );
+            } catch (DataException de) {
+                LOGGER.log(Level.SEVERE, "Data access error while fetching student subjects for student ID: " + authenticatedUser.id(), de);
+                treatUnexpectedError(request, response);
+                studentSubjectMap = Map.of();
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Database error while fetching student subjects for student ID: " + authenticatedUser.id(), e);
-                request.setAttribute("error", "Unable to load bulletin data. Please try again later.");
+                treatUnexpectedError(request, response);
                 studentSubjectMap = Map.of();
             }
 
@@ -113,6 +117,9 @@ public class FindBulletinServlet extends HttpServlet {
             
         } catch (ServletException | IOException e) {
             LOGGER.log(Level.SEVERE, "Error processing bulletin request for student ID: " + authenticatedUser.id(), e);
+            treatUnexpectedError(request, response);
+        } catch (DataException de) {
+            LOGGER.log(Level.SEVERE, "Data access error while processing bulletin for student ID: " + authenticatedUser.id(), de);
             treatUnexpectedError(request, response);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected error in bulletin servlet", e);
