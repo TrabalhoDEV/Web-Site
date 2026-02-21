@@ -107,6 +107,30 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    public List<Subject> findByTeacherId(int teacherId) throws DataException {
+        List<Subject> subjects = new ArrayList<>();
+        String sql = "SELECT s.id, s.name, s.deadline " +
+                "FROM subject s " +
+                "JOIN subject_teacher st ON s.id = st.id_subject " +
+                "WHERE st.id_teacher = ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, teacherId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Subject subject = new Subject(rs.getInt("id"),rs.getString("name"),rs.getDate("deadline"));
+                    subjects.add(subject);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DataException("Erro ao buscar matérias do professor", e);
+        }
+
+        return subjects;
+    }
     @Override
     public int totalCount() throws DataException {
         try(Connection conn = PostgreConnection.getConnection();

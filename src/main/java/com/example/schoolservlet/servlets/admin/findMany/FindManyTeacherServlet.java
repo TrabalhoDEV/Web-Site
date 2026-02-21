@@ -1,7 +1,11 @@
 package com.example.schoolservlet.servlets.admin.findMany;
 
+import com.example.schoolservlet.daos.SchoolClassDAO;
+import com.example.schoolservlet.daos.SubjectDAO;
 import com.example.schoolservlet.daos.TeacherDAO;
 import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.models.SchoolClass;
+import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
@@ -10,6 +14,9 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 /**
  * Servlet responsible for listing multiple teachers in the system with pagination.
@@ -29,6 +36,7 @@ public class FindManyTeacherServlet extends HttpServlet {
         int skip = 0;
         int page;
         int totalCount = 0;
+        int totalPages;
 
         try {
             page = Integer.parseInt(pageParam);
@@ -37,36 +45,45 @@ public class FindManyTeacherServlet extends HttpServlet {
         }
 
         TeacherDAO teacherDAO = new TeacherDAO();
-        try{
+        Map<Integer, Teacher> teacherMap;
+        try {
             totalCount = teacherDAO.totalCount();
-        } catch (DataException de){
+            totalPages = Math.max(1, (int)Math.ceil((double) totalCount / Constants.MAX_TAKE));
+            page = Math.max(1, Math.min(page, totalPages));
+            skip = take * (page - 1);
+            teacherMap = teacherDAO.findMany(skip, take);
+        } catch (DataException de) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/student.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp")
                     .forward(request, response);
             return;
         }
 
-        int totalPages = Math.max(1, (int)Math.ceil((double) totalCount / Constants.MAX_TAKE));
+        Map<Integer, List<Subject>> teacherSubjects = new HashMap<>();
+        Map<Integer, List<SchoolClass>> teacherClasses = new HashMap<>();
 
-        page = Math.max(1, Math.min(page, totalPages));
+        SubjectDAO subjectDAO = new SubjectDAO();
+        SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
 
-        skip = take * (page - 1);
-
-        Map<Integer, Teacher> teacherMap;
-
-        try {
-            teacherMap = teacherDAO.findMany(skip, take);
-        } catch (DataException de){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/student.jsp")
-                    .forward(request, response);
-            return;
+        for (Teacher teacher : teacherMap.values()) {
+            try {
+                teacherSubjects.put(teacher.getId(), subjectDAO.findByTeacherId(teacher.getId()));
+            } catch (DataException de) {
+                teacherSubjects.put(teacher.getId(), new ArrayList<>());
+            }
+            try {
+                teacherClasses.put(teacher.getId(), schoolClassDAO.findByTeacherId(teacher.getId()));
+            } catch (DataException de) {
+                teacherClasses.put(teacher.getId(), new ArrayList<>());
+            }
         }
 
         request.setAttribute("teacherMap", teacherMap);
+        request.setAttribute("teacherSubjects", teacherSubjects);
+        request.setAttribute("teacherClasses", teacherClasses);
         request.setAttribute("page", page);
+        request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
     }

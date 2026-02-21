@@ -85,7 +85,6 @@ public class UpdateTeacherServlet extends HttpServlet {
             String name = InputNormalizer.normalizeName(request.getParameter("name"));
             String email = InputNormalizer.normalizeEmail(request.getParameter("email"));
             String username = InputNormalizer.normalizeUserName(request.getParameter("username"));
-            String password = request.getParameter("password");
 
             InputValidation.validateTeacherName(name);
             InputValidation.validateEmail(email);
@@ -105,14 +104,13 @@ public class UpdateTeacherServlet extends HttpServlet {
 
             teacherDAO.update(teacher);
 
-            if (password != null && !password.isBlank()) {
-                InputValidation.validatePassword(password);
-                teacherDAO.updatePassword(id, password);
-            }
-
             response.sendRedirect(request.getContextPath()+ "/admin/teacher/find-many");
 
-        }  catch (DataException de){
+        }catch (NumberFormatException nfe){
+            request.setAttribute("error", "ID inválido.");
+            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
+            return;
+        } catch (DataException de){
             request.setAttribute("error", de.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
             return;

@@ -47,15 +47,6 @@
             required>
     </div>
 
-    <div class="form-group">
-        <label for="password">Nova senha (opcional)</label>
-        <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Digite apenas se quiser alterar">
-    </div>
-
     <% if (request.getAttribute("error") != null) { %>
     <p>
         <%= request.getAttribute("error") %>
