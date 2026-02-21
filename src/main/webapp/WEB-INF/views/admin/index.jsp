@@ -59,5 +59,6 @@
     </form>
 <a href="${pageContext.request.contextPath}/admin/student/find-many">Ver alunos</a>
 <a href="${pageContext.request.contextPath}/admin/school-class/find-many">Ver turmas</a>
+    <a href="${pageContext.request.contextPath}/admin/subject/find-many">Ver matérias</a>
 </body>
 </html>
