@@ -1,5 +1,7 @@
 package com.example.schoolservlet.exceptions;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 public class ValidationException extends SchoolServletException{
     private String field;
     public ValidationException(String message){
@@ -14,5 +16,10 @@ public class ValidationException extends SchoolServletException{
 
     public String getField() {
         return field;
+    }
+
+    @Override
+    public int getStatus() {
+        return HttpServletResponse.SC_BAD_REQUEST;
     }
 }

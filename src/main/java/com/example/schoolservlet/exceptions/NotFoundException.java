@@ -1,5 +1,7 @@
 package com.example.schoolservlet.exceptions;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 public class NotFoundException extends SchoolServletException{
     private String table;
     private String field;
@@ -21,5 +23,10 @@ public class NotFoundException extends SchoolServletException{
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public int getStatus() {
+        return HttpServletResponse.SC_NOT_FOUND;
     }
 }

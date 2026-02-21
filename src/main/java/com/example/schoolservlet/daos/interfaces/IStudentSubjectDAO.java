@@ -2,13 +2,14 @@ package com.example.schoolservlet.daos.interfaces;
 
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.ValidationException;
-import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.records.StudentsPerformance;
 import com.example.schoolservlet.utils.records.TeacherPendency;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Interface that defines the contract, like functions, exceptions and params of diferent methos implemented in {@link com.example.schoolservlet.daos.StudentSubjectDAO}
+ * Interface for managing Student Subject operations.
+ * Defines contract for accessing student subject data from the database.
  */
 public interface IStudentSubjectDAO {
     /**

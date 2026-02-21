@@ -46,7 +46,7 @@
 <section>
   <div>
     <h3>Alunos em atenção</h3>
-    <a href="">Ver alunos</a>
+    <a href="${pageContext.request.contextPath}/teacher/students">Ver alunos</a>
   </div>
   <%if (studentSubjectMap != null && !studentSubjectMap.isEmpty()){%>
     <%for(StudentSubject studentSubject: studentSubjectMap.values()){%>
@@ -55,10 +55,12 @@
         <p>Média: <%=studentSubject.getAverage()%></p>
       </div>
     <%}%>
-  <%} else if (request.getAttribute("error") != null) {%>
-    <p><%=request.getAttribute("error")%></p>
   <%} else {%>
     <p>Nenhum aluno foi encontrado nessa situação</p>
+  <%}%>
+
+  <%if (request.getAttribute("error") != null) {%>
+    <p><%=request.getAttribute("error")%></p>
   <%}%>
 </section>
 </body>
