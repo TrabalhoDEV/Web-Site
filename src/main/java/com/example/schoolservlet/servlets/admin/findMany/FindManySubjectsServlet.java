@@ -21,13 +21,16 @@ public class FindManySubjectsServlet extends HttpServlet {
         response.setContentType("text/html");
 
         if (!AccessValidation.isAdmin(request, response)) return;
-
+        HttpSession session = request.getSession();
+        String error = (String) session.getAttribute("error");
         String pageParam = request.getParameter("page");
-
         int take = Constants.MAX_TAKE;
         int skip = 0;
         int page;
         int totalCount = 0;
+
+        session.removeAttribute("error");
+        request.setAttribute("error", error);
 
         try {
             page = Integer.parseInt(pageParam);
