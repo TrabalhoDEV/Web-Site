@@ -43,6 +43,6 @@
 <%} else {%>
 <p>Nenhum aluno foi encontrado</p>
 <%}%>
-<a href="${pageContext.request.contextPath}admin/add-student">Cadastrar alunos</a>
+<a href="${pageContext.request.contextPath}/admin/add-student">Cadastrar alunos</a>
 </body>
 </html>
