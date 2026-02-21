@@ -33,10 +33,11 @@
     <%}%>
     </tbody>
 </table>
-<%} else if (request.getAttribute("error") != null){%>
-<p><%=request.getAttribute("error")%></p>
 <%} else {%>
 <p>Nenhuma matéria foi encontrada</p>
+<%}%>
+<% if (request.getAttribute("error") != null){%>
+<p><%=request.getAttribute("error")%></p>
 <%}%>
 <a href="${pageContext.request.contextPath}/admin/subject/insert">Adicionar matéria</a>
 <div style="display: flex; gap: 10px">

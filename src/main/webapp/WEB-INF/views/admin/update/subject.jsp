@@ -33,6 +33,8 @@
         >
     </div>
 
+    <input name="id" hidden="hidden" value="<%=((Subject) request.getAttribute("subject")).getId()%>">
+
     <%if (request.getAttribute("error") != null) {%>
     <p><%=request.getAttribute("error") %></p>
     <%}%>
