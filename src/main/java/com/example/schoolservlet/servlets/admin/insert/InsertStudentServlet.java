@@ -29,6 +29,7 @@ import java.util.List;
 public class InsertStudentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        if (!AccessValidation.isAdmin(request, response)) return;
         getAllData(request, response);
 
         request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
