@@ -11,32 +11,45 @@
   int pageNumber = (Integer) request.getAttribute("page");
 %>
 <body>
-<%if (!teacherMap.isEmpty()){%>
+<% if (teacherMap != null && !teacherMap.isEmpty()) { %>
+
 <table>
   <thead>
   <tr>
     <th>Nome</th>
     <th>Usuário</th>
     <th>Email</th>
+    <th>Ações</th>
   </tr>
   </thead>
   <tbody>
-  <%for (Teacher teacher: teacherMap.values()) {%>
+  <% for (Teacher teacher : teacherMap.values()) { %>
   <tr>
-    <td><%=OutputFormatService.formatName(teacher.getName())%></td>
-    <td><%=teacher.getUsername()%>
-    </td>
-    <td><%=teacher.getEmail()%>
+    <td><%= OutputFormatService.formatName(teacher.getName()) %></td>
+    <td><%= teacher.getUsername() %></td>
+    <td><%= teacher.getEmail() %></td>
+    <td>
+      <a href="${pageContext.request.contextPath}/admin/teacher/update?id=<%=teacher.getId()%>">
+        Editar
+      </a>
     </td>
   </tr>
-  <%}%>
+  <% } %>
   </tbody>
 </table>
-<%} else if (request.getAttribute("error") != null){%>
-<p><%=request.getAttribute("error")%></p>
-<%} else {%>
+
+<% } else if (request.getAttribute("error") != null) { %>
+
+<p><%= request.getAttribute("error") %></p>
+
+<% } else { %>
+
 <p>Nenhum professor foi encontrado</p>
-<%}%>
-<a href="admin/teacher/insert">Adicionar professor</a>
+
+<% } %>
+
+<a href="${pageContext.request.contextPath}/admin/teacher/insert">
+  Adicionar professor
+</a>
 </body>
 </html>

@@ -38,10 +38,6 @@ public class UpdateTeacherServlet extends HttpServlet {
             Teacher teacher = teacherDAO.findById(id);
             request.setAttribute("teacher",teacher);
 
-        } catch (InvalidNumberException ine){
-            request.setAttribute("error",ine.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
-            return;
         } catch (NumberFormatException nfe){
             request.setAttribute("error",nfe.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
@@ -66,7 +62,7 @@ public class UpdateTeacherServlet extends HttpServlet {
     }
 
     /**
-     * Handles POSST requests for teacher updating.
+     * Handles POST requests for teacher updating.
      *
      * @param request  HTTP request containing name, email, username, password parameters
      * @param response HTTP response object
@@ -133,7 +129,5 @@ public class UpdateTeacherServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
             return;
         }
-
-        request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
     }
 }

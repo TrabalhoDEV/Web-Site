@@ -61,6 +61,30 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    public List<Subject> findAll() throws DataException {
+        List<Subject> subjects = new ArrayList<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "SELECT * FROM subject ORDER BY id")) {
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                subjects.add(new Subject(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getDate("deadline")
+                ));
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar matérias", sqle);
+        }
+
+        return subjects;
+    }
     @Override
     public Subject findById(int id) throws DataException, NotFoundException, ValidationException{
         InputValidation.validateId(id, "id");
