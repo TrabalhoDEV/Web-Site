@@ -41,7 +41,7 @@
 
         <!-- CPF field: expects numeric input -->
         <label for="cpf">CPF:</label>
-        <input type="number" id="cpf" name="cpf" placeholder="Digite o CPF do estudante" required>
+        <input type="text" id="cpf" name="cpf" placeholder="Digite o CPF do estudante" required>
         <br><br>
 
         <!-- Academic year selection dropdown -->
