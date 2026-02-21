@@ -157,7 +157,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
 
             FieldAlreadyUsedValidation.exists("student", "cpf", student.getCpf());
             FieldAlreadyUsedValidation.exists("admin", "document", String.valueOf(student.getCpf()));
-            pstmt.setInt(1, StudentStatusEnum.INACTIVE.ordinal());
+            pstmt.setInt(1, StudentStatusEnum.INACTIVE.ordinal() + 1);
             pstmt.setString(2, InputNormalizer.normalizeCpf(student.getCpf()));
             pstmt.setInt(3, student.getIdSchoolClass());
 
@@ -230,7 +230,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             pstmt.setString(1, InputNormalizer.normalizeName(student.getName()));
             pstmt.setString(2, InputNormalizer.normalizeEmail(student.getEmail()));
             pstmt.setString(3, BCrypt.hashpw(student.getPassword(), BCrypt.gensalt(12)));
-            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal());
+            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal() + 1);
             pstmt.setInt(5, student.getId());
 
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("alunos", "matrícula", String.valueOf(student.getId()));
