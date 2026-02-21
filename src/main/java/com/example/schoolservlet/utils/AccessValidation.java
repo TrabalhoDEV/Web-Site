@@ -1,6 +1,5 @@
 package com.example.schoolservlet.utils;
 
-import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.ServletException;

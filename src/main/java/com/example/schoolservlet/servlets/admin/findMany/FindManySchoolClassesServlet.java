@@ -1,10 +1,8 @@
 package com.example.schoolservlet.servlets.admin.findMany;
 
 import com.example.schoolservlet.daos.SchoolClassDAO;
-import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.SchoolClass;
-import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import jakarta.servlet.*;

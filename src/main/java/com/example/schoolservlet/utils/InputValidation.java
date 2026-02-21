@@ -2,7 +2,6 @@ package com.example.schoolservlet.utils;
 
 import com.example.schoolservlet.exceptions.*;
 
-import java.awt.*;
 import java.nio.charset.StandardCharsets;
 
 /**
