@@ -80,7 +80,6 @@ public class FindBulletinServlet extends HttpServlet {
             int totalSubjects = new StudentSubjectDAO().totalCount(authenticatedUser.id());
             int totalPages = PaginationUtilities.calculateTotalPages(totalSubjects, Constants.MAX_TAKE);
 
-
             // Fetch student's subjects and grades from database with pagination
             StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
             Map<Integer, StudentSubject> studentSubjectMap = null;
