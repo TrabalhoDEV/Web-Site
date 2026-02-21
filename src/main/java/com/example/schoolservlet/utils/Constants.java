@@ -38,4 +38,8 @@ public class Constants {
 
 //    PAGES constratins:
     public static final int MAX_TAKE = 6;
+    public static final int MIN_PAGE = 0;
+
+// STRINGS
+    public static final String UNEXPECTED_ERROR_MESSAGE = "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.";
 }

@@ -82,4 +82,16 @@ public class StudentSubject {
     public void setObs(String obs) {
         this.obs = obs;
     }
+
+    @Override
+    public String toString() {
+        return "StudentSubject{" +
+                "id=" + id +
+                ", student=" + student +
+                ", subject=" + subject +
+                ", grade1=" + grade1 +
+                ", grade2=" + grade2 +
+                ", obs='" + obs + '\'' +
+                '}';
+    }
 }
