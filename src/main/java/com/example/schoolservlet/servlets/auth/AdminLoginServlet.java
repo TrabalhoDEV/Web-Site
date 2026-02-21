@@ -36,6 +36,8 @@ public class AdminLoginServlet extends HttpServlet {
             cpf = request.getParameter("cpf");
             password = request.getParameter("password");
 
+            System.out.println(cpf);
+            System.out.println(password);
 
             InputValidation.validateCpf(cpf);
             InputValidation.validateIsNull("senha", password);

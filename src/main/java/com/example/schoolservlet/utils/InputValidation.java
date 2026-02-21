@@ -16,7 +16,7 @@ public class InputValidation {
      * @return    true if cpf's format is valid
      */
     public static void validateCpf(String cpf) throws ValidationException{
-        validateIsNull("document", cpf);
+        validateIsNull("cpf", cpf);
         if (!StandardCharsets.US_ASCII.newEncoder().canEncode(cpf)) throw new ValidationException("CPF contém caracteres inválidos");
         if (!cpf.matches("\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}")) throw new RegexException("cpf");
     }
