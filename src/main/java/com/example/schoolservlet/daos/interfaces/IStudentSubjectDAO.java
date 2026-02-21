@@ -20,7 +20,7 @@ public interface IStudentSubjectDAO {
      * @return a {@link Map} where the key is the subject ID and the value is the {@link StudentSubject} object,
      *         or an empty map if no subjects are found
      */
-    Map<Integer, StudentSubject> findMany(int skip, int take, int studentId);
+    Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException;
 
 
     /**

@@ -74,7 +74,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
     }
 
     @Override
-    public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) {
+    public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException{
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -130,6 +130,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
             }
         } catch (SQLException sqle) {
             sqle.printStackTrace();
+            throw new DataException("Erro ao listar matérias por aluno", sqle);
         }
 
         return studentsSubjects;

@@ -91,9 +91,13 @@ public class FindBulletinServlet extends HttpServlet {
                         Constants.MAX_TAKE,
                         authenticatedUser.id()
                 );
+            } catch (DataException de) {
+                LOGGER.log(Level.SEVERE, "Data access error while fetching student subjects for student ID: " + authenticatedUser.id(), de);
+                treatUnexpectedError(request, response);
+                studentSubjectMap = Map.of();
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Database error while fetching student subjects for student ID: " + authenticatedUser.id(), e);
-                request.setAttribute("error", "Unable to load bulletin data. Please try again later.");
+                treatUnexpectedError(request, response);
                 studentSubjectMap = Map.of();
             }
 
