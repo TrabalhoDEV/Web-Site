@@ -25,29 +25,29 @@ public class UpdateSubjectServlet extends HttpServlet {
         String idParam = request.getParameter("id");
 
         try {
-            SubjectDAO subjectDAO = new SubjectDAO();
-
             if (idParam == null || idParam.isEmpty()) throw new InvalidNumberException(idParam,"O ID não pode estar vazio");
 
+            SubjectDAO subjectDAO = new SubjectDAO();
             int id = Integer.parseInt(idParam);
-
             InputValidation.validateId(id, "id");
-
             Subject subject = subjectDAO.findById(id);
+
             request.setAttribute("subject", subject);
-        } catch (ValidationException | DataException | NotFoundException e){
+            request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
+        } catch (NotFoundException nfe){
+            nfe.printStackTrace();
+            request.getSession(false).setAttribute("error", nfe.getMessage());
+
+            response.sendRedirect(request.getContextPath() + "/admin/subject/find-many");
+        } catch (ValidationException | DataException e){
             e.printStackTrace();
             request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
-            return;
         } catch (NumberFormatException nfe){
-            nfe.printStackTrace();
-            request.setAttribute("error", "ID precisa ser um valor numérico");
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
-            return;
-        }
+            request.getSession(false).setAttribute("error", "ID precisa ser um valor numérico");
 
-        request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/admin/subject/find-many");
+        }
     }
 
     @Override
@@ -98,6 +98,7 @@ public class UpdateSubjectServlet extends HttpServlet {
 
             response.sendRedirect(request.getContextPath() + "/admin/subject/find-many");
         }  catch (NumberFormatException nfe){
+            nfe.printStackTrace();
             request.getSession(false).setAttribute("error", "ID precisa ser um valor numérico");
 
             response.sendRedirect(request.getContextPath() + "/admin/subject/find-many");
