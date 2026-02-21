@@ -156,4 +156,23 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
             throw new DataException("Erro ao deletar school_class_teacher", sqle);
         }
     }
+
+    public void deleteByTeacherAndClass(int teacherId, int schoolClassId)
+            throws DataException {
+
+        String sql = "DELETE FROM school_class_teacher " +
+                "WHERE id_teacher = ? AND id_school_class = ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, teacherId);
+            stmt.setInt(2, schoolClassId);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new DataException("Erro ao remover matéria do professor.", e);
+        }
+    }
 }

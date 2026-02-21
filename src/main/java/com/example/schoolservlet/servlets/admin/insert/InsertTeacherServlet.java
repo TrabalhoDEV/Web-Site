@@ -107,8 +107,8 @@ public class InsertTeacherServlet extends HttpServlet {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
             request.setAttribute("success",true);
+            response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
 
         } catch (NumberFormatException nfe){
             getAllSchoolClasses(request);

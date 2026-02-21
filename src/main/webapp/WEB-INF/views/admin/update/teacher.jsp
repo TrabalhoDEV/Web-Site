@@ -1,5 +1,10 @@
 <%@ page import="com.example.schoolservlet.models.Teacher" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
+<%@ page import="com.example.schoolservlet.models.Subject" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.example.schoolservlet.models.SchoolClass" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="java.util.HashSet" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <html>
@@ -11,6 +16,25 @@
 
 <%
     Teacher teacher = (Teacher) request.getAttribute("teacher");
+    List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
+    List<Subject> teacherSubjects = (List<Subject>) request.getAttribute("teacherSubjects");
+
+    Set<Integer> teacherSubjectIds = new HashSet<>();
+    if (teacherSubjects != null) {
+        for (Subject ts : teacherSubjects) {
+            teacherSubjectIds.add(ts.getId());
+        }
+    }
+
+    List<SchoolClass> schoolClasses = (List<SchoolClass>) request.getAttribute("schoolClasses");
+    List<SchoolClass> teacherSchoolClasses = (List<SchoolClass>) request.getAttribute("teacherSchoolClasses");
+
+    Set<Integer> teacherSchoolClassesId = new HashSet<>();
+    if (teacherSchoolClasses != null) {
+        for (SchoolClass sc : teacherSchoolClasses) {
+            teacherSchoolClassesId.add(sc.getId());
+        }
+    }
 %>
 
 <h2>Atualizar Professor</h2>
@@ -46,6 +70,22 @@
             placeholder="Ex: joaosilva"
             required>
     </div>
+
+    <% for (Subject subject : subjects) { %>
+    <input type="checkbox"
+           name="subjectIds"
+           value="<%=subject.getId()%>"
+        <%= teacherSubjectIds.contains(subject.getId()) ? "checked" : "" %>>
+    <%= OutputFormatService.formatName(subject.getName()) %><br>
+    <% } %>
+
+    <% for (SchoolClass schoolClass : schoolClasses) { %>
+    <input type="checkbox"
+           name="schoolClassIds"
+           value="<%=schoolClass.getId()%>"
+        <%= teacherSchoolClassesId.contains(schoolClass.getId()) ? "checked" : "" %>>
+    <%= OutputFormatService.formatName(schoolClass.getSchoolYear()) %><br>
+    <% } %>
 
     <% if (request.getAttribute("error") != null) { %>
     <p>

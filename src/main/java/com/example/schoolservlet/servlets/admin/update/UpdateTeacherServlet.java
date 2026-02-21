@@ -1,8 +1,8 @@
 package com.example.schoolservlet.servlets.admin.update;
 
-import com.example.schoolservlet.daos.TeacherDAO;
+import com.example.schoolservlet.daos.*;
 import com.example.schoolservlet.exceptions.*;
-import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.models.*;
 import com.example.schoolservlet.utils.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,6 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Servlet responsible for updating teachers in the system.
@@ -18,6 +21,14 @@ import java.io.IOException;
  */
 @WebServlet(name = "admin-update-teacher",value = "/admin/teacher/update")
 public class UpdateTeacherServlet extends HttpServlet {
+    private SubjectDAO subjectDAO = new SubjectDAO();
+    private SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+    private SubjectTeacherDAO subjectTeacherDAO = new SubjectTeacherDAO();
+    private SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
+    private TeacherDAO teacherDAO = new TeacherDAO();
+
+
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -31,9 +42,8 @@ public class UpdateTeacherServlet extends HttpServlet {
             }
 
             int id = Integer.parseInt(idParam);
-            TeacherDAO teacherDAO = new TeacherDAO();
-            Teacher teacher = teacherDAO.findById(id);
-            request.setAttribute("teacher",teacher);
+            loadUpdateData(request,id);
+            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
 
         } catch (NumberFormatException nfe){
             request.setAttribute("error",nfe.getMessage());
@@ -53,9 +63,6 @@ public class UpdateTeacherServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
             return;
         }
-
-        request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
-
     }
 
     /**
@@ -70,18 +77,20 @@ public class UpdateTeacherServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!AccessValidation.isAdmin(request, response)) return;
 
+        int id = -1;
         try{
             String idParam = request.getParameter("id");
             if(idParam == null || idParam.isEmpty()){
                 throw new InvalidNumberException(idParam,"O ID não pode estar vazio");
             }
-            int id = Integer.valueOf(idParam);
-            TeacherDAO teacherDAO = new TeacherDAO();
+            id = Integer.parseInt(idParam);
             Teacher teacher = teacherDAO.findById(id);
 
             String name = InputNormalizer.normalizeName(request.getParameter("name"));
             String email = InputNormalizer.normalizeEmail(request.getParameter("email"));
             String username = InputNormalizer.normalizeUserName(request.getParameter("username"));
+            String[] subjectIdsParam = request.getParameterValues("subjectIds");
+            String[] schoolClassIdsParam = request.getParameterValues("schoolClassIds");
 
             InputValidation.validateTeacherName(name);
             InputValidation.validateEmail(email);
@@ -100,6 +109,76 @@ public class UpdateTeacherServlet extends HttpServlet {
             teacher.setUsername(username);
 
             teacherDAO.update(teacher);
+
+            Set<Integer> newSubjectIds = new HashSet<>();
+            if (subjectIdsParam != null) {
+                for (String sId : subjectIdsParam) {
+                    newSubjectIds.add(Integer.parseInt(sId));
+                }
+            }
+
+            List<Subject> currentSubjects = subjectDAO.findByTeacherId(teacher.getId());
+
+            Set<Integer> currentSubjectIds = new HashSet<>();
+            for (Subject s : currentSubjects) {
+                currentSubjectIds.add(s.getId());
+            }
+
+            Set<Integer> toAddSubjects = new HashSet<>(newSubjectIds);
+            toAddSubjects.removeAll(currentSubjectIds);
+
+            Set<Integer> toRemoveSubjects = new HashSet<>(currentSubjectIds);
+            toRemoveSubjects.removeAll(newSubjectIds);
+
+            for (Integer subjectId : toAddSubjects) {
+                Subject subject = subjectDAO.findById(subjectId);
+
+                SubjectTeacher st = new SubjectTeacher();
+                st.setTeacher(teacher);
+                st.setSubject(subject);
+                subjectTeacherDAO.create(st);
+            }
+
+            for (Integer subjectId : toRemoveSubjects) {
+                subjectTeacherDAO.deleteByTeacherAndSubject(teacher.getId(), subjectId);
+            }
+
+            Set<Integer> newSchoolClassIds = new HashSet<>();
+            if (schoolClassIdsParam != null) {
+                for (String scId : schoolClassIdsParam) {
+                    newSchoolClassIds.add(Integer.parseInt(scId));
+                }
+            }
+
+            List<SchoolClass> currentSchoolClasses = schoolClassDAO.findByTeacherId(teacher.getId());
+
+            Set<Integer> currentSchoolClassIds = new HashSet<>();
+            for (SchoolClass sc : currentSchoolClasses) {
+                currentSchoolClassIds.add(sc.getId());
+            }
+
+            Set<Integer> toAddClasses = new HashSet<>(newSchoolClassIds);
+            toAddClasses.removeAll(currentSchoolClassIds);
+
+            Set<Integer> toRemoveClasses = new HashSet<>(currentSchoolClassIds);
+            toRemoveClasses.removeAll(newSchoolClassIds);
+
+            for (Integer classId : toAddClasses) {
+                SchoolClass schoolClass = schoolClassDAO.findById(classId);
+
+                SchoolClassTeacher sct = new SchoolClassTeacher();
+                sct.setTeacher(teacher);
+                sct.setSchoolClass(schoolClass);
+
+                schoolClassTeacherDAO.create(sct);
+            }
+
+
+            for (Integer classId : toRemoveClasses) {
+                schoolClassTeacherDAO.deleteByTeacherAndClass(teacher.getId(), classId);
+            }
+
+
             try {
                 String assunto = "Edição dos dados do Sistema Escolar";
                 String mensagem = "Olá " + teacher.getName() + ",<br><br>"
@@ -115,25 +194,58 @@ public class UpdateTeacherServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath()+ "/admin/teacher/find-many");
 
         }catch (NumberFormatException nfe){
+            loadSafely(request, id);
             request.setAttribute("error", "ID inválido.");
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
             return;
         } catch (DataException de){
+            loadSafely(request, id);
             request.setAttribute("error", de.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
             return;
         } catch (NotFoundException nfe){
+            loadSafely(request, id);
+
             request.setAttribute("error", nfe.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
             return;
         } catch (ValueAlreadyExistsException vaee){
+            loadSafely(request, id);
             request.setAttribute("error", vaee.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
             return;
         } catch (ValidationException ve){
+            loadSafely(request, id);
             request.setAttribute("error", ve.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
             return;
         }
+    }
+
+    private void loadUpdateData(HttpServletRequest request, int teacherId)
+            throws DataException, NotFoundException, ValidationException {
+
+        Teacher teacher = teacherDAO.findById(teacherId);
+        List<Subject> allSubjects = subjectDAO.findAll();
+        List<Subject> teacherSubjects =
+                subjectDAO.findByTeacherId(teacherId);
+
+        List<SchoolClass> allSchoolClasses =
+                schoolClassDAO.findAll();
+        List<SchoolClass> teacherSchoolClasses =
+                schoolClassDAO.findByTeacherId(teacherId);
+
+        request.setAttribute("teacher", teacher);
+        request.setAttribute("subjects", allSubjects);
+        request.setAttribute("teacherSubjects", teacherSubjects);
+        request.setAttribute("schoolClasses", allSchoolClasses);
+        request.setAttribute("teacherSchoolClasses",
+                teacherSchoolClasses);
+    }
+
+    private void loadSafely(HttpServletRequest request, int id) {
+        try {
+            loadUpdateData(request, id);
+        } catch (Exception ignored) {}
     }
 }

@@ -22,7 +22,7 @@
   <input name="password" id="password" type="text">
 
   <fieldset>
-    <legend>Matérias:</legend>
+    <legend>Selecione as matérias:</legend>
     <%
       List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
       if (subjects != null) {
@@ -37,7 +37,7 @@
   </fieldset><br>
 
   <fieldset>
-    <legend>Turmas:</legend>
+    <legend>Selecione as turmas:</legend>
     <%
       List<SchoolClass> classes = (List<SchoolClass>) request.getAttribute("classes");
       if (classes != null) {
