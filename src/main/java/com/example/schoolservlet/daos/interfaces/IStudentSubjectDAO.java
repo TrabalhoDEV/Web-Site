@@ -1,5 +1,6 @@
 package com.example.schoolservlet.daos.interfaces;
 
+import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.StudentSubject;
 
 import java.util.Map;
@@ -28,5 +29,5 @@ public interface IStudentSubjectDAO {
      * @param studentId the unique identifier of the student
      * @return the total number of subjects for the given student ID
      */
-    int totalCount(int studentId);
+    int totalCount(int studentId) throws DataException;
 }

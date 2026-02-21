@@ -202,7 +202,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
-    public int totalCount(int studentId) {
+    @Override
+    public int totalCount(int studentId) throws DataException {
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT COUNT(*) AS totalCount FROM student_subject WHERE id_student = ?"
@@ -216,8 +217,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
             return -1;
         } catch (SQLException sqle){
             sqle.printStackTrace();
+            throw new DataException("Erro ao contar relações entre alunos e professores", sqle);
         }
-        return -1;
     }
 
     @Override

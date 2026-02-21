@@ -1,6 +1,7 @@
 package com.example.schoolservlet.servlets.student.find;
 
 import com.example.schoolservlet.daos.StudentSubjectDAO;
+import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
@@ -112,6 +113,9 @@ public class FindBulletinServlet extends HttpServlet {
             
         } catch (ServletException | IOException e) {
             LOGGER.log(Level.SEVERE, "Error processing bulletin request for student ID: " + authenticatedUser.id(), e);
+            treatUnexpectedError(request, response);
+        } catch (DataException de) {
+            LOGGER.log(Level.SEVERE, "Data access error while processing bulletin for student ID: " + authenticatedUser.id(), de);
             treatUnexpectedError(request, response);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected error in bulletin servlet", e);
