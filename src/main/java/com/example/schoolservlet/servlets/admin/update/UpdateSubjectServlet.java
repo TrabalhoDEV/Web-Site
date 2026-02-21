@@ -22,8 +22,6 @@ public class UpdateSubjectServlet extends HttpServlet {
 
         if (!AccessValidation.isAdmin(request, response)) return;
 
-        HttpSession session = request.getSession(false);
-
         String idParam = request.getParameter("id");
 
         try {
@@ -31,27 +29,21 @@ public class UpdateSubjectServlet extends HttpServlet {
 
             if (idParam == null || idParam.isEmpty()) throw new InvalidNumberException(idParam,"O ID não pode estar vazio");
 
-            Subject subject = subjectDAO.findById(Integer.parseInt(idParam));
-            session.setAttribute("subject", subject);
+            int id = Integer.parseInt(idParam);
+
+            InputValidation.validateId(id, "id");
+
+            Subject subject = subjectDAO.findById(id);
             request.setAttribute("subject", subject);
-        } catch (DataException de){
-            de.printStackTrace();
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
-            return;
-        } catch (ValidationException e){
+        } catch (ValidationException | DataException | NotFoundException e){
             e.printStackTrace();
             request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
             return;
-        } catch (NotFoundException nfe){
+        } catch (NumberFormatException nfe){
             nfe.printStackTrace();
-            request.setAttribute("error", nfe.getMessage());
+            request.setAttribute("error", "ID precisa ser um valor numérico");
             request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
-            return;
-        } catch (NumberFormatException nfe) {
-            request.setAttribute("error", nfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
             return;
         }
 
@@ -59,85 +51,62 @@ public class UpdateSubjectServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         response.setContentType("text/html");
 
         if (!AccessValidation.isAdmin(request, response)) return;
 
-        HttpSession session = request.getSession(false);
-
-        Subject oldSubject;
-        try {
-            oldSubject = (Subject) session.getAttribute("subject");
-        } catch (NullPointerException npe){
-            npe.printStackTrace();
-            request.setAttribute("error", "Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/pages/admin/login.jsp")
-                    .forward(request, response);
-            return;
-        }
-
-        if (!AccessValidation.isAdmin(request, response)) return;
-
+        String idParam = request.getParameter("id");
         String name = request.getParameter("name");
         String deadlineParam = request.getParameter("deadline");
-        Date deadline;
-
-        try{
-            InputValidation.validateSubjectName(name);
-            InputValidation.validateIsNull("data limite", deadlineParam);
-        } catch (ValidationException e){
-            e.printStackTrace();
-            request.setAttribute("subject", oldSubject);
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
-            return;
-        }
-
-        try{
-            name = InputNormalizer.normalizeName(name.trim());
-            deadline = InputNormalizer.normalizeDate(deadlineParam.trim());
-        } catch (TransformTypeException vte){
-            vte.printStackTrace();
-            request.setAttribute("subject", oldSubject);
-            request.setAttribute("error", vte.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
-            return;
-        }
-
         Subject subject = new Subject();
-        subject.setName(name);
-        subject.setDeadline(deadline);
-        subject.setId(oldSubject.getId());
 
         try {
-            if (!name.equals(oldSubject.getName())){
-                FieldAlreadyUsedValidation.exists("subject", "name", "nome", name);
+            if (idParam == null || idParam.isEmpty()) {
+                throw new InvalidNumberException(idParam, "ID inválido");
             }
+
+            int id = Integer.parseInt(idParam);
+
+            InputValidation.validateId(id, "id");
+            InputValidation.validateSubjectName(name);
+            InputValidation.validateIsNull("data limite", deadlineParam);
+
+            name = InputNormalizer.normalizeName(name.trim());
+            Date deadline = InputNormalizer.normalizeDate(deadlineParam.trim());
 
             SubjectDAO subjectDAO = new SubjectDAO();
 
-            subjectDAO.update(subject);
-        } catch (DataException de){
-            de.printStackTrace();
-            request.setAttribute("subject", oldSubject);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
-            return;
-        } catch (ValidationException ve){
-            ve.printStackTrace();
-            request.setAttribute("subject", oldSubject);
-            request.setAttribute("error", ve.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
-            return;
-        } catch (NotFoundException nfe){
-            nfe.printStackTrace();
-            request.setAttribute("subject", oldSubject);
-            request.setAttribute("error", nfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp").forward(request, response);
-            return;
-        }
+            subject = subjectDAO.findById(id);
 
-        response.sendRedirect(request.getContextPath() + "/admin/subject/find-many");
+            if (!name.equals(subject.getName())) {
+                FieldAlreadyUsedValidation.exists("subject", "name", "nome", name);
+                subject.setName(name);
+            }
+
+            if (deadline != subject.getDeadline()) {
+                subject.setDeadline(deadline);
+            }
+
+            subjectDAO.update(subject);
+
+            response.sendRedirect(request.getContextPath() + "/admin/subject/find-many");
+        } catch (NotFoundException | InvalidNumberException e) {
+            e.printStackTrace();
+            request.getSession(false).setAttribute("error", e.getMessage());
+
+            response.sendRedirect(request.getContextPath() + "/admin/subject/find-many");
+        }  catch (NumberFormatException nfe){
+            request.getSession(false).setAttribute("error", "ID precisa ser um valor numérico");
+
+            response.sendRedirect(request.getContextPath() + "/admin/subject/find-many");
+        } catch (ValidationException | DataException e) {
+            e.printStackTrace();
+            request.setAttribute("subject", subject);
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/update/subject.jsp")
+                    .forward(request, response);
+        }
     }
 }
