@@ -5,6 +5,7 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
+import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -70,16 +71,14 @@ public class FindManyStudentsServlet extends HttpServlet {
         try {
             studentMap = studentDAO.findManyByTeacherId(skip, take, user.id());
         } catch (DataException de){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/teacher/student/find-many.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, de.getStatus(), de.getMessage(), "/WEB-INF/views/teacher/student/find-many.jsp");
             return;
         }
 
+        response.setStatus(HttpServletResponse.SC_OK);
         request.setAttribute("studentMap", studentMap);
         request.setAttribute("page", page);
-
+        request.setAttribute("totalPages", totalPages);
         request.getRequestDispatcher("/WEB-INF/views/teacher/student/find-many.jsp").forward(request, response);
     }
 

@@ -214,7 +214,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                 "AND (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL)" +
                 ") AS sub " +
                 "WHERE media < ? " +
-                "ORDER BY media DESC " +
+                "ORDER BY media ASC " +
                 "LIMIT ?";
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -259,25 +259,47 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
     @Override
     public StudentsPerformance studentsPerformance(int idTeacher) throws ValidationException, DataException{
+        InputValidation.validateId(idTeacher, "id do professor");
+
         try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("SELECT " +
-                    "    ROUND(100.0 * SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) / COUNT(*), 0) AS approved, " +
-                    "    ROUND(100.0 * SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) / COUNT(*), 0) AS failed, " +
-                    "    ROUND(100.0 * SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) / COUNT(*), 0) AS pending " +
+            PreparedStatement pstmt = conn.prepareStatement("SELECT\n" +
+                    "COALESCE(\n" +
+                    "    ROUND(\n" +
+                    "        100.0 * SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
+                    "    ), 0) AS approved,\n" +
+                    "\n" +
+                    "COALESCE(\n" +
+                    "    ROUND(\n" +
+                    "        100.0 * SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
+                    "    ), 0) AS failed,\n" +
+                    "\n" +
+                    "COALESCE(\n" +
+                    "    ROUND(\n" +
+                    "        100.0 * SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
+                    "    ), 0) AS pending\n" +
+                    "\n" +
                     "FROM (\n" +
-                    "    SELECT \n" +
+                    "    SELECT\n" +
                     "        s.id,\n" +
                     "        CASE\n" +
-                    "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
-                    "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
-                    "            WHEN ss.grade2 IS NOT NULL THEN ss.grade2 " +
-                    "            ELSE NULL " +
-                    "        END AS media " +
-                    "    FROM student s " +
-                    "    JOIN school_class sc ON sc.id = s.id_school_class " +
-                    "    JOIN school_class_teacher sct ON sct.id_school_class = sc.id " +
-                    "    LEFT JOIN student_subject ss ON ss.id_student = s.id " +
-                    "    WHERE sct.id_teacher = ?" +
+                    "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL\n" +
+                    "                THEN (ss.grade1 + ss.grade2) / 2.0\n" +
+                    "            WHEN ss.grade1 IS NOT NULL\n" +
+                    "                THEN ss.grade1\n" +
+                    "            WHEN ss.grade2 IS NOT NULL\n" +
+                    "                THEN ss.grade2\n" +
+                    "            ELSE NULL\n" +
+                    "        END AS media\n" +
+                    "\n" +
+                    "    FROM student s\n" +
+                    "    JOIN school_class sc\n" +
+                    "        ON sc.id = s.id_school_class\n" +
+                    "    JOIN school_class_teacher sct\n" +
+                    "        ON sct.id_school_class = sc.id\n" +
+                    "    LEFT JOIN student_subject ss\n" +
+                    "        ON ss.id_student = s.id\n" +
+                    "\n" +
+                    "    WHERE sct.id_teacher = ?\n" +
                     ") AS sub;")){
             pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APROVAL);
             pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APROVAL);

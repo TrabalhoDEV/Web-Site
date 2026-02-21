@@ -1,5 +1,6 @@
 package com.example.schoolservlet.utils;
 
+import com.example.schoolservlet.exceptions.UnauthorizedException;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
@@ -17,15 +18,16 @@ public class AccessValidation {
             AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
 
             if (user.role() != UserRoleEnum.ADMIN) {
-                request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
-                return false;
+                throw new UnauthorizedException("administrador");
             }
 
             return true;
         } catch (NullPointerException npe) {
-            request.setAttribute("error", "Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/pages/admin/login.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Sessão expirada, faça login novamente", "/pages/admin/login.jsp");
+            return false;
+        } catch (UnauthorizedException ue){
+            ue.printStackTrace();
+            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/pages/admin/login.jsp");
             return false;
         }
     }
@@ -36,15 +38,16 @@ public class AccessValidation {
             AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
 
             if (user.role() != UserRoleEnum.TEACHER) {
-                request.getRequestDispatcher("/index.jsp").forward(request, response);
-                return false;
+                throw new UnauthorizedException("professor");
             }
 
             return true;
         } catch (NullPointerException npe) {
-            request.setAttribute("error","Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/index.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Sessão expirada, faça login novamente", "index.jsp");
+            return false;
+        } catch (UnauthorizedException ue){
+            ue.printStackTrace();
+            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/index.jsp");
             return false;
         }
     }
@@ -55,15 +58,16 @@ public class AccessValidation {
             AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
 
             if (user.role() != UserRoleEnum.STUDENT) {
-                request.getRequestDispatcher("/index.jsp").forward(request, response);
-                return false;
+                throw new UnauthorizedException("aluno");
             }
 
             return true;
         } catch (NullPointerException npe) {
-            request.setAttribute("error", "Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/index.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Sessão expirada, faça login novamente", "index.jsp");
+            return false;
+        } catch (UnauthorizedException ue){
+            ue.printStackTrace();
+            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/index.jsp");
             return false;
         }
     }

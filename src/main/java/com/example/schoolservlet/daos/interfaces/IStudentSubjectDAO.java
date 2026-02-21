@@ -2,10 +2,10 @@ package com.example.schoolservlet.daos.interfaces;
 
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.ValidationException;
-import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.records.StudentsPerformance;
 import com.example.schoolservlet.utils.records.TeacherPendency;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Data Access Object interface for managing Student Subject operations.
