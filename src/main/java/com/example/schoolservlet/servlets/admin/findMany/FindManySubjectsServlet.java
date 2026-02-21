@@ -1,16 +1,13 @@
 package com.example.schoolservlet.servlets.admin.findMany;
 
-import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.SubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
-import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-
 import java.io.IOException;
 import java.util.Map;
 

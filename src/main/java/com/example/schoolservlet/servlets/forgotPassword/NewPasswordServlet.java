@@ -5,7 +5,6 @@ import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.TeacherDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.utils.InputValidation;
-import com.example.schoolservlet.utils.PasswordValidationEnum;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -27,7 +26,6 @@ public class NewPasswordServlet extends HttpServlet {
         //        Atributes:
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
-        PasswordValidationEnum valid = null;
         HttpSession session = request.getSession(false);
         Integer userId = 0;
         UserRoleEnum role = null;
