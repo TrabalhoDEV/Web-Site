@@ -3,10 +3,7 @@ package com.example.schoolservlet.servlets.admin.update;
 import com.example.schoolservlet.daos.TeacherDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Teacher;
-import com.example.schoolservlet.utils.AccessValidation;
-import com.example.schoolservlet.utils.FieldAlreadyUsedValidation;
-import com.example.schoolservlet.utils.InputNormalizer;
-import com.example.schoolservlet.utils.InputValidation;
+import com.example.schoolservlet.utils.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -103,6 +100,17 @@ public class UpdateTeacherServlet extends HttpServlet {
             teacher.setUsername(username);
 
             teacherDAO.update(teacher);
+            try {
+                String assunto = "Edição dos dados do Sistema Escolar";
+                String mensagem = "Olá " + teacher.getName() + ",<br><br>"
+                        + "Seus dados já foram atualizados!.<br>"
+                        + "Atenciosamente,<br>"
+                        + "Secretaria Vértice";
+
+                EmailService.sendEmail(teacher.getEmail(), assunto, mensagem);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             response.sendRedirect(request.getContextPath()+ "/admin/teacher/find-many");
 
