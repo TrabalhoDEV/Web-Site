@@ -19,7 +19,7 @@
   <input name="username" id="username" type="text">
 
   <label for="password">Digite a senha do professor:</label>
-  <input name="password" id="password" type="text">
+  <input name="password" id="password" type="password">
 
   <fieldset>
     <legend>Selecione as matérias:</legend>

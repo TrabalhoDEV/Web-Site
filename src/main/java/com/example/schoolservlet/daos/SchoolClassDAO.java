@@ -129,6 +129,25 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
         return classes;
     }
 
+    public List<Integer> findAllIds() throws DataException {
+        String sql = "SELECT id FROM school_class";
+        List<Integer> ids = new ArrayList<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                ids.add(rs.getInt("id"));
+            }
+
+        } catch (SQLException e) {
+            throw new DataException("Erro ao buscar IDs de turmas.");
+        }
+
+        return ids;
+    }
+
     @Override
     public void update(SchoolClass schoolClass) throws DataException, NotFoundException, ValidationException{
         InputValidation.validateId(schoolClass.getId(), "id");

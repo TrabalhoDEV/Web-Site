@@ -20,6 +20,12 @@ import java.util.List;
  */
 @WebServlet(name = "admin-insert-teacher", value = "/admin/teacher/insert")
 public class InsertTeacherServlet extends HttpServlet {
+    private SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+    private SubjectDAO subjectDAO = new SubjectDAO();
+    private TeacherDAO teacherDAO = new TeacherDAO();
+    private SubjectTeacherDAO subjectTeacherDAO = new SubjectTeacherDAO();
+    private SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
+
     /**
      * Handles POST requests for teacher registration.
      *
@@ -40,11 +46,6 @@ public class InsertTeacherServlet extends HttpServlet {
         String[] schoolClassIdsParam = request.getParameterValues("schoolClassIds");
 
         try {
-
-            if (subjectIdsParam == null || subjectIdsParam.length == 0) {
-                throw new RequiredFieldException("matéria");
-            }
-
             InputValidation.validateTeacherName(name);
             InputValidation.validateEmail(email);
             InputValidation.validateUserName(username);
@@ -58,41 +59,38 @@ public class InsertTeacherServlet extends HttpServlet {
             teacher.setEmail(email);
             teacher.setUsername(username);
             teacher.setPassword(password);
-            TeacherDAO teacherDAO = new TeacherDAO();
             teacherDAO.create(teacher);
 
             Teacher createdTeacher = teacherDAO.findByUserName(username);
             int teacherId = createdTeacher.getId();
             teacher.setId(teacherId);
 
-            SubjectDAO subjectDAO = new SubjectDAO();
-            SubjectTeacherDAO subjectTeacherDAO = new SubjectTeacherDAO();
+            List<Integer> validSubjectIds = InputValidation.validateIdsExist(subjectIdsParam,subjectDAO.findAllIds());
+            if(validSubjectIds != null && !validSubjectIds.isEmpty()) {
 
-            for(String sId : subjectIdsParam){
-                int subjectID = Integer.parseInt(sId);
-                InputValidation.validateId(subjectID,"subject_id");
+                for (Integer subjectId : validSubjectIds) {
 
-                Subject subject= subjectDAO.findById(subjectID);
-                SubjectTeacher subjectTeacher = new SubjectTeacher();
-                subjectTeacher.setTeacher(teacher);
-                subjectTeacher.setSubject(subject);
+                    Subject subject = subjectDAO.findById(subjectId);
 
-                subjectTeacherDAO.create(subjectTeacher);
+                    SubjectTeacher subjectTeacher = new SubjectTeacher();
+                    subjectTeacher.setTeacher(teacher);
+                    subjectTeacher.setSubject(subject);
+
+                    subjectTeacherDAO.create(subjectTeacher);
+                }
             }
 
-            SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
-            SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
+            List<Integer> validClassIds = InputValidation.validateIdsExist(schoolClassIdsParam, schoolClassDAO.findAllIds());
+            if(validClassIds != null && !validClassIds.isEmpty()){
 
-            for(String scId : schoolClassIdsParam){
-                int schoolClassID = Integer.parseInt(scId);
-                InputValidation.validateId(schoolClassID,"school_class_id");
+                for (Integer classId : validClassIds) {
+                    SchoolClass schoolClass = schoolClassDAO.findById(classId);
+                    SchoolClassTeacher sct = new SchoolClassTeacher();
+                    sct.setTeacher(teacher);
+                    sct.setSchoolClass(schoolClass);
 
-                SchoolClass schoolClass = schoolClassDAO.findById(schoolClassID);
-                SchoolClassTeacher sct = new SchoolClassTeacher();
-                sct.setTeacher(teacher);
-                sct.setSchoolClass(schoolClass);
-
-                schoolClassTeacherDAO.create(sct);
+                    schoolClassTeacherDAO.create(sct);
+                }
             }
 
             try {
@@ -160,8 +158,6 @@ public class InsertTeacherServlet extends HttpServlet {
     }
 
     private void getAllSubjects(HttpServletRequest request){
-        SubjectDAO subjectDAO = new SubjectDAO();
-
         try {
             List<Subject> subjects = subjectDAO.findAll();
             request.setAttribute("subjects", subjects);
@@ -171,9 +167,8 @@ public class InsertTeacherServlet extends HttpServlet {
     }
 
     private void getAllSchoolClasses(HttpServletRequest request) {
-        SchoolClassDAO dao = new SchoolClassDAO();
         try {
-            List<SchoolClass> classes = dao.findAll();
+            List<SchoolClass> classes = schoolClassDAO.findAll();
             request.setAttribute("classes", classes);
         } catch (DataException de) {
             request.setAttribute("error", de.getMessage());

@@ -131,6 +131,26 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
         return subjects;
     }
+
+    public List<Integer> findAllIds() throws DataException {
+        String sql = "SELECT id FROM subject";
+        List<Integer> ids = new ArrayList<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                ids.add(rs.getInt("id"));
+            }
+
+        } catch (SQLException e) {
+            throw new DataException("Erro ao buscar IDs de matérias.");
+        }
+
+        return ids;
+    }
+
     @Override
     public int totalCount() throws DataException {
         try(Connection conn = PostgreConnection.getConnection();
