@@ -27,7 +27,12 @@ public class FindTeacherDetailsServlet extends HttpServlet {
             if(idParam == null || idParam.isEmpty()) {
                 throw new InvalidNumberException(idParam, "O ID não pode estar vazio");
             }
-            int id = Integer.parseInt(idParam);
+            int id;
+            try {
+                id = Integer.parseInt(idParam);
+            } catch (NumberFormatException e) {
+                throw new InvalidNumberException(idParam, "ID inválido");
+            }
 
             TeacherDAO teacherDAO = new TeacherDAO();
             SubjectDAO subjectDAO = new SubjectDAO();
@@ -47,16 +52,13 @@ public class FindTeacherDetailsServlet extends HttpServlet {
         }catch (InvalidNumberException ine){
             request.getSession().setAttribute("error", ine.getMessage());
             response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
-            response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
             return;
-        }
-        catch (ValidationException ve){
+        } catch (ValidationException ve){
             request.setAttribute("error",ve.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/details/teacher.jsp").forward(request,response);
             return;
         } catch (NotFoundException nfe) {
             request.getSession().setAttribute("error", nfe.getMessage());
-            response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
             response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
             return;
         } catch (DataException de) {

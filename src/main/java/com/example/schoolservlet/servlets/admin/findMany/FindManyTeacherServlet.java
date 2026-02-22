@@ -29,6 +29,12 @@ public class FindManyTeacherServlet extends HttpServlet {
         response.setContentType("text/html");
 
         if (!AccessValidation.isAdmin(request, response)) return;
+        String sessionError = (String) request.getSession().getAttribute("error");
+
+        if (sessionError != null) {
+            request.setAttribute("error", sessionError);
+            request.getSession().removeAttribute("error");
+        }
 
         String pageParam = request.getParameter("page");
 
