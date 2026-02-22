@@ -51,7 +51,7 @@
   <%if (studentSubjectMap != null && !studentSubjectMap.isEmpty()){%>
     <%for(StudentSubject studentSubject: studentSubjectMap.values()){%>
       <div>
-        <p><%= studentSubject.getStudent().getName()%></p>
+        <p><%=OutputFormatService.formatName(studentSubject.getStudent().getName())%></p>
         <p>Média: <%=studentSubject.getAverage()%></p>
       </div>
     <%}%>

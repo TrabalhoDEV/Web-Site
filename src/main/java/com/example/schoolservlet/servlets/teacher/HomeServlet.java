@@ -18,6 +18,7 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +29,18 @@ public class HomeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
 
+        if (!AccessValidation.isTeacher(request, response)) return;
+
+        request.setAttribute("studentsPerformance", new StudentsPerformance(0, 0, 0));
+        request.setAttribute("studentsToHelpMap", new HashMap<Integer, StudentSubject>());
+        request.setAttribute("pendencies", new ArrayList<TeacherPendency>());
+
+        HttpSession session = request.getSession(false);
         AuthenticatedUser user;
         Teacher teacher = null;
         Map<Integer, StudentSubject> studentSubjectMap;
         StudentsPerformance studentsPerformance;
         List<TeacherPendency> pendencies;
-
-        if (!AccessValidation.isTeacher(request, response)) return;
-
-        request.setAttribute("studentsPerformance", new StudentsPerformance(0, 0, 0));
-
-        HttpSession session = request.getSession(false);
 
         try {
             user = (AuthenticatedUser) session.getAttribute("user");
@@ -53,28 +55,22 @@ public class HomeServlet extends HttpServlet {
             return;
         }
 
-        if (teacher == null) {
-            try {
+        try {
+            StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
+
+            if (teacher == null) {
                 TeacherDAO teacherDAO = new TeacherDAO();
 
                 teacher = teacherDAO.findById(user.id());
 
                 session.setAttribute("teacher", teacher);
-                request.setAttribute("teacher", teacher);
-            } catch (DataException | NotFoundException | ValidationException e) {
-                ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/index.jsp");
-                return;
             }
-        }
-        request.setAttribute("teacher", teacher);
-
-        try {
-            StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
+            request.setAttribute("teacher", teacher);
 
             studentSubjectMap = studentSubjectDAO.findStudentsThatRequireTeacher(teacher.getId());
             studentsPerformance = studentSubjectDAO.studentsPerformance(teacher.getId());
             pendencies = studentSubjectDAO.teacherPendency(teacher.getId());
-        } catch (ValidationException | DataException e) {
+        } catch (ValidationException | NotFoundException | DataException e) {
             ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/index.jsp");
             return;
         }
@@ -84,10 +80,5 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("studentsPerformance", studentsPerformance);
         request.setAttribute("pendencies", pendencies);
         request.getRequestDispatcher("/WEB-INF/views/teacher/index.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
     }
 }

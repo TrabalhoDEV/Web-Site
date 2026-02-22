@@ -78,7 +78,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
     }
 
     @Override
-    public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException{
+    public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException, ValidationException{
+        InputValidation.validateId(studentId, "id do aluno");
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -122,15 +123,16 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                 subject.setName(rs.getString("subject_name"));
                 subject.setDeadline(rs.getDate("subject_deadline"));
 
-                StudentSubject studentSubject = new StudentSubject();
-                studentSubject.setId(rs.getInt("id"));
-                studentSubject.setObs(rs.getString("obs"));
-                studentSubject.setGrade1(rs.getDouble("grade1"));
-                studentSubject.setGrade2(rs.getDouble("grade2"));
-                studentSubject.setStudent(student);
-                studentSubject.setSubject(subject);
-
-                studentsSubjects.put(studentSubject.getId(), studentSubject);
+                studentsSubjects.put(rs.getInt("id"),
+                        new StudentSubject(
+                                rs.getInt("id"),
+                                rs.getString("obs"),
+                                rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
+                                rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
+                                student,
+                                subject
+                        )
+                );
             }
         } catch (SQLException sqle) {
             sqle.printStackTrace();
@@ -301,8 +303,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                     "\n" +
                     "    WHERE sct.id_teacher = ?\n" +
                     ") AS sub;")){
-            pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APROVAL);
-            pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APROVAL);
+            pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APPROVAL);
+            pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APPROVAL);
             pstmt.setInt(3, idTeacher);
 
             ResultSet rs = pstmt.executeQuery();
@@ -382,7 +384,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
-    public int totalCount(int studentId) throws DataException {
+    public int totalCount(int studentId) throws DataException, ValidationException{
+        InputValidation.validateId(studentId, "id do aluno");
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT COUNT(*) AS totalCount FROM student_subject WHERE id_student = ?"

@@ -44,7 +44,7 @@
     </tbody>
 </table>
 <%} else {%>
-<p>Você nã possui nenhum aluno</p>
+<p>Você não possui nenhum aluno</p>
 <%}%>
 <%if (request.getAttribute("error") != null) {%>
 <p><%= request.getAttribute("error")%>

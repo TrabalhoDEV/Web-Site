@@ -18,7 +18,7 @@ public interface IStudentDAO {
      * @return      a map with key as id and value as the table's object
      * @throws DataException if an error in database happen
      */
-    Map<Integer, Student> findManyByTeacherId(int skip, int take, int idTeacher) throws DataException;
+    Map<Integer, Student> findManyByTeacherId(int skip, int take, int idTeacher) throws DataException, ValidationException;
 
     /**
      * A method that count the number of records from database's table that is related with a teacher
@@ -26,7 +26,7 @@ public interface IStudentDAO {
      * @return      The total count
      * @throws DataException if an error in database happen
      */
-    int countByTeacherId(int idTeacher) throws DataException;
+    int countByTeacherId(int idTeacher) throws DataException, ValidationException;
 
     /**
      * Updates the school class assigned to a specific student

@@ -48,6 +48,7 @@
 
     <%
         for (StudentSubject ss : studentSubjectMap.values()) {
+            Double avg = ss.getAverage();
     %>
     <tr>
         <td><%= (ss.getSubject() != null && ss.getSubject().getName() != null)
@@ -59,14 +60,7 @@
         <td><%= (ss.getGrade2() != null) ? ss.getGrade2() : "—" %></td>
 
         <td>
-            <%
-                Double avg = ss.getAverage();
-                if (avg != null) {
-                    out.print(String.format("%.2f", avg));
-                } else {
-                    out.print("—");
-                }
-            %>
+            <%= avg != null ? String.format("%.2f", avg) : "-"%>
         </td>
 
         <td><%= avg >= 7? "Aprovado" : "Reprovado"%></td>
