@@ -1,5 +1,7 @@
 package com.example.schoolservlet.models;
 
+import com.example.schoolservlet.utils.Constants;
+
 public class StudentSubject {
     // Attributes:
     private int id;
@@ -60,6 +62,13 @@ public class StudentSubject {
 
     public String getObs() {
         return obs;
+    }
+
+    public String getStatus(){
+        if (grade1 != null && grade2 != null){
+            return getAverage() > Constants.MIN_GRADE_TO_BE_APROVAL ? "Aprovado" : "Reprovado";
+        }
+        return "Pendente";
     }
 
     // Setters:
