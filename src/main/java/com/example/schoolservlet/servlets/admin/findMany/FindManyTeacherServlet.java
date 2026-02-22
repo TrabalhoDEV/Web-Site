@@ -60,28 +60,7 @@ public class FindManyTeacherServlet extends HttpServlet {
             return;
         }
 
-        Map<Integer, List<Subject>> teacherSubjects = new HashMap<>();
-        Map<Integer, List<SchoolClass>> teacherClasses = new HashMap<>();
-
-        SubjectDAO subjectDAO = new SubjectDAO();
-        SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
-
-        for (Teacher teacher : teacherMap.values()) {
-            try {
-                teacherSubjects.put(teacher.getId(), subjectDAO.findByTeacherId(teacher.getId()));
-            } catch (DataException de) {
-                teacherSubjects.put(teacher.getId(), new ArrayList<>());
-            }
-            try {
-                teacherClasses.put(teacher.getId(), schoolClassDAO.findByTeacherId(teacher.getId()));
-            } catch (DataException de) {
-                teacherClasses.put(teacher.getId(), new ArrayList<>());
-            }
-        }
-
         request.setAttribute("teacherMap", teacherMap);
-        request.setAttribute("teacherSubjects", teacherSubjects);
-        request.setAttribute("teacherClasses", teacherClasses);
         request.setAttribute("page", page);
         request.setAttribute("totalPages", totalPages);
 

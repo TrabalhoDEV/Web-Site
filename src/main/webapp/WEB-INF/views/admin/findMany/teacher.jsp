@@ -11,11 +11,19 @@
 </head>
 <%
   Map<Integer, Teacher> teacherMap = (Map<Integer, Teacher>) request.getAttribute("teacherMap");
-  Map<Integer, List<Subject>> teacherSubjects = (Map<Integer, List<Subject>>) request.getAttribute("teacherSubjects");
-  Map<Integer, List<SchoolClass>> teacherClasses = (Map<Integer, List<SchoolClass>>) request.getAttribute("teacherClasses");
   int pageNumber = (Integer) request.getAttribute("page");
 %>
 <body>
+<%
+  String error = (String) session.getAttribute("error");
+  if (error != null) {
+%>
+<p style="color:red;"><%= error %></p>
+<%
+    session.removeAttribute("error");
+  }
+%>
+
 <% if (teacherMap != null && !teacherMap.isEmpty()) { %>
 
 <table>
@@ -24,8 +32,6 @@
     <th>Nome</th>
     <th>Usuário</th>
     <th>Email</th>
-    <th>Matérias</th>
-    <th>Turmas</th>
     <th>Ações</th>
   </tr>
   </thead>
@@ -36,22 +42,10 @@
     <td><%= teacher.getUsername() %></td>
     <td><%= teacher.getEmail() %></td>
     <td>
-      <% List<Subject> subjects = teacherSubjects.get(teacher.getId());
-        if(subjects != null){
-          for(Subject s : subjects){ %>
-      <%= OutputFormatService.formatName(s.getName()) %><br>
-      <%     }
-      } %>
-    </td>
-    <td>
-      <% List<SchoolClass> classes = teacherClasses.get(teacher.getId());
-        if(classes != null){
-          for(SchoolClass sc : classes){ %>
-      <%= OutputFormatService.formatName(sc.getSchoolYear()) %><br>
-      <%     }
-      } %>
-    </td>
-    <td>
+      <a href="${pageContext.request.contextPath}/admin/teacher/details?id=<%=teacher.getId()%>">
+        Ver detalhes
+      </a>
+      |
       <a href="${pageContext.request.contextPath}/admin/teacher/update?id=<%=teacher.getId()%>">
         Editar
       </a>
