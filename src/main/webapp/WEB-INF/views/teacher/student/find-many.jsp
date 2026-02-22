@@ -1,4 +1,3 @@
-<%@ page import="com.example.schoolservlet.models.Teacher" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="com.example.schoolservlet.models.Student" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
