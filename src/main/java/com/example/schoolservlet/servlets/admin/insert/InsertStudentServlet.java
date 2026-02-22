@@ -2,6 +2,7 @@ package com.example.schoolservlet.servlets.admin.insert;
 
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.StudentDAO;
+import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.RequiredFieldException;
@@ -9,6 +10,7 @@ import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.AccessValidation;
+import com.example.schoolservlet.utils.EmailService;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import jakarta.servlet.ServletException;
@@ -52,20 +54,31 @@ public class InsertStudentServlet extends HttpServlet {
         // ============ PARAMETER EXTRACTION ============
         // Retrieve CPF and school grade from request parameters
         String cpf = request.getParameter("cpf");
+        String email = request.getParameter("email");
         String studentClassParam = request.getParameter("anoEscolar");
 
         // ============ PARAMETER VALIDATION ============
         // Validate that both parameters are present and not empty
         try {
             InputValidation.validateIsNull("cpf", cpf);
+            InputValidation.validateIsNull("email", email);
             InputValidation.validateIsNull("ano escolar", studentClassParam);
-        } catch (RequiredFieldException re){
+
+            cpf = cpf.trim();
+            email = email.trim();
+
+            InputValidation.validateCpf(cpf);
+            InputValidation.validateEmail(email);
+        } catch (ValidationException ve){
             getAllData(request, response);
-            request.setAttribute("error", re.getMessage());
+            request.setAttribute("error", ve.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
                     .forward(request, response);
             return;
         }
+
+        cpf = InputNormalizer.normalizeCpf(cpf);
+        email = InputNormalizer.normalizeEmail(email);
 
         // Validate that anoEscolar is a valid integer
         int studentClassId = 0;
@@ -91,41 +104,39 @@ public class InsertStudentServlet extends HttpServlet {
             return;
         }
 
-        // ============ CPF NORMALIZATION & VALIDATION ============
-        // Normalize the CPF format (remove special characters, etc.)
-        cpf = InputNormalizer.normalizeCpf(cpf);
-
-        // Validate CPF using business rules
-        try {
-            InputValidation.validateCpf(cpf);
-        } catch (ValidationException e){
-            getAllData(request, response);
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
-                    .forward(request, response);
-            return;
-        }
-
         // ============ STUDENT REGISTRATION ============
         // Create a new student object and populate it with validated data
         Student student = new Student();
         StudentDAO studentDAO = new StudentDAO();
+        StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
 
         student.setCpf(cpf);
+        student.setEmail(email);
         student.setIdSchoolClass(studentClassId);
 
         // Attempt to create the student in the database
         try{
             studentDAO.create(student);
-            request.setAttribute("success", true);
+
+            student = studentDAO.findByCpf(student.getCpf());
+
+            studentSubjectDAO.createManyByStudentClass(student.getId(), studentClassId);
+
+            EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
+            "<h2>Faça sua matrícula na Vétice</h2>" +
+                    "<p>Se você realmente for o próximo aluno da Vértice:</p>" +
+                    "<p><a href=\"#\">Clique aqui</a> para fazer o seu cadastro</p>"
+                    );
         } catch (ValidationException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             request.setAttribute("error", e.getMessage());
-        } catch (DataException de){
+        }  catch (NotFoundException nfe){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            request.setAttribute("error", nfe.getMessage());
+        } catch (Exception e){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", de.getMessage());
+            request.setAttribute("error", e.getMessage());
         }
-
 
         getAllData(request, response);
         // Forward to admin dashboard with result attributes

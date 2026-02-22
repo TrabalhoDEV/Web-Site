@@ -44,6 +44,10 @@
         <input type="text" id="cpf" name="cpf" placeholder="Digite o CPF do estudante" required>
         <br><br>
 
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" placeholder="Digite o email do estudante" required>
+        <br><br>
+
         <!-- Academic year selection dropdown -->
         <label for="anoEscolar">Ano Escolar:</label>
         <select id="anoEscolar" name="anoEscolar" required>
