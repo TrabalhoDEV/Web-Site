@@ -23,7 +23,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @WebServlet(name = "teacher-find-many-students", value = "/teacher/students")
@@ -105,33 +107,32 @@ public class FindManyStudentsServlet extends HttpServlet {
             page = 1;
         }
 
-        try{
-            count = studentSubjectDAO.countByTeacherId(teacher.getId());
-        } catch (DataException | ValidationException e){
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student/find-many.jsp");
-            return;
-        }
+        Map<Integer, List<StudentSubject>> studentSubjectMap = new HashMap<>();
 
-        int totalPages = Math.max(1, (int)Math.ceil((double) count / Constants.MAX_TAKE));
-
-        page = Math.max(1, Math.min(page, totalPages));
-
-        skip = take * (page - 1);
-
-        Map<Integer, StudentSubject> studentSubjectMap = new HashMap<>();
-
+        int totalPages = 0;
         try {
             if (hasFilter) {
-                StudentSubject studentSubject = studentSubjectDAO.findById(id);
-                studentSubjectMap.put(studentSubject.getId(), studentSubject);
+                count = studentSubjectDAO.countByStudentId(id);
+                totalPages = Math.max(1, (int)Math.ceil((double) count / Constants.MAX_TAKE));
+
+                page = Math.max(1, Math.min(page, totalPages));
+
+                skip = take * (page - 1);
+                studentSubjectMap = studentSubjectDAO.findManyByStudentId(skip, take, id);
             } else {
+                count = studentSubjectDAO.countByTeacherId(teacher.getId());
+                totalPages = Math.max(1, (int)Math.ceil((double) count / Constants.MAX_TAKE));
+
+                page = Math.max(1, Math.min(page, totalPages));
+
+                skip = take * (page - 1);
                 studentSubjectMap = studentSubjectDAO.findManyByTeacherId(skip, take, teacher.getId());
             }
 
             StudentsPerformanceCount studentsPerformanceCount = studentSubjectDAO.studentsPerformanceCount(teacher.getId());
             request.setAttribute("studentsPerformanceCount", studentsPerformanceCount);
 
-        } catch (DataException | NotFoundException | ValidationException e){
+        } catch (DataException | ValidationException e){
             ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student/find-many.jsp");
             return;
         }
@@ -141,10 +142,5 @@ public class FindManyStudentsServlet extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher("/WEB-INF/views/teacher/student/find-many.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
     }
 }

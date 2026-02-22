@@ -2,13 +2,14 @@
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 <%@ page import="com.example.schoolservlet.models.StudentSubject" %>
 <%@ page import="com.example.schoolservlet.utils.records.StudentsPerformanceCount" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
     <title>Title</title>
 </head>
 <%
-  Map<Integer, StudentSubject> studentSubjectMap = (Map<Integer, StudentSubject>) request.getAttribute("studentSubjectMap");
+  Map<Integer, List<StudentSubject>> studentSubjectMap = (Map<Integer, List<StudentSubject>>) request.getAttribute("studentSubjectMap");
   StudentsPerformanceCount studentsPerformanceCount = (StudentsPerformanceCount) request.getAttribute("studentsPerformanceCount");
   boolean hasFilter = request.getAttribute("hasFilter") != null;
   Teacher teacher = (Teacher) request.getAttribute("teacher");
@@ -55,25 +56,29 @@
   <tr>
     <th>Matrícula</th>
     <th>Nome</th>
+    <th>Matéria</th>
     <th>Nota 1</th>
     <th>Nota 2</th>
     <th>Média</th>
-    <th>Situação</th>
+    <th>Situação de nota</th>
     <th>Ação</th>
   </tr>
   </thead>
   <tbody>
   <%if (!studentSubjectMap.isEmpty()){%>
-  <%for (StudentSubject studentSubject: studentSubjectMap.values()) {%>
+  <%for (List<StudentSubject> studentSubjects: studentSubjectMap.values()) {%>
+  <%for (StudentSubject studentSubject: studentSubjects){%>
   <tr>
     <td><%=studentSubject.getStudent().getEnrollment()%></td>
     <td><%=OutputFormatService.formatName(studentSubject.getStudent().getName())%></td>
+    <td><%=OutputFormatService.formatName(studentSubject.getSubject().getName())%></td>
     <td style="text-align: center"><%=studentSubject.getGrade1() != null ? studentSubject.getGrade1() : "-"%></td>
     <td style="text-align: center"><%=studentSubject.getGrade2() != null ? studentSubject.getGrade2() : "-"%></td>
     <td style="text-align: center"><%=studentSubject.getAverage() != null ? studentSubject.getAverage() : "-"%></td>
     <td><%=studentSubject.getStatus()%></td>
-    <td><a href="">Detalhes</a></td>
+    <td><%=studentSubject.getStudent().getStatus()%></td>
   </tr>
+  <%}%>
   <%}%>
   <%} else {%>
   <td colspan="7" style="text-align: center"><%= hasFilter ? "Nenhum aluno foi encontrado" : "Você não possui nenhum aluno no momento"%></td>
