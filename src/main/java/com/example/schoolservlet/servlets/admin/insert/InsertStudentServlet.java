@@ -3,10 +3,7 @@ package com.example.schoolservlet.servlets.admin.insert;
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.StudentSubjectDAO;
-import com.example.schoolservlet.exceptions.DataException;
-import com.example.schoolservlet.exceptions.NotFoundException;
-import com.example.schoolservlet.exceptions.RequiredFieldException;
-import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.AccessValidation;
@@ -127,9 +124,9 @@ public class InsertStudentServlet extends HttpServlet {
                     "<p>Se você realmente for o próximo aluno da Vértice:</p>" +
                     "<p><a href=\"#\">Clique aqui</a> para fazer o seu cadastro</p>"
                     );
-        } catch (ValidationException e) {
+        } catch (DataException de) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", e.getMessage());
+            request.setAttribute("error", de.getMessage());
         }  catch (NotFoundException nfe){
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             request.setAttribute("error", nfe.getMessage());
