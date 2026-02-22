@@ -119,6 +119,8 @@ public class InsertStudentServlet extends HttpServlet {
 
             studentSubjectDAO.createManyByStudentClass(student.getId(), studentClassId);
 
+            response.setStatus(HttpServletResponse.SC_OK);
+
             EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
             "<h2>Faça sua matrícula na Vétice</h2>" +
                     "<p>Se você realmente for o próximo aluno da Vértice:</p>" +
@@ -131,7 +133,6 @@ public class InsertStudentServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             request.setAttribute("error", nfe.getMessage());
         } catch (Exception e){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", e.getMessage());
         }
 
