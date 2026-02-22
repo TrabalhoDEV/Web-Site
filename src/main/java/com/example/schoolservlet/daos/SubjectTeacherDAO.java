@@ -17,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
@@ -41,6 +42,26 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
         }
     }
 
+    public void createMany(List<SubjectTeacher> subjectTeachers) throws DataException {
+        String sql = "INSERT INTO subject_teacher (id_subject, id_teacher) VALUES (?, ?)";
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false);
+
+            for (SubjectTeacher st : subjectTeachers) {
+                ps.setInt(1, st.getSubject().getId());
+                ps.setInt(2, st.getTeacher().getId());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao inserir múltiplos registros de relacionamentos entre matéria e professor");
+        }
+    }
     @Override
     public Map<Integer, SubjectTeacher> findMany(int skip, int take) throws DataException {
         Map<Integer, SubjectTeacher> subjectTeacherMap = new HashMap<>();

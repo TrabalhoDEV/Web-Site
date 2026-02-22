@@ -11,6 +11,7 @@ import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
@@ -119,6 +120,26 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao contar school_class_teacher", sqle);
+        }
+    }
+    public void createMany(List<SchoolClassTeacher> scts) throws DataException {
+        String sql = "INSERT INTO school_class_teacher (id_school_class, id_teacher) VALUES (?, ?)";
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false);
+
+            for (SchoolClassTeacher sct : scts) {
+                ps.setInt(1, sct.getSchoolClass().getId());
+                ps.setInt(2, sct.getTeacher().getId());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao inserir múltiplos registros de relacionamentos entre turmas e professores");
         }
     }
 

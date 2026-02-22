@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -67,7 +68,7 @@ public class InsertTeacherServlet extends HttpServlet {
 
             List<Integer> validSubjectIds = InputValidation.validateIdsExist(subjectIdsParam,subjectDAO.findAllIds());
             if(validSubjectIds != null && !validSubjectIds.isEmpty()) {
-
+                List<SubjectTeacher> subjectTeachersToInsert = new ArrayList<>();
                 for (Integer subjectId : validSubjectIds) {
 
                     Subject subject = subjectDAO.findById(subjectId);
@@ -75,22 +76,22 @@ public class InsertTeacherServlet extends HttpServlet {
                     SubjectTeacher subjectTeacher = new SubjectTeacher();
                     subjectTeacher.setTeacher(teacher);
                     subjectTeacher.setSubject(subject);
-
-                    subjectTeacherDAO.create(subjectTeacher);
+                    subjectTeachersToInsert.add(subjectTeacher);
                 }
+                subjectTeacherDAO.createMany(subjectTeachersToInsert);
             }
 
             List<Integer> validClassIds = InputValidation.validateIdsExist(schoolClassIdsParam, schoolClassDAO.findAllIds());
             if(validClassIds != null && !validClassIds.isEmpty()){
-
+                List<SchoolClassTeacher> classTeachersToInsert = new ArrayList<>();
                 for (Integer classId : validClassIds) {
                     SchoolClass schoolClass = schoolClassDAO.findById(classId);
-                    SchoolClassTeacher sct = new SchoolClassTeacher();
-                    sct.setTeacher(teacher);
-                    sct.setSchoolClass(schoolClass);
-
-                    schoolClassTeacherDAO.create(sct);
+                    SchoolClassTeacher schoolClassTeacher = new SchoolClassTeacher();
+                    schoolClassTeacher.setTeacher(teacher);
+                    schoolClassTeacher.setSchoolClass(schoolClass);
+                    classTeachersToInsert.add(schoolClassTeacher);
                 }
+                schoolClassTeacherDAO.createMany(classTeachersToInsert);
             }
 
             try {
