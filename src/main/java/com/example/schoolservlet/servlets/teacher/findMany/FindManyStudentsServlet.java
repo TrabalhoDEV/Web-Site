@@ -25,6 +25,8 @@ public class FindManyStudentsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
 
+        if (!AccessValidation.isTeacher(request, response)) return;
+
         AuthenticatedUser user;
         try {
             HttpSession session = request.getSession(false);
@@ -36,8 +38,6 @@ public class FindManyStudentsServlet extends HttpServlet {
                     .forward(request, response);
             return;
         }
-
-        if (!AccessValidation.isTeacher(request, response)) return;
 
         String pageParam = request.getParameter("page");
         int take = Constants.MAX_TAKE;

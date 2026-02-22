@@ -13,7 +13,6 @@
     int totalPages = (Integer) request.getAttribute("totalPages");
 %>
 <body>
-<%if (!studentMap.isEmpty()) {%>
 <table>
     <thead>
     <tr>
@@ -26,6 +25,7 @@
     </tr>
     </thead>
     <tbody>
+    <%if (!studentMap.isEmpty()) {%>
     <%for (Student student : studentMap.values()) {%>
     <tr>
         <td><%=student.getEnrollment()%>
@@ -36,16 +36,16 @@
         </td>
         <td><%=student.getEmail() != null ? student.getEmail() : "Não informado"%>
         </td>
-        <td><%=student.getStatus()%>
+        <td><%=OutputFormatService.formatStudentStatus(student.getStatus())%>
         </td>
         <td></td>
     </tr>
     <%}%>
+    <%} else {%>
+    <td colspan="6" style="text-align: center">Você não possui nenhum aluno</td>
+    <%}%>
     </tbody>
 </table>
-<%} else {%>
-<p>Você não possui nenhum aluno</p>
-<%}%>
 <%if (request.getAttribute("error") != null) {%>
 <p><%= request.getAttribute("error")%>
 </p>

@@ -1,5 +1,7 @@
 package com.example.schoolservlet.utils;
 
+import com.example.schoolservlet.utils.enums.StudentStatusEnum;
+
 import java.util.Date;
 
 /**
@@ -67,6 +69,15 @@ public class OutputFormatService {
     public static String formatDate(Date date) {
         if (date == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM").format(date);
+    }
+
+    /**
+     * Static method that transform student status to a portuguese string
+     * @param status is the status stored in the database
+     * @return       is a string representing the status in portuguese
+     */
+    public static String formatStudentStatus(StudentStatusEnum status) {
+        return status == StudentStatusEnum.ACTIVE ? "Ativo" : "Inativo";
     }
 
     /**
