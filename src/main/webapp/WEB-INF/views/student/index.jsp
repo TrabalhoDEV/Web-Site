@@ -71,11 +71,13 @@
     if (currentPage == null) currentPage = 0;
 %>
 
-<form method="get" action="${pageContext.request.contextPath}/student/home?nextPage=<%=currentPage - 1%>">
+<form method="get" action="${pageContext.request.contextPath}/student/home">
+    <input type="hidden" name="nextPage" value="<%=currentPage - 1%>">
     <button type="submit" <%= currentPage <= 0 ? "disabled" : "" %>>Previous</button>
 </form>
 
-<form method="get" action="${pageContext.request.contextPath}/student/home?nextPage=<%=currentPage + 1%>">
+<form method="get" action="${pageContext.request.contextPath}/student/home">
+    <input type="hidden" name="nextPage" value="<%=currentPage + 1%>">
     <button type="submit" <%= (int) request.getAttribute("totalPages") <= currentPage ? "disabled": ""%>>Next</button>
 </form>
 
