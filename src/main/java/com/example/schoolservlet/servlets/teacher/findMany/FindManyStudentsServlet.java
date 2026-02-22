@@ -1,13 +1,17 @@
 package com.example.schoolservlet.servlets.teacher.findMany;
 
 import com.example.schoolservlet.daos.StudentDAO;
+import com.example.schoolservlet.daos.StudentSubjectDAO;
+import com.example.schoolservlet.daos.TeacherDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.ErrorHandler;
+import com.example.schoolservlet.utils.PaginationUtilities;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
+import com.example.schoolservlet.utils.records.TeacherStudentGrades;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -39,48 +43,25 @@ public class FindManyStudentsServlet extends HttpServlet {
             return;
         }
 
-        String pageParam = request.getParameter("page");
-        int take = Constants.MAX_TAKE;
-        int skip = 0;
-        int page;
-        int count = 0;
-
-        request.setAttribute("studentMap", new HashMap<Integer, Student>());
-        request.setAttribute("page", 1);
-        request.setAttribute("totalPages", 1);
-
-        try {
-            page = Integer.parseInt(pageParam);
-        } catch (NumberFormatException nfe) {
-            page = 1;
-        }
-
-        StudentDAO studentDAO = new StudentDAO();
+        TeacherDAO teacherDAO = new TeacherDAO();
         try{
-            count = studentDAO.countByTeacherId(user.id());
+            int amountOfStudents = new TeacherDAO().totalCountOfStudentsForTeacher(user.id());
+            int totalPages = PaginationUtilities.calculateTotalPages(amountOfStudents, Constants.MAX_TAKE);
 
-            int totalPages = Math.max(1, (int)Math.ceil((double) count / Constants.MAX_TAKE));
+            int page = PaginationUtilities.extractNextPage(request);
+            int skip = page * Constants.MAX_TAKE;
 
-            page = Math.max(1, Math.min(page, totalPages));
+            Map<Integer, TeacherStudentGrades> teacherStudentGradesMap = teacherDAO.findManyStudentsByTeacherID(skip, Constants.MAX_TAKE, user.id());
 
-            skip = take * (page - 1);
-
-            Map<Integer, Student> studentMap = studentDAO.findManyByTeacherId(skip, take, user.id());
-
-            request.setAttribute("studentMap", studentMap);
-            request.setAttribute("page", page);
+            request.setAttribute("studentMap", teacherStudentGradesMap);
+            request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
-        } catch (DataException | ValidationException e){
+        } catch (DataException e){
             ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student/find-many.jsp");
             return;
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
         request.getRequestDispatcher("/WEB-INF/views/teacher/student/find-many.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
     }
 }

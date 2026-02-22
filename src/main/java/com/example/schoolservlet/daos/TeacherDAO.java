@@ -7,6 +7,7 @@ import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
+import com.example.schoolservlet.utils.records.TeacherStudentGrades;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
@@ -107,6 +108,93 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar professor pelo usuário", sqle);
         }
+    }
+
+
+    // TODO: Sign method in interface and implement it here
+    public Map<Integer, TeacherStudentGrades> findManyStudentsByTeacherID(int skip, int take, int teacherID) throws DataException {
+        Map<Integer, TeacherStudentGrades> TeacherStudentGradesMap = new HashMap<>();
+
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "SELECT \n" +
+                            "    s.id AS student_id,\n" +
+                            "    s.name AS student_name,\n" +
+                            "    sc.school_year AS school_year,\n" +
+                            "    subj.name AS subject_name,\n" +
+                            "    ss.grade1 AS g1,\n" +
+                            "    ss.grade2 AS g2\n" +
+                            "FROM teacher t\n" +
+                            "JOIN school_class_teacher sct \n" +
+                            "    ON t.id = sct.id_teacher\n" +
+                            "JOIN school_class sc \n" +
+                            "    ON sct.id_school_class = sc.id\n" +
+                            "JOIN student s \n" +
+                            "    ON s.id_school_class = sc.id\n" +
+                            "JOIN student_subject ss \n" +
+                            "    ON s.id = ss.id_student\n" +
+                            "JOIN subject subj \n" +
+                            "    ON ss.id_subject = subj.id\n" +
+                            "JOIN subject_teacher st \n" +
+                            "    ON subj.id = st.id_subject AND t.id = st.id_teacher\n" +
+                            "WHERE t.id = ? \n" +
+                            "LIMIT ? OFFSET ?;\n"
+                    )){
+
+            pstmt.setInt(1, teacherID);
+            pstmt.setInt(2, take < 0 ? 0 : (Math.min(take, Constants.MAX_TAKE)));
+            pstmt.setInt(3, Math.max(skip, 0));
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                TeacherStudentGradesMap.put(rs.getInt("student_id"), new TeacherStudentGrades(
+                        rs.getInt("student_id"),
+                        rs.getString("school_year"),
+                        rs.getString("student_name"),
+                        rs.getString("subject_name"),
+                        rs.getDouble("g1"),
+                        rs.getDouble("g2")
+                ));
+            }
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar os estudantes que pertencem ao professor. ", sqle);
+        }
+        return TeacherStudentGradesMap;
+    }
+
+    public int totalCountOfStudentsForTeacher(int teacherID) throws DataException {
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "SELECT \n" +
+                            "COUNT(*) AS total_count \n" +
+                            "FROM teacher t\n" +
+                            "JOIN school_class_teacher sct \n" +
+                            "    ON t.id = sct.id_teacher\n" +
+                            "JOIN school_class sc \n" +
+                            "    ON sct.id_school_class = sc.id\n" +
+                            "JOIN student s \n" +
+                            "    ON s.id_school_class = sc.id\n" +
+                            "JOIN student_subject ss \n" +
+                            "    ON s.id = ss.id_student\n" +
+                            "JOIN subject subj \n" +
+                            "    ON ss.id_subject = subj.id\n" +
+                            "JOIN subject_teacher st \n" +
+                            "    ON subj.id = st.id_subject AND t.id = st.id_teacher\n" +
+                            "WHERE t.id = ?;"
+                    );){
+            pstmt.setInt(1, teacherID);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()){
+                return rs.getInt("total_count");
+            }
+
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar professores", sqle);
+        }
+        return  -1;
     }
 
     @Override
