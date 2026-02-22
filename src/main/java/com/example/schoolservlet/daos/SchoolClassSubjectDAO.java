@@ -4,6 +4,7 @@ import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.exceptions.ValueAlreadyExistsException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.SchoolClassSubject;
 import com.example.schoolservlet.models.Subject;
@@ -121,6 +122,9 @@ public class SchoolClassSubjectDAO implements GenericDAO<SchoolClassSubject> {
             pstmt.executeUpdate();
 
         } catch (SQLException sqle) {
+            if ("23505".equals(sqle.getSQLState())) {
+                throw new ValidationException("Essa matéria já está vinculada a essa turma");
+            }
             sqle.printStackTrace();
             throw new DataException("Erro ao criar school_class_subject", sqle);
         }
