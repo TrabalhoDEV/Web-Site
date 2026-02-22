@@ -42,17 +42,21 @@ public class UpdateTeacherServlet extends HttpServlet {
             }
 
             int id = Integer.parseInt(idParam);
+            Teacher teacher = teacherDAO.findById(id);
+            if (teacher == null) {
+                throw new NotFoundException("teacher","id",idParam);
+            }
             loadUpdateData(request,id);
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
 
         } catch (NumberFormatException nfe){
             request.setAttribute("error",nfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
             return;
 
         } catch (DataException de){
             request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
             return;
         } catch (NotFoundException nfe){
             request.setAttribute("error", nfe.getMessage());
@@ -60,7 +64,7 @@ public class UpdateTeacherServlet extends HttpServlet {
             return;
         } catch (ValidationException ve){
             request.setAttribute("error", ve.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
             return;
         }
     }
@@ -85,6 +89,9 @@ public class UpdateTeacherServlet extends HttpServlet {
             }
             id = Integer.parseInt(idParam);
             Teacher teacher = teacherDAO.findById(id);
+            if (teacher == null) {
+                throw new NotFoundException("teacher", "id", idParam);
+            }
 
             String name = InputNormalizer.normalizeName(request.getParameter("name"));
             String email = InputNormalizer.normalizeEmail(request.getParameter("email"));
@@ -194,19 +201,13 @@ public class UpdateTeacherServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath()+ "/admin/teacher/find-many");
 
         }catch (NumberFormatException nfe){
-            loadSafely(request, id);
-            request.setAttribute("error", "ID inválido.");
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp")
+                    .forward(request, response);
             return;
         } catch (DataException de){
-            loadSafely(request, id);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
             return;
         } catch (NotFoundException nfe){
-            loadSafely(request, id);
-
-            request.setAttribute("error", nfe.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
             return;
         } catch (ValueAlreadyExistsException vaee){
