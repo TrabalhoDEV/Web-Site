@@ -2,6 +2,7 @@ package com.example.schoolservlet.daos.interfaces;
 
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.records.StudentsPerformance;
 import com.example.schoolservlet.utils.records.TeacherPendency;
 import java.util.List;
@@ -42,7 +43,7 @@ public interface IStudentSubjectDAO {
      * @return a {@link Map} where the key is the subject ID and the value is the {@link StudentSubject} object,
      *         or an empty map if no subjects are found
      */
-    Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException;
+    Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException, ValidationException;
 
 
     /**
@@ -51,12 +52,12 @@ public interface IStudentSubjectDAO {
      * @param studentId the unique identifier of the student
      * @return the total number of subjects for the given student ID
      */
-    int totalCount(int studentId) throws DataException;
+    int totalCount(int studentId) throws DataException, ValidationException;
 
     /**
      * Method that find the students with less grade, helping teacher find who he should give more attention
      * @param teacherId is teacher id
-     * @return      students, subjects and the data between tehem, all related to passed teacher
+     * @return      students, subjects and the data between them, all related to passed teacher
      * @throws DataException  if an error in database or persistence happen;
      * @throws ValidationException  if teacherId is empty or less than 0
      */

@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 public class FindFeedbacksServlet extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(FindFeedbacksServlet.class.getName());
-    private static final int MIN_PAGE = 0;
 
     /**
      * Processes GET requests to load and display student feedbacks.

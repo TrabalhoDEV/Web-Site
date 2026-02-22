@@ -13,6 +13,7 @@ public class OutputFormatService {
      */
     public static String formatName(String name){
         if (name.isEmpty()) return null;
+        name = escapeHtml(name);
 
         String[] nameDivided = name.split("\\s+");
         StringBuilder result = new StringBuilder();
@@ -43,6 +44,7 @@ public class OutputFormatService {
      */
     public static String formatObs(String obs){
         if (obs.isEmpty()) return null;
+        obs = escapeHtml(obs);
         return capitalizeOne(obs);
     }
 
@@ -53,11 +55,32 @@ public class OutputFormatService {
      */
     public static String formatCpf(String cpf){
         if (cpf.isEmpty()) return null;
+        cpf = escapeHtml(cpf);
         return cpf.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
     }
 
+    /**
+     * Static method that transform date to string
+     * @param date Is the date stored in the database
+     * @return    Is the date formatted to string day/month
+     */
     public static String formatDate(Date date) {
         if (date == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM").format(date);
+    }
+
+    /**
+     * Static method that replaces possible js injections in output
+     * @param input is the data return from servlet
+     * @return      data normalize
+     */
+    public static String escapeHtml(String input) {
+        if (input == null) return "";
+        return input
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#x27;");
     }
 }
