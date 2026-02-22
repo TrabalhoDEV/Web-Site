@@ -42,6 +42,33 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         }
     }
 
+    public Student findByCpf(String cpf) throws DataException, ValidationException, NotFoundException {
+        InputValidation.validateIsNull("cpf", cpf);
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "SELECT * FROM student WHERE cpf = ?")) {
+
+            pstmt.setString(1, InputNormalizer.normalizeCpf(cpf));
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                Student student = new Student();
+                student.setId(rs.getInt("id"));
+                student.setName(rs.getString("name"));
+                student.setEmail(rs.getString("email"));
+                student.setCpf(rs.getString("cpf"));
+                student.setIdSchoolClass(rs.getInt("id_school_class"));
+                student.setStatus(StudentStatusEnum.values()[rs.getInt("status") - 1]);
+                return student;
+            } else throw new NotFoundException("student", "cpf", cpf);
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar aluno por cpf", sqle);
+        }
+    }
+
     @Override
     public Map<Integer, Student> findMany(int skip, int take) throws DataException{
         Map<Integer, Student> students = new HashMap<>();
@@ -154,14 +181,15 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
 
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO student " +
-                    "(status, cpf, id_school_class) " +
-                    "VALUES (?, ?, ?)")){
+                    "(status, cpf, email, id_school_class) " +
+                    "VALUES (?, ?, ?, ?)")){
 
             FieldAlreadyUsedValidation.exists("student", "cpf", student.getCpf());
             FieldAlreadyUsedValidation.exists("admin", "document", String.valueOf(student.getCpf()));
             pstmt.setInt(1, StudentStatusEnum.INACTIVE.ordinal() + 1);
             pstmt.setString(2, InputNormalizer.normalizeCpf(student.getCpf()));
-            pstmt.setInt(3, student.getIdSchoolClass());
+            pstmt.setString(3, InputNormalizer.normalizeEmail(student.getEmail()));
+            pstmt.setInt(4, student.getIdSchoolClass());
 
             pstmt.executeUpdate();
         } catch (SQLException sqle){

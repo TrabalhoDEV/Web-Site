@@ -452,6 +452,43 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    public void createManyByStudentClass(int studentId, int schoolClassId) throws DataException, ValidationException {
+        InputValidation.validateId(studentId, "id do aluno");
+        InputValidation.validateId(schoolClassId, "id da turma");
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement selectPstmt = conn.prepareStatement(
+                     "SELECT id_subject FROM school_class_subject WHERE id_school_class = ?");
+             PreparedStatement insertPstmt = conn.prepareStatement(
+                     "INSERT INTO student_subject (id_student, id_subject) VALUES (?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            selectPstmt.setInt(1, schoolClassId);
+            ResultSet rs = selectPstmt.executeQuery();
+
+            boolean hasSubjects = false;
+            while (rs.next()) {
+                hasSubjects = true;
+                insertPstmt.setInt(1, studentId);
+                insertPstmt.setInt(2, rs.getInt("id_subject"));
+                insertPstmt.addBatch();
+            }
+
+            if (!hasSubjects) {
+                conn.setAutoCommit(true);
+                return;
+            }
+
+            insertPstmt.executeBatch();
+            conn.commit();
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao vincular matérias ao aluno", sqle);
+        }
+    }
+
     @Override
     public void update(StudentSubject studentSubject) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId(studentSubject.getId(), "id");
