@@ -6,10 +6,7 @@ import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
-import com.example.schoolservlet.utils.AccessValidation;
-import com.example.schoolservlet.utils.EmailService;
-import com.example.schoolservlet.utils.InputNormalizer;
-import com.example.schoolservlet.utils.InputValidation;
+import com.example.schoolservlet.utils.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -77,15 +74,24 @@ public class InsertStudentServlet extends HttpServlet {
         cpf = InputNormalizer.normalizeCpf(cpf);
         email = InputNormalizer.normalizeEmail(email);
 
+        // Validate duplicates:
+        try {
+            FieldAlreadyUsedValidation.exists("student", "cpf", "cpf", cpf);
+            FieldAlreadyUsedValidation.exists("admin", "document", "cpf", cpf);
+            FieldAlreadyUsedValidation.exists("student", "email", "email", email);
+        } catch (DataException | ValueAlreadyExistsException e){
+            getAllData(request, response);
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/index.jsp");
+            return;
+        }
+
         // Validate that anoEscolar is a valid integer
         int studentClassId = 0;
         try {
             studentClassId = Integer.parseInt(studentClassParam);
         } catch (NumberFormatException nfe) {
             getAllData(request, response);
-            request.setAttribute("error", "ID precisa ser um valor numérico inteiro");
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST,"ID precisa ser um valor numérico inteiro", "/WEB-INF/views/admin/index.jsp");
             return;
         }
 
@@ -94,10 +100,7 @@ public class InsertStudentServlet extends HttpServlet {
             schoolClassDAO.findById(studentClassId);
         } catch (DataException | ValidationException | NotFoundException e){
             getAllData(request, response);
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/index.jsp");
             return;
         }
 
@@ -149,7 +152,7 @@ public class InsertStudentServlet extends HttpServlet {
             List<SchoolClass> schoolClasses = schoolClassDAO.findAll();
             request.setAttribute("schoolClasses", schoolClasses);
         } catch (DataException de){
-            request.setAttribute("error", de);
+            request.setAttribute("error", de.getMessage());
         }
     }
 }

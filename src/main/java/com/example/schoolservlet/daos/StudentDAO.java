@@ -184,8 +184,8 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
                     "(status, cpf, email, id_school_class) " +
                     "VALUES (?, ?, ?, ?)")){
 
-            FieldAlreadyUsedValidation.exists("student", "cpf", student.getCpf());
-            FieldAlreadyUsedValidation.exists("admin", "document", String.valueOf(student.getCpf()));
+            FieldAlreadyUsedValidation.exists("student", "cpf", "cpf", student.getCpf());
+            FieldAlreadyUsedValidation.exists("admin", "document", "cpf", String.valueOf(student.getCpf()));
             pstmt.setInt(1, StudentStatusEnum.INACTIVE.ordinal() + 1);
             pstmt.setString(2, InputNormalizer.normalizeCpf(student.getCpf()));
             pstmt.setString(3, InputNormalizer.normalizeEmail(student.getEmail()));
