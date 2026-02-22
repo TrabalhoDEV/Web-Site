@@ -31,7 +31,7 @@
     </td>
     <td><%=student.getEmail() != null ? student.getEmail() : "Não informado"%>
     </td>
-    <td><%=student.getStatus()%>
+    <td><%=OutputFormatService.formatStudentStatus(student.getStatus())%>
     </td>
   </tr>
   <%}%>
