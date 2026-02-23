@@ -76,7 +76,7 @@
     <td style="text-align: center"><%=studentSubject.getGrade2() != null ? studentSubject.getGrade2() : "-"%></td>
     <td style="text-align: center"><%=studentSubject.getAverage() != null ? studentSubject.getAverage() : "-"%></td>
     <td><%=studentSubject.getStatus()%></td>
-    <td><%=studentSubject.getStudent().getStatus()%></td>
+    <td><a>Ver detalhes</a>/td>
   </tr>
   <%}%>
   <%}%>
