@@ -1,4 +1,4 @@
-package com.example.schoolservlet.servlets.student.find;
+package com.example.schoolservlet.servlets.students.find;
 
 import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
