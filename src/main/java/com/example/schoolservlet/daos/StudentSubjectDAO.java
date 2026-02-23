@@ -11,6 +11,7 @@ import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import com.example.schoolservlet.utils.PostgreConnection;
 import com.example.schoolservlet.utils.records.StudentsPerformance;
+import com.example.schoolservlet.utils.records.StudentsPerformanceCount;
 import com.example.schoolservlet.utils.records.TeacherPendency;
 import java.sql.*;
 import java.util.ArrayList;
@@ -332,8 +333,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                     "    JOIN subject sb ON sb.id = ss.id_subject " +
                     "    WHERE sct.id_teacher = ? AND st.status = ? " +
                     ") AS sub")){
-            pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APROVAL);
-            pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APROVAL);
+            pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APPROVAL);
+            pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APPROVAL);
             pstmt.setInt(3, teacherId);
             pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal() + 1);
 
@@ -456,11 +457,12 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                     "    LEFT JOIN student_subject ss\n" +
                     "        ON ss.id_student = s.id\n" +
                     "\n" +
-                    "    WHERE sct.id_teacher = ?\n" +
+                    "    WHERE sct.id_teacher = ?\n AND s.status = ?" +
                     ") AS sub;")){
             pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APPROVAL);
             pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APPROVAL);
             pstmt.setInt(3, idTeacher);
+            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal() + 1);
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()){
@@ -496,11 +498,12 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                     "JOIN subject sb ON sb.id = ss.id_subject\n" +
                     "JOIN school_class sc ON sc.id = st.id_school_class\n" +
                     "JOIN school_class_teacher sct ON sct.id_school_class = sc.id\n" +
-                    "WHERE sct.id_teacher = ?\n" +
+                    "WHERE sct.id_teacher = ? AND st.status = ?\n" +
                     "AND (ss.grade1 IS NULL or ss.grade2 IS NULL)\n" +
                     "ORDER BY sb.deadline ASC LIMIT ?;")){
             pstmt.setInt(1, idTeacher);
-            pstmt.setInt(2, Constants.PENDENCIES_TAKE);
+            pstmt.setInt(2, StudentStatusEnum.ACTIVE.ordinal() + 1);
+            pstmt.setInt(3, Constants.PENDENCIES_TAKE);
 
             ResultSet rs = pstmt.executeQuery();
 

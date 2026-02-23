@@ -66,7 +66,7 @@ public class StudentSubject {
 
     public String getStatus(){
         if (grade1 != null && grade2 != null){
-            return getAverage() > Constants.MIN_GRADE_TO_BE_APROVAL ? "Aprovado" : "Reprovado";
+            return getAverage() > Constants.MIN_GRADE_TO_BE_APPROVAL ? "Aprovado" : "Reprovado";
         }
         return "Pendente";
     }

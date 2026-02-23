@@ -3,6 +3,7 @@
 <%@ page import="com.example.schoolservlet.models.StudentSubject" %>
 <%@ page import="com.example.schoolservlet.utils.records.StudentsPerformanceCount" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.example.schoolservlet.models.Teacher" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -76,7 +77,7 @@
     <td style="text-align: center"><%=studentSubject.getGrade2() != null ? studentSubject.getGrade2() : "-"%></td>
     <td style="text-align: center"><%=studentSubject.getAverage() != null ? studentSubject.getAverage() : "-"%></td>
     <td><%=studentSubject.getStatus()%></td>
-    <td><a>Ver detalhes</a>/td>
+    <td><a href="#">Ver detalhes</a></td>
   </tr>
   <%}%>
   <%}%>

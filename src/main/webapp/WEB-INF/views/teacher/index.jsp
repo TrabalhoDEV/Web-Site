@@ -35,6 +35,7 @@
                 : (pendency.grade1() == null ? String.format("Lançar N1- %s", OutputFormatService.formatName(pendency.studentName()))
                 : String.format("Lançar N2 - %s", OutputFormatService.formatName(pendency.studentName())))
         %></h4>
+        <h5><%= OutputFormatService.formatName(pendency.subjectName())%></h5>
         <p>Prazo: <%=OutputFormatService.formatDate(pendency.deadline())%></p>
         <p><%=pendency.status()%></p>
       </div>
