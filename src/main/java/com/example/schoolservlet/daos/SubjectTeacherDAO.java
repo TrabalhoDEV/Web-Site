@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
 
@@ -194,22 +195,27 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
         }
     }
 
-    public void deleteByTeacherAndSubject(int teacherId, int subjectId)
+    public void deleteManyByTeacherAndSubjects(int teacherId, Set<Integer> subjectIds)
             throws DataException {
 
-        String sql = "DELETE FROM subject_teacher " +
-                "WHERE id_teacher = ? AND id_subject = ?";
+        if (subjectIds == null || subjectIds.isEmpty()) return;
+
+        String sql = "DELETE FROM subject_teacher WHERE id_teacher = ? AND id_subject = ?";
 
         try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, teacherId);
-            stmt.setInt(2, subjectId);
+            for (Integer subjectId : subjectIds) {
+                ps.setInt(1, teacherId);
+                ps.setInt(2, subjectId);
+                ps.addBatch();
+            }
 
-            stmt.executeUpdate();
+            ps.executeBatch();
 
         } catch (SQLException e) {
-            throw new DataException("Erro ao remover matéria do professor.", e);
+            e.printStackTrace();
+            throw new DataException("Erro ao remover múltiplos vínculos entre matéria e professor");
         }
     }
 

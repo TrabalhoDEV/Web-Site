@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -117,11 +118,11 @@ public class UpdateTeacherServlet extends HttpServlet {
 
             teacherDAO.update(teacher);
 
+            List<Integer> validSubjectIds = InputValidation.validateIdsExist(subjectIdsParam, subjectDAO.findAllIds());
+
             Set<Integer> newSubjectIds = new HashSet<>();
-            if (subjectIdsParam != null) {
-                for (String sId : subjectIdsParam) {
-                    newSubjectIds.add(Integer.parseInt(sId));
-                }
+            if (validSubjectIds != null) {
+                newSubjectIds.addAll(validSubjectIds);
             }
 
             List<Subject> currentSubjects = subjectDAO.findByTeacherId(teacher.getId());
@@ -137,24 +138,28 @@ public class UpdateTeacherServlet extends HttpServlet {
             Set<Integer> toRemoveSubjects = new HashSet<>(currentSubjectIds);
             toRemoveSubjects.removeAll(newSubjectIds);
 
-            for (Integer subjectId : toAddSubjects) {
-                Subject subject = subjectDAO.findById(subjectId);
+            if (!toAddSubjects.isEmpty()) {
+                List<SubjectTeacher> subjectTeachersToInsert = new ArrayList<>();
 
-                SubjectTeacher st = new SubjectTeacher();
-                st.setTeacher(teacher);
-                st.setSubject(subject);
-                subjectTeacherDAO.create(st);
+                for (Integer subjectId : toAddSubjects) {
+                    Subject subject = subjectDAO.findById(subjectId);
+
+                    SubjectTeacher st = new SubjectTeacher();
+                    st.setTeacher(teacher);
+                    st.setSubject(subject);
+                    subjectTeachersToInsert.add(st);
+                }
+
+                subjectTeacherDAO.createMany(subjectTeachersToInsert);
             }
 
-            for (Integer subjectId : toRemoveSubjects) {
-                subjectTeacherDAO.deleteByTeacherAndSubject(teacher.getId(), subjectId);
-            }
+            subjectTeacherDAO.deleteManyByTeacherAndSubjects(teacher.getId(), toRemoveSubjects);
+
+            List<Integer> validClassIds = InputValidation.validateIdsExist(schoolClassIdsParam, schoolClassDAO.findAllIds());
 
             Set<Integer> newSchoolClassIds = new HashSet<>();
-            if (schoolClassIdsParam != null) {
-                for (String scId : schoolClassIdsParam) {
-                    newSchoolClassIds.add(Integer.parseInt(scId));
-                }
+            if (validClassIds != null) {
+                newSchoolClassIds.addAll(validClassIds);
             }
 
             List<SchoolClass> currentSchoolClasses = schoolClassDAO.findByTeacherId(teacher.getId());
@@ -170,21 +175,23 @@ public class UpdateTeacherServlet extends HttpServlet {
             Set<Integer> toRemoveClasses = new HashSet<>(currentSchoolClassIds);
             toRemoveClasses.removeAll(newSchoolClassIds);
 
-            for (Integer classId : toAddClasses) {
-                SchoolClass schoolClass = schoolClassDAO.findById(classId);
+            if (!toAddClasses.isEmpty()) {
+                List<SchoolClassTeacher> classTeachersToInsert = new ArrayList<>();
 
-                SchoolClassTeacher sct = new SchoolClassTeacher();
-                sct.setTeacher(teacher);
-                sct.setSchoolClass(schoolClass);
+                for (Integer classId : toAddClasses) {
+                    SchoolClass schoolClass = schoolClassDAO.findById(classId);
 
-                schoolClassTeacherDAO.create(sct);
+                    SchoolClassTeacher sct = new SchoolClassTeacher();
+                    sct.setTeacher(teacher);
+                    sct.setSchoolClass(schoolClass);
+                    classTeachersToInsert.add(sct);
+                }
+
+                schoolClassTeacherDAO.createMany(classTeachersToInsert);
             }
 
 
-            for (Integer classId : toRemoveClasses) {
-                schoolClassTeacherDAO.deleteByTeacherAndClass(teacher.getId(), classId);
-            }
-
+            schoolClassTeacherDAO.deleteManyByTeacherAndClasses(teacher.getId(), toRemoveClasses);
 
             try {
                 String assunto = "Edição dos dados do Sistema Escolar";
