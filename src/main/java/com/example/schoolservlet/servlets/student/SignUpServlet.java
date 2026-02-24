@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/register")
+@WebServlet(name = "SignUpServlet", value = "/student/register")
 public class SignUpServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -32,28 +32,33 @@ public class SignUpServlet extends HttpServlet {
             InputValidation.validateEmail(email);
             newStudent.setEmail(email);
         } catch (ValidationException ve) {
-            request.setAttribute("errorEmail", ve.getMessage());
+            request.setAttribute("error", ve.getMessage());
         }
         try {
             InputValidation.validatePassword(password);
         } catch (ValidationException ve) {
-            request.setAttribute("errorPassword", ve.getMessage());
+            request.setAttribute("error", ve.getMessage());
         }
 
-        int enrollNum = Integer.parseInt(enroll);
-        newStudent.setId(enrollNum);
+        int enrollNum = 0;
+        try {
+            enrollNum = Integer.parseInt(enroll);
+            newStudent.setId(enrollNum);
+        } catch (NumberFormatException nfe) {
+            request.setAttribute("error", nfe.getMessage());
+        }
 
         StudentDAO dao = new StudentDAO();
         try {
             dao.update(newStudent);
             dao.updatePassword(enrollNum, password);
-            response.sendRedirect("signup.jsp?register=sucess");
+            response.sendRedirect(request.getContextPath() + "signup.jsp?register=sucess");
         } catch (NotFoundException nfe) {
-            request.setAttribute("errorNotFound", nfe.getMessage());
+            request.setAttribute("error", nfe.getMessage());
         } catch (DataException de) {
-            request.setAttribute("errorData", de.getMessage());
+            request.setAttribute("error", de.getMessage());
         } catch (ValidationException ve) {
-            request.setAttribute("errorValidation", ve.getMessage());
+            request.setAttribute("error", ve.getMessage());
         }
     }
 }

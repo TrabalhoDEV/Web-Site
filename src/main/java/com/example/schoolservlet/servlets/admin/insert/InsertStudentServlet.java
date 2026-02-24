@@ -125,9 +125,9 @@ public class InsertStudentServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
 
             EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
-            "<h2>Faça sua matrícula na Vétice</h2>" +
+            "<h2>Faça sua matrícula na Vértice</h2>" +
                     "<p>Se você realmente for o próximo aluno da Vértice:</p>" +
-                    "<p><a href=\"#\">Clique aqui</a> para fazer o seu cadastro</p>"
+                    "<p><a href=\""+ request.getContextPath() + "/\">Clique aqui</a> para fazer o seu cadastro</p>"
                     );
         } catch (DataException de) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
