@@ -1,6 +1,7 @@
 package com.example.schoolservlet.servlets.admin.update;
 
 import com.example.schoolservlet.daos.SchoolClassDAO;
+<<<<<<< HEAD
 import com.example.schoolservlet.daos.SchoolClassSubjectDAO;
 import com.example.schoolservlet.daos.SubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
@@ -30,10 +31,36 @@ public class UpdateSchoolClassServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+=======
+import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.models.SchoolClass;
+import com.example.schoolservlet.utils.AccessValidation;
+import com.example.schoolservlet.utils.ErrorHandler;
+import com.example.schoolservlet.utils.FieldAlreadyUsedValidation;
+import com.example.schoolservlet.utils.InputValidation;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.servlet.annotation.*;
+
+import java.io.IOException;
+
+@WebServlet(name = "UpdateSchoolClassServlet", value = "/admin/school-class/update")
+public class UpdateSchoolClassServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+>>>>>>> 987874a (feat: creating routes to create or update school_class)
         response.setContentType("text/html");
 
         if (!AccessValidation.isAdmin(request, response)) return;
 
+<<<<<<< HEAD
         String idParam = request.getParameter("id");
 
         try {
@@ -168,3 +195,43 @@ public class UpdateSchoolClassServlet extends HttpServlet {
         } catch (Exception ignored) {}
     }
 }
+=======
+        String name = request.getParameter("name");
+        String idParam = request.getParameter("id");
+
+        try{
+            InputValidation.validateIsNull("turma", name);
+            InputValidation.validateIsNull("id da turma", idParam);
+
+            name = name.trim();
+            int id = Integer.parseInt(idParam);
+
+            InputValidation.validateSchoolClassName(name);
+            InputValidation.validateId(id, "id da turma");
+
+            SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+
+            SchoolClass schoolClass;
+
+            schoolClass = schoolClassDAO.findById(id);
+
+            if (schoolClass.getSchoolYear().equals(name)){
+                response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
+            }
+
+            FieldAlreadyUsedValidation.exists("school_class", "school_year", "nome da turma", name);
+
+            schoolClass.setSchoolYear(name);
+            schoolClassDAO.update(schoolClass);
+
+            response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
+        } catch (DataException | NotFoundException  | ValidationException e){
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/update/school-class.jsp");
+        } catch (NumberFormatException nfe){
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            request.setAttribute("error", "ID da turma precisa ser um número");
+            request.getRequestDispatcher("/WEB-INF/views/admin/update/school-class.jsp").forward(request, response);
+        }
+    }
+}
+>>>>>>> 987874a (feat: creating routes to create or update school_class)
