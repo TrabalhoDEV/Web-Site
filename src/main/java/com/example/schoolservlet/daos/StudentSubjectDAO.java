@@ -478,4 +478,52 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
             throw new DataException("Erro ao deletar matéria de um aluno");
         }
     }
+
+    public StudentSubject findByStudentIdAndCourseId(int studentId, int courseId) {
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT " +
+                    "ss.id, " +
+                    "ss.obs, " +
+                    "ss.grade1, " +
+                    "ss.grade2, " +
+                    "st.id AS id_student, " +
+                    "st.name AS student_name, " +
+                    "st.cpf AS student_cpf, " +
+                    "st.email AS student_email, " +
+                    "sb.id AS id_subject, " +
+                    "sb.name AS subject_name, " +
+                    "sb.deadline AS subject_deadline " +
+                    "FROM student_subject ss JOIN student st ON st.id = ss.id_student JOIN subject sb ON sb.id = ss.id_subject WHERE st.id = ? AND sb.id = ?")){
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, courseId);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()){
+                Student student = new Student();
+                student.setId(rs.getInt("id_student"));
+                student.setName(rs.getString("student_name"));
+                student.setCpf(rs.getString("student_cpf"));
+                student.setEmail(rs.getString("student_email"));
+                student.setStatus(StudentStatusEnum.ACTIVE);
+
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id_subject"));
+                subject.setName(rs.getString("subject_name"));
+                subject.setDeadline(rs.getDate("subject_deadline"));
+
+                return new StudentSubject(
+                        rs.getInt("id"),
+                        rs.getString("obs"),
+                        rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
+                        rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
+                        student,
+                        subject
+                );
+            } else return null;
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -68,7 +68,7 @@
         <td><%=record.grade1() != null ? record.grade1() : "-"%></td>
         <td><%=record.grade2() != null ? record.grade2() : "-"%></td>
         <td>
-            <form action="${pageContext.request.contextPath}/teacher/students/grades/update" method="post">
+            <form action="${pageContext.request.contextPath}/teacher/students/grades/release" method="get">
                 <input type="hidden" name="studentId" value="<%=record.studentId()%>">
                 <input type="hidden" name="subjectName" value="<%=record.subjectName()%>">
                 <button type="submit">Lançar notas</button>

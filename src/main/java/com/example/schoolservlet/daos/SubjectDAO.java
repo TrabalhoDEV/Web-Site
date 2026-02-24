@@ -2,6 +2,7 @@ package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.exceptions.*;
+import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputValidation;
@@ -79,6 +80,25 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    public Subject findByName(String subjectName) throws DataException, NotFoundException {
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM subject WHERE name = ?")) {
+            pstmt.setString(1, subjectName);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return new Subject(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getDate("deadline")
+                );
+            } else throw new NotFoundException("matéria", "nome", subjectName);
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar matéria", sqle);
+        }
+    }
+
 
 
     @Override
@@ -137,4 +157,6 @@ public class SubjectDAO implements GenericDAO<Subject> {
             throw new DataException("Erro ao deletar matéria", sqle);
         }
     }
+
+
 }
