@@ -196,4 +196,14 @@ public class InputValidation {
         if (name.length() > Constants.MAX_SUBJECT_NAME_LENGTH) throw new MaxLengthException("nome", Constants.MAX_SUBJECT_NAME_LENGTH);
         if (name.length() < Constants.MIN_SUBJECT_NAME_LENGTH) throw new MinLengthException("nome", Constants.MIN_SUBJECT_NAME_LENGTH);
     }
+    
+    public static void validateName(String name) throws ValidationException{
+        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(name)) throw new ValidationException("Nome contém caracteres inválidos");
+        if (name.matches("^[\\p{L} ]*$")) throw new RegexException("nome");
+    }
+
+    public static void validateSchoolClassName(String name) throws ValidationException{
+        validateIsNull("nome da turma", name);
+        if (!name.matches("^[\\p{L}\\d ºª]+$")) throw new ValidationException("Nome da turma contém caracteres inválidos");
+    }
 }
