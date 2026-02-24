@@ -95,7 +95,7 @@ public class EmailService {
                 }
             }
         } catch (Exception e) {
-            throw new Exception("Erro ao enviar e-mail via Brevo: " + e.getMessage(), e);
+            throw new Exception("Não foi possível enviar e-mail para o aluno");
         }
     }
 }
