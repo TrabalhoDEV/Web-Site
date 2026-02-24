@@ -196,6 +196,7 @@ public class InputValidation {
         if (name.length() > Constants.MAX_SUBJECT_NAME_LENGTH) throw new MaxLengthException("nome", Constants.MAX_SUBJECT_NAME_LENGTH);
         if (name.length() < Constants.MIN_SUBJECT_NAME_LENGTH) throw new MinLengthException("nome", Constants.MIN_SUBJECT_NAME_LENGTH);
     }
+<<<<<<< HEAD
 
     /**
      * Static method that validates if name contains only letters and whitespace characters.
@@ -216,6 +217,12 @@ public class InputValidation {
                 throw new ValidationException("Nome contém caracteres inválidos");
             }
         }
+=======
+    
+    public static void validateName(String name) throws ValidationException{
+        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(name)) throw new ValidationException("Nome contém caracteres inválidos");
+        if (name.matches("^[\\p{L} ]*$")) throw new RegexException("nome");
+>>>>>>> 987874a (feat: creating routes to create or update school_class)
     }
 
     public static void validateSchoolClassName(String name) throws ValidationException{
