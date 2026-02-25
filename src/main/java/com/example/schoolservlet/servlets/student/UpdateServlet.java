@@ -62,7 +62,7 @@ public class UpdateServlet extends HttpServlet {
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Validate session:
-        AccessValidation.isAdmin(request, response);
+        if (!AccessValidation.isAdmin(request, response)) return;
 
         // Get parameters:
         String enrollmentParam = request.getParameter("enrollment");
@@ -118,7 +118,7 @@ public class UpdateServlet extends HttpServlet {
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Validate session:
-        AccessValidation.isAdmin(request, response);
+        if (!AccessValidation.isAdmin(request, response)) return;
 
         // Get form parameters:
         String enrollmentParam = request.getParameter("enrollment");
