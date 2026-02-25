@@ -28,8 +28,6 @@ public class UpdateTeacherServlet extends HttpServlet {
     private SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
     private TeacherDAO teacherDAO = new TeacherDAO();
 
-
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -50,23 +48,11 @@ public class UpdateTeacherServlet extends HttpServlet {
             loadUpdateData(request,id);
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
 
-        } catch (NumberFormatException nfe){
-            request.setAttribute("error",nfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
-            return;
+        } catch (NumberFormatException e) {
+            handleError(request, response, "ID inválido.");
 
-        } catch (DataException de){
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
-            return;
-        } catch (NotFoundException nfe){
-            request.setAttribute("error", nfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
-            return;
-        } catch (ValidationException ve){
-            request.setAttribute("error", ve.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
-            return;
+        } catch (DataException | NotFoundException | ValidationException e) {
+            handleError(request, response, e.getMessage());
         }
     }
 
@@ -207,15 +193,13 @@ public class UpdateTeacherServlet extends HttpServlet {
 
             response.sendRedirect(request.getContextPath()+ "/admin/teacher/find-many");
 
-        }catch (NumberFormatException nfe){
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp")
-                    .forward(request, response);
+        } catch (NumberFormatException e) {
+            request.getSession().setAttribute("error", "ID inválido.");
+            response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
             return;
-        } catch (DataException de){
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
-            return;
-        } catch (NotFoundException nfe){
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
+        } catch (DataException | NotFoundException e) {
+            request.getSession().setAttribute("error", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
             return;
         } catch (ValueAlreadyExistsException vaee){
             loadSafely(request, id);
@@ -255,5 +239,16 @@ public class UpdateTeacherServlet extends HttpServlet {
         try {
             loadUpdateData(request, id);
         } catch (Exception ignored) {}
+    }
+
+    private void handleError(HttpServletRequest request,
+                             HttpServletResponse response,
+                             String message)
+            throws ServletException, IOException {
+
+        request.setAttribute("error", message);
+
+        request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp")
+                .forward(request, response);
     }
 }
