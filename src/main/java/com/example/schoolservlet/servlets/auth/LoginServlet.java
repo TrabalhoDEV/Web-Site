@@ -35,9 +35,11 @@ public class LoginServlet extends HttpServlet {
         HttpSession session = request.getSession();
         UserRoleEnum role = null;
 
-        if (identifier == null ||identifier.isBlank()){
+        try{
+            InputValidation.validateIsNull("matrícula/usuário", identifier);
+        } catch (ValidationException ve){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", "Matrícula/usuário é obrigatório");
+            request.setAttribute("error", ve.getMessage());
             request.getRequestDispatcher("index.jsp").forward(request, response);
             return;
         }
@@ -47,24 +49,15 @@ public class LoginServlet extends HttpServlet {
         try{
             InputValidation.validateUserName(identifier);
             role = UserRoleEnum.TEACHER;
-        } catch (ValidationException e){
-            if (role == null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                request.setAttribute("error", e.getMessage());
-            }
-        }
+        } catch (ValidationException e){}
 
         try{
             InputValidation.validateEnrollment(identifier);
             role = UserRoleEnum.STUDENT;
-        } catch (ValidationException e){
-            if (role == null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                request.setAttribute("error", e.getMessage());
-            }
-        }
+        } catch (ValidationException e){}
 
         if (role == null) {
+            request.setAttribute("error", "Usuário e/ou senha incorretos");
             request.getRequestDispatcher("index.jsp").forward(request, response);
             return;
         }
@@ -84,7 +77,7 @@ public class LoginServlet extends HttpServlet {
                         session.setAttribute("user", user);
                         session.setMaxInactiveInterval(60 * 60);
 
-                        response.sendRedirect(request.getContextPath() + "/teacher/students");
+                        response.sendRedirect(request.getContextPath() + "/teacher");
                         return;
                     } else {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

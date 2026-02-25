@@ -41,7 +41,11 @@
 
         <!-- CPF field: expects numeric input -->
         <label for="cpf">CPF:</label>
-        <input type="number" id="cpf" name="cpf" placeholder="Digite o CPF do estudante" required>
+        <input type="text" id="cpf" name="cpf" placeholder="Digite o CPF do estudante" required>
+        <br><br>
+
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" placeholder="Digite o email do estudante" required>
         <br><br>
 
         <!-- Academic year selection dropdown -->
@@ -60,5 +64,6 @@
 <a href="${pageContext.request.contextPath}/admin/student/find-many">Ver alunos</a>
 <a href="${pageContext.request.contextPath}/admin/school-class/find-many">Ver turmas</a>
 <a href="${pageContext.request.contextPath}/admin/teacher/find-many">Ver professores</a>
+    <a href="${pageContext.request.contextPath}/admin/subject/find-many">Ver matérias</a>
 </body>
 </html>

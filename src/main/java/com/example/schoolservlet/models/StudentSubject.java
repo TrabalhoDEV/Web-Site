@@ -46,10 +46,16 @@ public class StudentSubject {
     }
 
     public Double getAverage() {
-        if (grade1 == null || grade2 == null) {
-            return null;
+        if (grade1 != null && grade2 != null){
+            return (grade1 + grade2) / 2;
         }
-        return (grade1 + grade2) / 2;
+        if (grade1 != null){
+            return grade1;
+        }
+        if (grade2 != null){
+            return grade2;
+        }
+        return null;
     }
 
     public String getObs() {
@@ -81,5 +87,17 @@ public class StudentSubject {
 
     public void setObs(String obs) {
         this.obs = obs;
+    }
+
+    @Override
+    public String toString() {
+        return "StudentSubject{" +
+                "id=" + id +
+                ", student=" + student +
+                ", subject=" + subject +
+                ", grade1=" + grade1 +
+                ", grade2=" + grade2 +
+                ", obs='" + obs + '\'' +
+                '}';
     }
 }

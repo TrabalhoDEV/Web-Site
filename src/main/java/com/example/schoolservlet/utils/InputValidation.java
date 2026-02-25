@@ -18,7 +18,7 @@ public class InputValidation {
      * @return    true if cpf's format is valid
      */
     public static void validateCpf(String cpf) throws ValidationException{
-        validateIsNull("document", cpf);
+        validateIsNull("cpf", cpf);
         if (!StandardCharsets.US_ASCII.newEncoder().canEncode(cpf)) throw new ValidationException("CPF contém caracteres inválidos");
         if (!cpf.matches("\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}")) throw new RegexException("cpf");
     }
@@ -182,5 +182,18 @@ public class InputValidation {
      */
     public static void validateIsNull(String field, String input) throws RequiredFieldException{
         if (input == null || input.isBlank()) throw new RequiredFieldException(field);
+    }
+
+    /**
+     * Static method that validates if subject name is valid
+     * @param name  is subject's name
+     * @throws RequiredFieldException if name is blank or null
+     * @throws MinLengthException  if name's length is less than minimal defined in a constant
+     * @throws MaxLengthException  if name's lenght is greater than it should
+     */
+    public static void validateSubjectName(String name) throws RequiredFieldException, MinLengthException, MaxLengthException{
+        validateIsNull("nome", name);
+        if (name.length() > Constants.MAX_SUBJECT_NAME_LENGTH) throw new MaxLengthException("nome", Constants.MAX_SUBJECT_NAME_LENGTH);
+        if (name.length() < Constants.MIN_SUBJECT_NAME_LENGTH) throw new MinLengthException("nome", Constants.MIN_SUBJECT_NAME_LENGTH);
     }
 }

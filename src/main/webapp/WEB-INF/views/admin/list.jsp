@@ -11,7 +11,6 @@
   int pageNumber = (Integer) request.getAttribute("page");
 %>
 <body>
-<%if (!studentMap.isEmpty()){%>
 <table>
   <thead>
   <tr>
@@ -32,17 +31,12 @@
     </td>
     <td><%=student.getEmail() != null ? student.getEmail() : "Não informado"%>
     </td>
-    <td><%=student.getStatus()%>
+    <td><%=OutputFormatService.formatStudentStatus(student.getStatus())%>
     </td>
   </tr>
   <%}%>
   </tbody>
 </table>
-<%} else if (request.getAttribute("error") != null){%>
-<p><%=request.getAttribute("error")%></p>
-<%} else {%>
-<p>Nenhum aluno foi encontrado</p>
-<%}%>
-<a href="${pageContext.request.contextPath}/admin/add-student">Cadastrar alunos</a>
+<a href="admin/add-student">Cadastrar alunos</a>
 </body>
 </html>

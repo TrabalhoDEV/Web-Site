@@ -4,13 +4,13 @@ import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Student;
+import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.*;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     @Override
@@ -38,6 +38,33 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar aluno", sqle);
+        }
+    }
+
+    public Student findByCpf(String cpf) throws DataException, ValidationException, NotFoundException {
+        InputValidation.validateIsNull("cpf", cpf);
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "SELECT * FROM student WHERE cpf = ?")) {
+
+            pstmt.setString(1, InputNormalizer.normalizeCpf(cpf));
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                Student student = new Student();
+                student.setId(rs.getInt("id"));
+                student.setName(rs.getString("name"));
+                student.setEmail(rs.getString("email"));
+                student.setCpf(rs.getString("cpf"));
+                student.setIdSchoolClass(rs.getInt("id_school_class"));
+                student.setStatus(StudentStatusEnum.values()[rs.getInt("status") - 1]);
+                return student;
+            } else throw new NotFoundException("student", "cpf", cpf);
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar aluno por cpf", sqle);
         }
     }
 
@@ -71,7 +98,8 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     }
 
     @Override
-    public Map<Integer, Student> findManyByTeacherId(int skip, int take, int idTeacher) throws DataException{
+    public Map<Integer, Student> findManyByTeacherId(int skip, int take, int idTeacher) throws DataException, ValidationException{
+        InputValidation.validateId(idTeacher, "id do professor");
         Map<Integer, Student> students = new HashMap<>();
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -126,8 +154,9 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         }
     }
 
-    @Override
-    public int countByTeacherId(int idTeacher) throws DataException{
+    public int countByTeacherId(int idTeacher) throws DataException, ValidationException{
+        InputValidation.validateId(idTeacher, "id do professor");
+
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) AS count_by_id_teacher FROM student s " +
                     "JOIN school_class sc ON sc.id = s.id_school_class " +
@@ -144,7 +173,6 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             throw new DataException("Erro ao contar alunos", sqle);
         }
     }
-
     @Override
     public void create(Student student) throws DataException, ValidationException {
         if (student.getCpf() == null || student.getCpf().isEmpty()) throw new RequiredFieldException("cpf");
@@ -152,14 +180,15 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
 
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO student " +
-                    "(status, cpf, id_school_class) " +
-                    "VALUES (?, ?, ?)")){
+                    "(status, cpf, email, id_school_class) " +
+                    "VALUES (?, ?, ?, ?)")){
 
-            FieldAlreadyUsedValidation.exists("student", "cpf", student.getCpf());
-            FieldAlreadyUsedValidation.exists("admin", "document", String.valueOf(student.getCpf()));
-            pstmt.setInt(1, StudentStatusEnum.INACTIVE.ordinal());
+            FieldAlreadyUsedValidation.exists("student", "cpf", "cpf", student.getCpf());
+            FieldAlreadyUsedValidation.exists("admin", "document", "cpf", String.valueOf(student.getCpf()));
+            pstmt.setInt(1, StudentStatusEnum.INACTIVE.ordinal() + 1);
             pstmt.setString(2, InputNormalizer.normalizeCpf(student.getCpf()));
-            pstmt.setInt(3, student.getIdSchoolClass());
+            pstmt.setString(3, InputNormalizer.normalizeEmail(student.getEmail()));
+            pstmt.setInt(4, student.getIdSchoolClass());
 
             pstmt.executeUpdate();
         } catch (SQLException sqle){
@@ -230,7 +259,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             pstmt.setString(1, InputNormalizer.normalizeName(student.getName()));
             pstmt.setString(2, InputNormalizer.normalizeEmail(student.getEmail()));
             pstmt.setString(3, BCrypt.hashpw(student.getPassword(), BCrypt.gensalt(12)));
-            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal());
+            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal() + 1);
             pstmt.setInt(5, student.getId());
 
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("alunos", "matrícula", String.valueOf(student.getId()));

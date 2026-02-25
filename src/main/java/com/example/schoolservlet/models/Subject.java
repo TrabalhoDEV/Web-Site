@@ -45,4 +45,13 @@ public class Subject {
     public void setDeadline(Date deadline) {
         this.deadline = deadline;
     }
+
+    @Override
+    public String toString() {
+        return "Subject{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", deadline=" + deadline +
+                '}';
+    }
 }

@@ -33,9 +33,17 @@ public class Constants {
 //  STUDENT_SUBJECT constraints:
     public static final double MAX_GRADE = 10.0;
     public static final double MIN_GRADE = 0.0;
+    public static final double MIN_GRADE_TO_BE_APPROVAL = 7.0;
+    public static final int MAX_GRADE_TO_HELP = 8;
+    public static final int STUDENTS_HELP_TAKE = 5;
+    public static final int PENDENCIES_TAKE = 3;
     public static final int MAX_OBS_LENGTH = 2000;
     public static final int MIN_OBS_LENGTH = 3;
 
-//    PAGES constratins:
+//    PAGES constraints:
     public static final int MAX_TAKE = 6;
+    public static final int MIN_PAGE = 0;
+
+// STRINGS
+    public static final String UNEXPECTED_ERROR_MESSAGE = "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.";
 }
