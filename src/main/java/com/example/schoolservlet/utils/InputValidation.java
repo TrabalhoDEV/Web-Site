@@ -127,17 +127,30 @@ public class InputValidation {
     public static void validateIsNull(String field, String input) throws RequiredFieldException{
         if (input == null || input.isBlank()) throw new RequiredFieldException(field);
     }
-    
+
+    /**
+     * Static method that validates if subject name is valid
+     * @param name  is subject's name
+     * @throws RequiredFieldException if name is blank or null
+     * @throws MinLengthException  if name's length is less than minimal defined in a constant
+     * @throws MaxLengthException  if name's lenght is greater than it should
+     */
+    public static void validateSubjectName(String name) throws RequiredFieldException, MinLengthException, MaxLengthException{
+        validateIsNull("nome", name);
+        if (name.length() > Constants.MAX_SUBJECT_NAME_LENGTH) throw new MaxLengthException("nome", Constants.MAX_SUBJECT_NAME_LENGTH);
+        if (name.length() < Constants.MIN_SUBJECT_NAME_LENGTH) throw new MinLengthException("nome", Constants.MIN_SUBJECT_NAME_LENGTH);
+    }
+
     /**
      * Static method that validates if name contains only letters and whitespace characters.
-     * 
+     *
      * Validation rules:
      * - Name cannot be null or blank
      * - Name must be encodable in US-ASCII
      * - Name length must be between MIN_STUDENT_NAME_LENGHT and MAX_STUDENT_NAME_LENGHT
      * - Name can only contain letters (A-Z, a-z) and whitespace
      * - Special characters, numbers and symbols are not allowed
-     * 
+     *
      * @param name is the user's name to be validated
      * @throws RequiredFieldException if name is null or blank
      * @throws ValidationException if name contains invalid characters or violates length constraints

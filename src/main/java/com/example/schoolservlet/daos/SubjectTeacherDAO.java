@@ -2,7 +2,6 @@ package com.example.schoolservlet.daos;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.exceptions.DataException;
-import com.example.schoolservlet.exceptions.InvalidNumberException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Subject;
