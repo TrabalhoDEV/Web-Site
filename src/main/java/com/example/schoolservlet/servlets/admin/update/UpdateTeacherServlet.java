@@ -91,11 +91,11 @@ public class UpdateTeacherServlet extends HttpServlet {
             InputValidation.validateUserName(username);
 
             if(!teacher.getEmail().equals(email)){
-                FieldAlreadyUsedValidation.exists("teacher","email",email);
+                FieldAlreadyUsedValidation.exists("teacher","email","Email",email);
             }
 
             if(!teacher.getUsername().equals(username)){
-                FieldAlreadyUsedValidation.exists("teacher","username",username);
+                FieldAlreadyUsedValidation.exists("teacher","username","Username",username);
             }
 
             teacher.setName(name);
