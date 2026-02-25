@@ -44,6 +44,7 @@ public class FindManyStudentsServlet extends HttpServlet {
         AuthenticatedUser user;
         Teacher teacher = null;
         StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
+        String responsePath = "/WEB-INF/views/teacher/student/find-many.jsp";
 
         try {
             user = (AuthenticatedUser) session.getAttribute("user");
@@ -68,12 +69,12 @@ public class FindManyStudentsServlet extends HttpServlet {
                 teacher = teacherDAO.findById(user.id());
 
                 session.setAttribute("teacher", teacher);
-                request.setAttribute("teacher", teacher);
             } catch (DataException | NotFoundException | ValidationException e) {
-                ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student/find-many.jsp");
+                ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), responsePath);
                 return;
             }
         }
+        request.setAttribute("teacher", teacher);
 
         try{
             InputValidation.validateIsNull("matrícula", enrollmentFilter);
@@ -87,7 +88,7 @@ public class FindManyStudentsServlet extends HttpServlet {
                 InputValidation.validateEnrollment(enrollmentFilter);
                 id = InputNormalizer.normalizeEnrollment(enrollmentFilter);
             } catch (ValidationException e){
-                ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student/find-many.jsp");
+                ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), responsePath);
                 return;
             }
         }
@@ -97,7 +98,6 @@ public class FindManyStudentsServlet extends HttpServlet {
         int page;
         int count = 0;
 
-        request.setAttribute("studentMap", new HashMap<Integer, Student>());
         request.setAttribute("page", 1);
         request.setAttribute("totalPages", 1);
 
@@ -107,7 +107,7 @@ public class FindManyStudentsServlet extends HttpServlet {
             page = 1;
         }
 
-        Map<Integer, List<StudentSubject>> studentSubjectMap = new HashMap<>();
+        Map<Integer, List<StudentSubject>> studentSubjectMap;
 
         int totalPages = 0;
         try {
@@ -133,7 +133,7 @@ public class FindManyStudentsServlet extends HttpServlet {
             request.setAttribute("studentsPerformanceCount", studentsPerformanceCount);
 
         } catch (DataException | ValidationException e){
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student/find-many.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), responsePath);
             return;
         }
 
@@ -141,6 +141,6 @@ public class FindManyStudentsServlet extends HttpServlet {
         request.setAttribute("page", page);
         request.setAttribute("totalPages", totalPages);
 
-        request.getRequestDispatcher("/WEB-INF/views/teacher/student/find-many.jsp").forward(request, response);
+        request.getRequestDispatcher(responsePath).forward(request, response);
     }
 }

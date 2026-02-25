@@ -77,12 +77,12 @@
     <td style="text-align: center"><%=studentSubject.getGrade2() != null ? studentSubject.getGrade2() : "-"%></td>
     <td style="text-align: center"><%=studentSubject.getAverage() != null ? studentSubject.getAverage() : "-"%></td>
     <td><%=studentSubject.getStatus()%></td>
-    <td><a href="#">Ver detalhes</a></td>
+    <td>-</td>
   </tr>
   <%}%>
   <%}%>
   <%} else {%>
-  <td colspan="7" style="text-align: center"><%= hasFilter ? "Nenhum aluno foi encontrado" : "Você não possui nenhum aluno no momento"%></td>
+  <td colspan="8" style="text-align: center"><%= hasFilter ? "Nenhum aluno foi encontrado" : "Você não possui nenhum aluno no momento"%></td>
   <%}%>
   </tbody>
 </table>
