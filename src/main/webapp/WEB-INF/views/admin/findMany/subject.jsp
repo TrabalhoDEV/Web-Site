@@ -5,7 +5,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Adicionar matéria</title>
+    <title>Listar matéria</title>
 </head>
 <%
     Map<Integer, Subject> subjectMap = (Map<Integer, Subject>) request.getAttribute("subjectMap");
@@ -13,7 +13,6 @@
     int pageNumber = (Integer) request.getAttribute("page");
 %>
 <body>
-<%if (!subjectMap.isEmpty()){%>
 <table>
     <thead>
     <tr>
@@ -23,6 +22,7 @@
     </tr>
     </thead>
     <tbody>
+    <%if (subjectMap != null && !subjectMap.isEmpty()){%>
     <%for (Subject subject: subjectMap.values()) {%>
     <tr>
         <td><%=OutputFormatService.formatName(subject.getName())%>
@@ -30,12 +30,11 @@
         <td><%=subject.getDeadline()%></td>
         <td><a href="${pageContext.request.contextPath}/admin/subject/update?id=<%=subject.getId()%>">Editar</a></td>
     </tr>
+    <%}%><%} else {%>
+    <td colspan="3">Nenhuma matéria foi encontrada</td>
     <%}%>
     </tbody>
 </table>
-<%} else {%>
-<p>Nenhuma matéria foi encontrada</p>
-<%}%>
 <% if (request.getAttribute("error") != null){%>
 <p><%=request.getAttribute("error")%></p>
 <%}%>
