@@ -85,7 +85,10 @@ public class FindManyStudentsServlet extends HttpServlet {
                 InputValidation.validateEnrollment(enrollmentFilter);
                 id = InputNormalizer.normalizeEnrollment(enrollmentFilter);
             } catch (ValidationException e){
+<<<<<<< HEAD
                 e.printStackTrace();
+=======
+>>>>>>> 77c9221 (feat: solving copilot comments)
                 ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), responsePath);
                 return;
             }
