@@ -3,7 +3,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Listar matérias</title>
+    <title>Editar matérias</title>
 </head>
 <body>
 <%

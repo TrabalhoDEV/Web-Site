@@ -85,7 +85,7 @@ public class UpdateSubjectServlet extends HttpServlet {
                 subject.setName(name);
             }
 
-            if (deadline != subject.getDeadline()) {
+            if (!deadline.equals(subject.getDeadline())) {
                 subject.setDeadline(deadline);
             }
 

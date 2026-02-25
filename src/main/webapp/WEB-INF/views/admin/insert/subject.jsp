@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Listar matérias</title>
+    <title>Inserir matérias</title>
 </head>
 <body>
 <form action="${pageContext.request.contextPath}/admin/subject/insert" method="post">
