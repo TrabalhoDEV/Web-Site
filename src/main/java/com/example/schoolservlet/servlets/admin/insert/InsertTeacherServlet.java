@@ -52,8 +52,8 @@ public class InsertTeacherServlet extends HttpServlet {
             InputValidation.validateUserName(username);
             InputValidation.validatePassword(password);
 
-            FieldAlreadyUsedValidation.exists("teacher","email",email);
-            FieldAlreadyUsedValidation.exists("teacher","username",username);
+            FieldAlreadyUsedValidation.exists("teacher","email","Email",email);
+            FieldAlreadyUsedValidation.exists("teacher","username","Username",username);
 
             Teacher teacher = new Teacher();
             teacher.setName(name);
