@@ -37,7 +37,7 @@
     </td>
     <td>
       <form action="${pageContext.request.contextPath}/admin/student/update" method="get">
-        <input type="hidden" name="enrollment" value="<%= student.getId() %>">
+        <input type="hidden" name="id" value="<%= student.getId() %>">
         <input type="submit" value="Atualizar estudante">
       </form>
     </td>

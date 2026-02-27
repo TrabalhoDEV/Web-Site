@@ -65,7 +65,7 @@ public class UpdateServlet extends HttpServlet {
         if (!AccessValidation.isAdmin(request, response)) return;
 
         // Get parameters:
-        String enrollmentParam = request.getParameter("enrollment");
+        String enrollmentParam = request.getParameter("id");
 
         try {
             // Validate and normalize enrollment parameter:
@@ -121,7 +121,7 @@ public class UpdateServlet extends HttpServlet {
         if (!AccessValidation.isAdmin(request, response)) return;
 
         // Get form parameters:
-        String enrollmentParam = request.getParameter("enrollment");
+        String enrollmentParam = request.getParameter("id");
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String cpf = request.getParameter("cpf");
