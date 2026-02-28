@@ -4,6 +4,7 @@ import com.example.schoolservlet.daos.AdminDAO;
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.TeacherDAO;
 import com.example.schoolservlet.exceptions.*;
+import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
 import jakarta.servlet.*;
@@ -16,6 +17,21 @@ import java.io.IOException;
 public class NewPasswordServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_NOT_FOUND, "É necessário revalidar a autenticidade, solicite um código novamente", "/WEB-INF/views/forgotPassword/sendCode.jsp");
+            return;
+        }
+
+        Integer userId = (Integer) session.getAttribute("userId");
+       UserRoleEnum role = (UserRoleEnum) session.getAttribute("role");
+
+        if (userId == null || role == null) {
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_NOT_FOUND, "É necessário revalidar a autenticidade, solicite um código novamente", "/WEB-INF/views/forgotPassword/sendCode.jsp");
+            return;
+        }
+
         request.getRequestDispatcher("/WEB-INF/views/forgotPassword/newPassword.jsp").forward(request, response);
     }
 
@@ -31,9 +47,7 @@ public class NewPasswordServlet extends HttpServlet {
         UserRoleEnum role = null;
 
         if (session == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            request.setAttribute("error", "É necessário revalidar a autenticidade, solicite um novo código");
-            request.getRequestDispatcher("/WEB-INF/views/forgotPassword/sendCode.jsp").forward(request, response);
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_NOT_FOUND, "É necessário revalidar a autenticidade, solicite um código novamente", "/WEB-INF/views/forgotPassword/sendCode.jsp");
             return;
         }
 
@@ -41,9 +55,7 @@ public class NewPasswordServlet extends HttpServlet {
         role = (UserRoleEnum) session.getAttribute("role");
 
         if (userId == null || role == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            request.setAttribute("error", "É necessário revalidar a autenticidade, solicite um código novamente");
-            request.getRequestDispatcher("/WEB-INF/views/forgotPassword/sendCode.jsp").forward(request, response);
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_NOT_FOUND, "É necessário revalidar a autenticidade, solicite um código novamente", "/WEB-INF/views/forgotPassword/sendCode.jsp");
             return;
         }
 

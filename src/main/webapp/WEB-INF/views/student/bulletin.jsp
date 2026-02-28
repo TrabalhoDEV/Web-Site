@@ -63,7 +63,7 @@
             <%= avg != null ? String.format("%.2f", avg) : "-"%>
         </td>
 
-        <td><%= avg >= 7? "Aprovado" : "Reprovado"%></td>
+        <td><%= (ss.getGrade1() == null && ss.getGrade2() == null) ? "Pendente" : (avg >= 7? "Aprovado" : "Reprovado")%></td>
     </tr>
     <%
         }
