@@ -1,0 +1,99 @@
+@import url('./topbar.css');
+@import url('./tokens.css');
+@import url('./navbar.css');
+
+/*Login*/
+
+*{
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color:#F5F5FD;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-container{
+    background-color: var(--surface-color);
+    border-radius: var(--large-radius);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 32px;
+    width: 30dvw;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+}
+
+.linkAdm{
+    color: black;
+    cursor: default;
+}
+.form-container h2{
+    margin-bottom: 0;
+    text-align: center;
+}
+.form-container p{
+    font-size: var(--text-sm);
+    color: var(--muted-text-color);
+    text-align: center;
+}
+
+.input-group{
+    display:flex;
+    flex-direction:column;
+    margin-bottom:20px;
+}
+
+input{
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #dfe3ea;
+    font-size:14px;
+}
+button {
+    background: #4c63ff;
+    color: white;
+    border: none;
+    padding: 10px ;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background: color-mix(in srgb, #4c63ff 85%, white 15%);
+}
+
+button:active {
+    background: color-mix(in srgb, #4c63ff 85%, white 15%);
+    transform: scale(98%);
+}
+
+a{
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+@media (max-width: 800px) {
+    .form-container{
+        width: 60dvw;
+    }
+}
+
+@media (max-width: 500px) {
+    .form-container{
+        width: 80dvw;
+    }
+}
