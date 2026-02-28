@@ -8,6 +8,7 @@ import com.example.schoolservlet.exceptions.RequiredFieldException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
@@ -64,6 +65,7 @@ public class LoginServlet extends HttpServlet {
 
         try {
             InputValidation.validateIsNull("senha", password);
+            InputValidation.validatePassword(password);
 
             if (role == UserRoleEnum.TEACHER) {
                 try {
@@ -126,9 +128,7 @@ public class LoginServlet extends HttpServlet {
 
             request.getRequestDispatcher("index.jsp").forward(request, response);
         } catch (ValidationException e){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("index.jsp").forward(request, response);
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "index.jsp");
         }
     }
 }
