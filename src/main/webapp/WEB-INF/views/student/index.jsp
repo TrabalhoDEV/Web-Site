@@ -67,17 +67,26 @@
 <br>
 
 <%
-    Integer currentPage = (Integer) request.getAttribute("currentPage");
-    if (currentPage == null) currentPage = 0;
+    Integer currentPage = 0;
+    Integer totalPages = 0;
+    try{
+        currentPage = request.getAttribute("currentPage") != null? (Integer) request.getAttribute("currentPage"):1;
+        totalPages =  request.getAttribute("totalPages") != null? (Integer) request.getAttribute("totalPages"):1;
+    } catch (ClassCastException e){
+        ;
+    }
+
 %>
 
-<form method="get" action="${pageContext.request.contextPath}/student/home?nextPage=<%=currentPage - 1%>">
-    <button type="submit" <%= currentPage <= 0 ? "disabled" : "" %>>Previous</button>
-</form>
+<a href="${pageContext.request.contextPath}/student/home?nextPage=<%= currentPage - 1 %>"
+        <%= currentPage <= 0 ? "style='pointer-events:none; color: gray;'" : "" %>>
+    Anterior
+</a>
 
-<form method="get" action="${pageContext.request.contextPath}/student/home?nextPage=<%=currentPage + 1%>">
-    <button type="submit" <%= (int) request.getAttribute("totalPages") <= currentPage ? "disabled": ""%>>Next</button>
-</form>
+<a href="${pageContext.request.contextPath}/student/home?nextPage=<%= currentPage + 1 %>"
+        <%= (int) totalPages <= currentPage ? "style='pointer-events:none; color: gray;'" : "" %>>
+    Próxima
+</a>
 
 </body>
 </html>
