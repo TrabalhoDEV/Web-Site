@@ -17,7 +17,6 @@ public class ValidationException extends SchoolServletException{
     public String getField() {
         return field;
     }
-
     @Override
     public int getStatus() {
         return HttpServletResponse.SC_BAD_REQUEST;

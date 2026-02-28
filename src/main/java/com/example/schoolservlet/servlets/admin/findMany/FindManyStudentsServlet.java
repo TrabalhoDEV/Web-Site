@@ -3,8 +3,7 @@ package com.example.schoolservlet.servlets.admin.findMany;
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.Student;
-import com.example.schoolservlet.utils.AccessValidation;
-import com.example.schoolservlet.utils.Constants;
+import com.example.schoolservlet.utils.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -20,11 +19,12 @@ public class FindManyStudentsServlet extends HttpServlet {
         if (!AccessValidation.isAdmin(request, response)) return;
 
         String pageParam = request.getParameter("page");
+        String responsePath = "/WEB-INF/views/admin/findMany/student.jsp";
 
         int take = Constants.MAX_TAKE;
         int skip = 0;
         int page;
-        int totalCount = 0;
+        int totalPages;
 
         try {
             page = Integer.parseInt(pageParam);
@@ -33,38 +33,28 @@ public class FindManyStudentsServlet extends HttpServlet {
         }
 
         StudentDAO studentDAO = new StudentDAO();
-        try{
-            totalCount = studentDAO.totalCount();
-        } catch (DataException de){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/student.jsp")
-                    .forward(request, response);
-            return;
-        }
-
-        int totalPages = Math.max(1, (int)Math.ceil((double) totalCount / Constants.MAX_TAKE));
-
-        page = Math.max(1, Math.min(page, totalPages));
-
-        skip = take * (page - 1);
 
         Map<Integer, Student> studentMap;
+        try{
+            int totalCount = studentDAO.totalCount();
 
-        try {
+            totalPages = Math.max(1, (int)Math.ceil((double) totalCount / Constants.MAX_TAKE));
+
+            page = Math.max(1, Math.min(page, totalPages));
+
+            skip = take * (page - 1);
+
             studentMap = studentDAO.findMany(skip, take);
         } catch (DataException de){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/student.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, de.getStatus(), de.getMessage(), responsePath);
             return;
         }
 
         request.setAttribute("studentMap", studentMap);
         request.setAttribute("page", page);
+        request.setAttribute("totalPages", totalPages);
 
-        request.getRequestDispatcher("/WEB-INF/views/admin/findMany/student.jsp").forward(request, response);
+        request.getRequestDispatcher(responsePath).forward(request, response);
     }
 
     @Override
