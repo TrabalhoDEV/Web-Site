@@ -7,9 +7,8 @@ import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Date;
+import java.sql.Date;
+import java.util.*;
 
 public class SubjectDAO implements GenericDAO<Subject> {
 
@@ -41,6 +40,51 @@ public class SubjectDAO implements GenericDAO<Subject> {
         return subjects;
     }
 
+    public List<Subject> findMany() throws DataException{
+        List<Subject> subjects = new ArrayList<>();
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT id, name FROM subject ORDER BY id LIMIT ? OFFSET ?")){
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()){
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setName(rs.getString("name"));
+
+                subjects.add(subject);
+            }
+
+            return subjects;
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar matérias", sqle);
+        }
+    }
+
+    public List<Subject> findAll() throws DataException {
+        List<Subject> subjects = new ArrayList<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "SELECT * FROM subject ORDER BY id")) {
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                subjects.add(new Subject(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getDate("deadline")
+                ));
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar matérias", sqle);
+        }
+
+        return subjects;
+    }
     @Override
     public Subject findById(int id) throws DataException, NotFoundException, ValidationException{
         InputValidation.validateId(id, "id");
@@ -61,6 +105,50 @@ public class SubjectDAO implements GenericDAO<Subject> {
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar matéria", sqle);
         }
+    }
+
+    public List<Subject> findByTeacherId(int teacherId) throws DataException {
+        List<Subject> subjects = new ArrayList<>();
+        String sql = "SELECT s.id, s.name, s.deadline " +
+                "FROM subject s " +
+                "JOIN subject_teacher st ON s.id = st.id_subject " +
+                "WHERE st.id_teacher = ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, teacherId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Subject subject = new Subject(rs.getInt("id"),rs.getString("name"),rs.getDate("deadline"));
+                    subjects.add(subject);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new DataException("Erro ao buscar matérias do professor", e);
+        }
+
+        return subjects;
+    }
+
+    public List<Integer> findAllIds() throws DataException {
+        String sql = "SELECT id FROM subject";
+        List<Integer> ids = new ArrayList<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                ids.add(rs.getInt("id"));
+            }
+
+        } catch (SQLException e) {
+            throw new DataException("Erro ao buscar IDs de matérias.");
+        }
+
+        return ids;
     }
 
     @Override
@@ -85,7 +173,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
     public void create(Subject subject) throws DataException, RequiredFieldException, InvalidDateException{
         if (subject.getName() == null || subject.getName().isEmpty()) throw new RequiredFieldException("nome");
         if (subject.getDeadline() == null) throw new RequiredFieldException("data final");
-        if (subject.getDeadline().before(new Date())) throw new InvalidDateException("data final", "Data final deve ser depois da data de hoje");
+        if (subject.getDeadline().before(new java.util.Date())) throw new InvalidDateException("data final", "Data final deve ser depois da data de hoje");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO subject" +
@@ -107,7 +195,7 @@ public class SubjectDAO implements GenericDAO<Subject> {
         if (subject.getName() == null || subject.getName().isEmpty()) throw new RequiredFieldException("nome");
         InputValidation.validateId(subject.getId(), "id");
         if (subject.getDeadline() == null) throw new RequiredFieldException("data final");
-        if (subject.getDeadline().before(new Date())) throw new InvalidDateException("data final", "Data final deve ser depois da data de hoje");
+        if (subject.getDeadline().before(new java.util.Date())) throw new InvalidDateException("data final", "Data final deve ser depois da data de hoje");
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE subject " +

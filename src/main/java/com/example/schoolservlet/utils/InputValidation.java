@@ -3,6 +3,8 @@ package com.example.schoolservlet.utils;
 import com.example.schoolservlet.exceptions.*;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class that user regex or ifs to validate if user's input is valid or not.
@@ -118,6 +120,60 @@ public class InputValidation {
         return studentClass >= Constants.MIN_STUDENT_CLASS && studentClass <= Constants.MAX_STUDENT_CLASS;
     }
 
+    /**
+     * Static method that verifies teacher's name format
+     * @param name the teacher's name
+     * @throws ValidationException if the name is null, smaller or greater than allowed length,
+     * or contains invalid characters according to business rules
+     */
+    public static void validateTeacherName(String name) throws ValidationException {
+        validateIsNull("nome", name);
+
+        if (name.length() > Constants.MAX_TEACHER_NAME_LENGTH)
+            throw new MaxLengthException("nome", Constants.MAX_TEACHER_NAME_LENGTH);
+
+        if (name.length() < Constants.MIN_TEACHER_NAME_LENGTH)
+            throw new MinLengthException("nome", Constants.MIN_TEACHER_NAME_LENGTH);
+
+        if (!name.matches("^[A-Za-zÀ-ÿ ]+$"))
+            throw new RegexException("nome");
+    }
+
+    /**
+     * Static method that verifies if the IDs sent from the form
+     * really exist in database.
+     * If an ID does not exist, it is not added to the returned list.
+     *
+     * @param idsFromForm      Array of IDs received from the form submission
+     * @param idsFromDatabase  List of valid IDs stored in database
+     * @return                 List containing only IDs that exist in database
+     * @throws ValidationException if an invalid number is sent
+     */
+    public static List<Integer> validateIdsExist(
+            String[] idsFromForm,
+            List<Integer> idsFromDatabase
+    ) throws ValidationException {
+
+        List<Integer> validIds = new ArrayList<>();
+
+        if (idsFromForm == null) return validIds;
+
+        for (String idStr : idsFromForm) {
+            try {
+                int id = Integer.parseInt(idStr);
+                validateId(id,"id");
+
+                if (idsFromDatabase.contains(id)) {
+                    validIds.add(id);
+                }
+
+            } catch (NumberFormatException e) {
+                throw new ValidationException("ID inválido enviado.");
+            }
+        }
+
+        return validIds;
+    }
     /**
      * Static method that validates if a field is null
      * @param field    is field's name
