@@ -48,7 +48,7 @@
     font-size: var(--text-sm);
     font-weight: var(--text-semi-bold);
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: background-color 150ms ease-in-out;
 }
 .primary-button:hover{
     background-color: rgba(255, 255, 255, 0.4);
@@ -154,22 +154,6 @@ button {
 
     line-height: 1.4;
     max-width: 100%;
-}
-
-.card-footer {
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-button {
-    background: #4c63ff;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 8px;
-    cursor: pointer;
 }
 
 dialog{

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.schoolservlet.utils.records.AuthenticatedUser" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -22,7 +23,7 @@
         String error = (String) request.getAttribute("error");
         if (error != null) {
     %>
-    <script>alert(<%= error %>)</script>
+    <p class="error-message"><%= OutputFormatService.escapeHtml(error) %></p>
     <%
         }
     %>
@@ -114,7 +115,7 @@
             %>
             <div class="card-tasks">
                 <p class="materia">Matéria: <span>anônima.</span></p>
-                <p class="descricao">Feedback: <span><%= obs %></span></p>
+                <p class="descricao">Feedback: <span><%= OutputFormatService.formatObs(obs) %></span></p>
             </div>
             <%
                 }
@@ -154,26 +155,32 @@
 </div>
 
 <script>
-    const dialog = document.querySelector("#modalDialog");
-    const openButtons = document.querySelectorAll(".openButton");
-    const closeButton = document.querySelector("#closeButton");
-
     document.addEventListener("DOMContentLoaded", () => {
+        const dialog = document.querySelector("#modalDialog");
+        const openButtons = document.querySelectorAll(".openButton");
+        const closeButton = document.querySelector("#closeButton");
+
+        if (!dialog) {
+            return;
+        }
+
         openButtons.forEach(button => {
             button.addEventListener("click", () => {
                 dialog.showModal();
             });
         });
 
-        closeButton.addEventListener("click", () => {
-            dialog.close();
-        });
-    });
-
-    dialog.addEventListener("click", (e) => {
-        if (e.target === dialog) {
-            dialog.close();
+        if (closeButton) {
+            closeButton.addEventListener("click", () => {
+                dialog.close();
+            });
         }
+
+        dialog.addEventListener("click", (e) => {
+            if (e.target === dialog) {
+                dialog.close();
+            }
+        });
     });
 </script>
 

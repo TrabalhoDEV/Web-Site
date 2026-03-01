@@ -2,6 +2,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="com.example.schoolservlet.models.StudentSubject" %>
 <%@ page import="com.example.schoolservlet.utils.records.AuthenticatedUser" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -164,7 +165,7 @@
           %>
           <tr>
             <td class="subject"><%= (ss.getSubject() != null && ss.getSubject().getName() != null)
-                    ? ss.getSubject().getName()
+                    ? OutputFormatService.formatName(ss.getSubject().getName())
                     : "—" %></td>
 
             <td><%= (ss.getGrade1() != null) ? ss.getGrade1() : "—" %></td>

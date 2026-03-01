@@ -1,10 +1,6 @@
-@import url('/assets/css/layout/topbar.css');
-@import url('/assets/css/layout/tokens.css');
-@import url('/assets/css/layout/navbar.css');
 /* Notes */
 
 .card-note{
-    width: 90%;
     width: 90%;
     margin: 35px;
     display: flex;
@@ -12,14 +8,14 @@
     margin-bottom: 60px;
 }
 .card-note h1{
-    font-size: var(--text-42x1);
+    font-size: var(--text-4xl);
     color:#ffffff;
     font-weight: 500;
 }
 
 .card-note p{
     padding-left: 20px;
-    font-size: var(--text-42x1);
+    font-size: var(--text-4xl);
     color:var(--muted-text-color);
     font-weight: 500;
 
