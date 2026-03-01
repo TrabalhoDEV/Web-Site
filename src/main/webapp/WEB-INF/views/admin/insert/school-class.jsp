@@ -7,7 +7,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cadastro | Vértice</title>
+  <title>CRUD | Vértice</title>
 
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout/tokens.css" />
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout/topbar.css" />
@@ -17,7 +17,7 @@
   <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/logo_pequena.svg" type="image/x-icon">
 </head>
 <%
-  List<SchoolClass> schoolClasses = (List<SchoolClass>) request.getAttribute("schoolClasses");
+  List<SchoolClass> schoolClasses= (List<SchoolClass>) request.getAttribute("schoolClasses");
 %>
 
 <body>
@@ -27,19 +27,21 @@
   if (request.getAttribute("error") != null) {
 %>
 <script>
+  // Display error alert with error message only
   alert("<%= request.getAttribute("error") %>");
 </script>
 <%
 } else if (request.getAttribute("success") != null){
 %>
 <script>
-  alert("Cadastro realizado com sucesso");
+  // Display error alert with error message only
+  alert("Estudante cadastrado com sucesso");
 </script>
 <%}%>
 
 <div class="app-layout">
 
-  <!-- SIDEBAR -->
+  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <svg class="l" xmlns="http://www.w3.org/2000/svg" width="101" height="51" viewBox="0 0 101 51" fill="none">
@@ -143,7 +145,7 @@
           </a>
         </li>
 
-        <li class="sidebar-item non-active">
+        <li class="sidebar-item active">
           <a href="${pageContext.request.contextPath}/admin/school-class/find-many">
                         <span class="icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school-icon lucide-school"><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M18 5v16"/><path d="m4 6 7.106-3.79a2 2 0 0 1 1.788 0L20 6"/><path d="m6 11-3.52 2.147a1 1 0 0 0-.48.854V19a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a1 1 0 0 0-.48-.853L18 11"/><path d="M6 5v16"/><circle cx="12" cy="9" r="2"/></svg>
@@ -152,7 +154,7 @@
           </a>
         </li>
 
-        <li class="sidebar-item active">
+        <li class="sidebar-item non-active">
           <a href="${pageContext.request.contextPath}/admin/subject/find-many">
                         <span class="icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions-icon lucide-captions"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
@@ -199,19 +201,22 @@
 
         <hr>
 
-        <!-- CUSTOMIZE THIS FORM: Change action, title, and form fields below -->
-        <form action="${pageContext.request.contextPath}/admin/subject/insert" method="post" class="generic-form">
+        <!-- Display error messages inline with form -->
+        <%
+          String error = (String) request.getAttribute("error");
+          if (error != null) {
+        %>
+        <p style="color:red;"><%= error %></p>
+        <%
+          }
+        %>
 
-          <!-- Example text input field -->
-          <div class="form-group">
-            <label for="name">Nome:</label>
-            <input type="text" id="name" name="name" placeholder="Digite o nome" required>
-          </div>
+        <form action="${pageContext.request.contextPath}/admin/insert/school-class" method="post" class="generic-form">
 
-          <!-- Example date input field -->
+          <!-- Example form group -->
           <div class="form-group">
-            <label for="deadline">Data:</label>
-            <input type="date" id="deadline" name="deadline" required>
+            <label for="name">Ano Letivo:</label>
+            <input type="text" id="name" name="schoolYear" placeholder="Digite o nome" required>
           </div>
 
           <!-- Submit button -->

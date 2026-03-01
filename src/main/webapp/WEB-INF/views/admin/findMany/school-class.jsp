@@ -180,7 +180,7 @@
                 <div class="header-grid">
                     <h1>Lista de Turmas</h1>
 
-                    <a href="${pageContext.request.contextPath}/admin/school-class/insert">
+                    <a href="${pageContext.request.contextPath}/admin/insert/school-class">
                         <button class="btn-add">Adicionar Turma</button>
                     </a>
                 </div>
