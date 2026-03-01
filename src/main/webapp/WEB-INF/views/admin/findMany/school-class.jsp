@@ -2,6 +2,10 @@
 <%@ page import="com.example.schoolservlet.models.SchoolClass" %>
 <%@ page import="java.util.TreeMap" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<<<<<<< HEAD
+=======
+
+>>>>>>> d7607bc (feat: adding style to find manys)
 <%
     Map<Integer, SchoolClass> schoolClassMap =
             (Map<Integer, SchoolClass>) request.getAttribute("schoolClassMap");
@@ -179,7 +183,7 @@
                 <div class="header-grid">
                     <h1>Lista de Turmas</h1>
 
-                    <a href="${pageContext.request.contextPath}/admin/insert/school-class">
+                    <a href="${pageContext.request.contextPath}/admin/school-class/insert">
                         <button class="btn-add">Adicionar Turma</button>
                     </a>
                 </div>
