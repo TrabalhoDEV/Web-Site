@@ -2,6 +2,9 @@
 @import url('./layout/tokens.css');
 @import url('./layout/navbar.css');
 
+body{
+    max-height: 100dvh;
+}
 
 .boletim-grid{
     background-color: var(--surface-color);
@@ -9,14 +12,12 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 24px 32px;
     width: 90%;
-    margin: 70px auto;
-    padding-top: 30px;
+    margin: 30px auto 0;
 }
 .header-grid{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
     font-size: var(--text-md);
 }
 
@@ -50,23 +51,46 @@ td button{
 .grade-table{
     width: 100%;
     font-size: 16px;
-
+    border-collapse: collapse;
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 6), 1fr);
 }
+
+thead,
+tbody {
+    display: contents;
+}
+
+tr {
+    display: contents;
+}
+
 
 .grade-table th{
     text-align: left;
     color: #8b97b3;
     font-weight: 600;
-    padding-top: 30px;
+    padding-top: 15px;
     padding-bottom: 15px;
 }
 
 .grade-table td{
-    width: 20%;
-    padding: 20px 0px;
+    padding: 10px 0px;
     border-top: 1px solid #eef1f6;
-    padding-bottom: 30px;
 }
+
+.grade-table td:not(.actions){
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+th{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .status{
     padding: 6px 14px;
     border-radius: 20px;
@@ -146,4 +170,18 @@ dialog {
     border-radius: 8px;
     cursor: pointer;
     margin-left: 20px;
+}
+
+.logout-button{
+    text-decoration: none;
+}
+
+.pagination{
+    margin-top: 10px;
+    margin-left: 40px;
+}
+
+.pagination > a{
+    text-decoration: none;
+    color: black;
 }
