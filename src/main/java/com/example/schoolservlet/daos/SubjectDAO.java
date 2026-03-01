@@ -132,6 +132,40 @@ public class SubjectDAO implements GenericDAO<Subject> {
         return subjects;
     }
 
+    public List<Subject> findBySchoolClassId(int schoolClassId)
+            throws DataException {
+
+        String sql =
+                "SELECT s.id, s.name, s.deadline " +
+                        "FROM subject s " +
+                        "INNER JOIN school_class_subject scs ON s.id = scs.id_subject " +
+                        "WHERE scs.id_school_class = ? " +
+                        "ORDER BY s.name";
+
+        List<Subject> subjects = new ArrayList<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, schoolClassId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setName(rs.getString("name"));
+                subject.setDeadline(rs.getDate("deadline")); // Date, não LocalDate
+                subjects.add(subject);
+            }
+
+            return subjects;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar matérias da turma", sqle);
+        }
+    }
+
     public List<Integer> findAllIds() throws DataException {
         String sql = "SELECT id FROM subject";
         List<Integer> ids = new ArrayList<>();
@@ -166,8 +200,6 @@ public class SubjectDAO implements GenericDAO<Subject> {
             throw new DataException("Erro ao contar matérias");
         }
     }
-
-
 
     @Override
     public void create(Subject subject) throws DataException, RequiredFieldException, InvalidDateException{
