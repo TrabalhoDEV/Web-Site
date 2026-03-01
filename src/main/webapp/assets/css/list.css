@@ -2,10 +2,6 @@
 @import url('./layout/tokens.css');
 @import url('./layout/navbar.css');
 
-body{
-    max-height: 100dvh;
-}
-
 .boletim-grid{
     background-color: var(--surface-color);
     border-radius: var(--medium-radius);
@@ -23,18 +19,17 @@ body{
 
 .btn-add{
     font-size: var(--text-sm) ;
-    background: #4c63ff;
+    background: var(--primary-color);
     color: white;
     border: none;
     padding: 15px 35px;
     border-radius: 8px;
     cursor: pointer;
-
 }
 
 td button{
     font-size: var(--text-sm) ;
-    background: #4c63ff;
+    background: var(--primary-color);
     color: white;
     border: none;
     width: 110px;
@@ -42,6 +37,11 @@ td button{
     border-radius: 8px;
     cursor: pointer;
 }
+
+button:hover{
+    background-color: var(--button-hover-color);
+}
+
 .btn-action {
     display: flex;
     justify-content: space-between;
@@ -162,14 +162,13 @@ dialog {
 }
 .modal-actions button{
     font-size: var(--text-sm) ;
-    background: #4c63ff;
+    background: var(--primary-color);
     color: white;
     border: none;
     width: 110px;
     height: 40px;
     border-radius: 8px;
     cursor: pointer;
-    margin-left: 20px;
 }
 
 .logout-button{

@@ -5,6 +5,7 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Admin;
+import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
@@ -39,14 +40,14 @@ public class AdminLoginServlet extends HttpServlet {
             InputValidation.validateCpf(cpf);
             InputValidation.validateIsNull("senha", password);
 
-            if (adminDAO.login(cpf.trim(), password.trim())) {
+            cpf = InputNormalizer.normalizeCpf(cpf);
+
+            if (adminDAO.login(cpf, password.trim())) {
                 Admin admin = adminDAO.findByDocument(cpf);
                 AuthenticatedUser user = new AuthenticatedUser(admin.getId(), admin.getEmail(), UserRoleEnum.ADMIN);
                 session.setAttribute("user", user);
                 session.setMaxInactiveInterval(60 * 60);
 
-
-//            TO DO: add context in AdminHomeServlet and change this redirect that brings all information necessarily to admin/index.jsp
                 response.sendRedirect(request.getContextPath() + "/admin/student/find-many");
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

@@ -63,7 +63,7 @@ input{
     font-size:14px;
 }
 button {
-    background: #4c63ff;
+    background: var(--primary-color);
     color: white;
     border: none;
     padding: 10px ;
@@ -73,11 +73,11 @@ button {
 }
 
 button:hover {
-    background: color-mix(in srgb, #4c63ff 85%, white 15%);
+    background: var(--button-hover-color);
 }
 
 button:active {
-    background: color-mix(in srgb, #4c63ff 85%, white 15%);
+    background: color-mix(in srgb, var(--primary-color) 85%, white 15%);
     transform: scale(98%);
 }
 
