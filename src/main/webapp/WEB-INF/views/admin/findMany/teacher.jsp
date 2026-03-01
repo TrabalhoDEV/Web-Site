@@ -1,9 +1,11 @@
 <%@ page import="com.example.schoolservlet.models.Teacher" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
+<%@ page import="java.util.TreeMap" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     Map<Integer, Teacher> teacherMap = (Map<Integer, Teacher>) request.getAttribute("teacherMap");
+    teacherMap = new TreeMap<>(teacherMap);
     int totalPages = (Integer) request.getAttribute("totalPages");
     int currentPage = (Integer) request.getAttribute("page");
 %>
@@ -22,7 +24,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Listar professores</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/teacher.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/list.css" />
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/Logo - Vértice.svg" type="image/x-icon">
 </head>
 <body>
@@ -135,7 +137,23 @@
                     </a>
                 </li>
 
+                <li class="sidebar-item non-active">
+                    <a href="${pageContext.request.contextPath}/admin/school-class/find-many">
+                        <span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school-icon lucide-school"><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M18 5v16"/><path d="m4 6 7.106-3.79a2 2 0 0 1 1.788 0L20 6"/><path d="m6 11-3.52 2.147a1 1 0 0 0-.48.854V19a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a1 1 0 0 0-.48-.853L18 11"/><path d="M6 5v16"/><circle cx="12" cy="9" r="2"/></svg>
+                        </span>
+                        <span>Turmas</span>
+                    </a>
+                </li>
 
+                <li class="sidebar-item non-active">
+                    <a href="${pageContext.request.contextPath}/admin/subject/find-many">
+                        <span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions-icon lucide-captions"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
+                        </span>
+                        <span>Matérias</span>
+                    </a>
+                </li>
 
                 <li class="sidebar-item non-active">
                     <a href="">
@@ -230,24 +248,26 @@
                 </div>
             </div>
         </dialog>
+
         <div class="pagination">
+
             <% if (totalPages > 1) { %>
+
             <% if (currentPage > 1) { %>
             <a href="?page=<%=currentPage-1%>">Anterior</a>
+            <a href="?page=<%= currentPage - 1 %>"><%= currentPage - 1 %></a>
             <% } %>
 
-            <% for(int i=1; i<=totalPages; i++) { %>
-            <% if (i == currentPage) { %>
-            <strong><%=i%></strong>
-            <% } else { %>
-            <a href="?page=<%=i%>"><%=i%></a>
-            <% } %>
-            <% } %>
+
+            <strong><%= currentPage %></strong>
 
             <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>"><%= currentPage + 1 %></a>
             <a href="?page=<%=currentPage+1%>">Próxima</a>
             <% } %>
+
             <% } %>
+
         </div>
     </main>
 

@@ -26,6 +26,9 @@ public class FindManyStudentsServlet extends HttpServlet {
         int page;
         int totalCount = 0;
 
+        request.setAttribute("page", 1);
+        request.setAttribute("totalPages", 1);
+
         try {
             page = Integer.parseInt(pageParam);
         } catch (NumberFormatException nfe) {
@@ -63,6 +66,7 @@ public class FindManyStudentsServlet extends HttpServlet {
 
         request.setAttribute("studentMap", studentMap);
         request.setAttribute("page", page);
+        request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher("/WEB-INF/views/admin/findMany/student.jsp").forward(request, response);
     }
