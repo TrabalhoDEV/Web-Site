@@ -53,7 +53,7 @@
         <select id="anoEscolar" name="anoEscolar" required>
             <option value="" selected disabled>-- Selecione um ano --</option>
             <%for (SchoolClass schoolClass: schoolClasses) {%>
-                <option value="<%=schoolClass.getId()%>"><%= schoolClass.getSchoolYear()%></option>
+                <option value="<%=schoolClass.getId()%>"><%= schoolClass.getSchoolYear().toUpperCase()%></option>
             <%}%>
         </select>
         <br><br>

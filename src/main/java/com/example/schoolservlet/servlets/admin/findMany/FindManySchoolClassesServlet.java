@@ -21,7 +21,9 @@ public class FindManySchoolClassesServlet extends HttpServlet {
 
         if (!AccessValidation.isAdmin(request, response)) return;
 
+        HttpSession session = request.getSession(false);
         String pageParam = request.getParameter("page");
+        String error = (String) session.getAttribute("error");
         int take = Constants.MAX_TAKE;
         int skip = 0;
         int page;
@@ -30,6 +32,10 @@ public class FindManySchoolClassesServlet extends HttpServlet {
 
         request.setAttribute("page", 1);
         request.setAttribute("totalPages", 1);
+
+        if (error != null){
+            request.setAttribute("error", error);
+        }
 
         try {
             page = Integer.parseInt(pageParam);

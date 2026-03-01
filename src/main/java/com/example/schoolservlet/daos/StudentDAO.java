@@ -138,6 +138,24 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         }
     }
 
+    public int countBySchoolClass(int schoolClassId) throws ValidationException, DataException{
+        InputValidation.validateId(schoolClassId, "id da turma");
+
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) AS count_by_id_teacher FROM student s WHERE id_school_class = ?")){
+            pstmt.setInt(1, schoolClassId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()){
+                return rs.getInt("count_by_id_teacher");
+            }
+            return -1;
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar alunos", sqle);
+        }
+    }
+
     @Override
     public int totalCount() throws DataException{
         try(Connection conn = PostgreConnection.getConnection();
@@ -228,6 +246,22 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             pstmt.setInt(2, id);
 
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "matrícula", String.valueOf(id));
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao atualizar id da sala", sqle);
+        }
+    }
+
+    public void updateManyIdSchoolClass(int oldId, int newId) throws NotFoundException, DataException, ValidationException{
+        InputValidation.validateId(oldId, "id_school_class");
+        InputValidation.validateId(newId, "id_school_class");
+
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET id_school_class = ? WHERE id_school_class = ?")){
+            pstmt.setInt(1, newId);
+            pstmt.setInt(2, oldId);
+
+            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "turma", String.valueOf(oldId));
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao atualizar id da sala", sqle);
