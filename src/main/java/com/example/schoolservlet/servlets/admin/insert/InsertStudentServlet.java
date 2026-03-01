@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -124,10 +126,14 @@ public class InsertStudentServlet extends HttpServlet {
 
             response.setStatus(HttpServletResponse.SC_OK);
 
+            String link = request.getRequestURL().toString().replace(request.getRequestURI(), "") +
+                    request.getContextPath() + "/pages/students/signup.jsp?enrollment=" +
+                    URLEncoder.encode(student.getEnrollment(), StandardCharsets.UTF_8);
+
             EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
             "<h2>Faça sua matrícula na Vértice</h2>" +
                     "<p>Se você realmente for o próximo aluno da Vértice:</p>" +
-                    "<p><a href=\""+ request.getContextPath() + "/\">Clique aqui</a> para fazer o seu cadastro</p>"
+                    "<p><a href=\"" + link + "\">Clique aqui</a> para fazer o seu cadastro</p>"
                     );
         } catch (DataException de) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
