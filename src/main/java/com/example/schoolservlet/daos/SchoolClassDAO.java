@@ -129,6 +129,30 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
         return classes;
     }
 
+    public SchoolClass findByName(String name) throws DataException, NotFoundException {
+        String sql = "SELECT id, school_year FROM school_class WHERE school_year = ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                SchoolClass schoolClass = new SchoolClass();
+                schoolClass.setId(rs.getInt("id"));
+                schoolClass.setSchoolYear(rs.getString("school_year"));
+                return schoolClass;
+            }
+
+            throw new NotFoundException("turma", "nome", name);
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar turma por nome", sqle);
+        }
+    }
+
     public List<Integer> findAllIds() throws DataException {
         String sql = "SELECT id FROM school_class";
         List<Integer> ids = new ArrayList<>();
