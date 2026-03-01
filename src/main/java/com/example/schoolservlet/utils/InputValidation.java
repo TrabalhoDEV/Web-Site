@@ -207,7 +207,7 @@ public class InputValidation {
      * @throws RequiredFieldException if name is null or blank
      * @throws ValidationException if name contains invalid characters (numbers, special characters, symbols)
      */
-    public static void validateName(String name) throws ValidationException{
+    public static void validateStudentName(String name) throws ValidationException{
         validateIsNull("nome", name);
         for (char c : name.toCharArray()){
             if (!Character.isLetter(c) && !Character.isWhitespace(c)){

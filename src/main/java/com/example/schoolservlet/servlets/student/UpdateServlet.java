@@ -173,7 +173,7 @@ public class UpdateServlet extends HttpServlet {
      * @throws ValidationException If any field is invalid
      */
     private void validateStudentFields(String name, String email, String cpf) throws ValidationException {
-        InputValidation.validateName(name);
+        InputValidation.validateStudentName(name);
         InputValidation.validateEmail(email);
         InputValidation.validateCpf(cpf);
     }
