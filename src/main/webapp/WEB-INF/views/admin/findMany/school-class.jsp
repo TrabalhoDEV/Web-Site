@@ -2,7 +2,6 @@
 <%@ page import="com.example.schoolservlet.models.SchoolClass" %>
 <%@ page import="java.util.TreeMap" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <%
     Map<Integer, SchoolClass> schoolClassMap =
             (Map<Integer, SchoolClass>) request.getAttribute("schoolClassMap");
