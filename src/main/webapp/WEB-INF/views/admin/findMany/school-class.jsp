@@ -23,6 +23,7 @@
     <%for (SchoolClass schoolClass: schoolClassMap.values()) {%>
     <tr>
         <td><%=schoolClass.getSchoolYear()%></td>
+        <td><a href="${pageContext.request.contextPath}/admin/school-class/update">Editar</a></td>
     </tr>
     <%}
     }else {%>
