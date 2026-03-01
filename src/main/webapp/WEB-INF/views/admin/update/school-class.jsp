@@ -48,6 +48,7 @@
   <%if (request.getAttribute("error") != null){%>
   <p><%=request.getAttribute("error")%></p>
   <%}%>
+
   <button type="submit">Enviar</button>
 </form>
 <a href="${pageContext.request.contextPath}/admin/school-class/find-many">Voltar</a>
