@@ -48,6 +48,8 @@ public class AdminLoginServlet extends HttpServlet {
                 session.setAttribute("user", user);
                 session.setMaxInactiveInterval(60 * 60);
 
+
+//            TO DO: add context in AdminHomeServlet and change this redirect that brings all information necessarily to admin/index.jsp
                 response.sendRedirect(request.getContextPath() + "/admin/student/find-many");
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
