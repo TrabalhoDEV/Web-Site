@@ -11,7 +11,9 @@ import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
     @Override
@@ -121,6 +123,26 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
             throw new DataException("Erro ao contar school_class_teacher", sqle);
         }
     }
+    public void createMany(List<SchoolClassTeacher> scts) throws DataException {
+        String sql = "INSERT INTO school_class_teacher (id_school_class, id_teacher) VALUES (?, ?)";
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false);
+
+            for (SchoolClassTeacher sct : scts) {
+                ps.setInt(1, sct.getSchoolClass().getId());
+                ps.setInt(2, sct.getTeacher().getId());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao inserir múltiplos registros de relacionamentos entre turmas e professores");
+        }
+    }
 
     @Override
     public void update(SchoolClassTeacher schoolClassTeacher) throws DataException, ValidationException, NotFoundException{
@@ -154,6 +176,30 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao deletar school_class_teacher", sqle);
+        }
+    }
+
+    public void deleteManyByTeacherAndClasses(int teacherId, Set<Integer> classIds)
+            throws DataException {
+
+        if (classIds == null || classIds.isEmpty()) return;
+
+        String sql = "DELETE FROM school_class_teacher WHERE id_teacher = ? AND id_school_class = ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (Integer classId : classIds) {
+                ps.setInt(1, teacherId);
+                ps.setInt(2, classId);
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao remover múltiplos vínculos entre turmas e professores");
         }
     }
 }

@@ -11,7 +11,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
     @Override

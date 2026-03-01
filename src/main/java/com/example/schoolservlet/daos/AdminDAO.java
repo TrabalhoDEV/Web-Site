@@ -16,7 +16,6 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
     @Override

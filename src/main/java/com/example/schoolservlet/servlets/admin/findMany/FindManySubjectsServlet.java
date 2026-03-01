@@ -1,31 +1,33 @@
 package com.example.schoolservlet.servlets.admin.findMany;
 
-import com.example.schoolservlet.daos.SchoolClassDAO;
+import com.example.schoolservlet.daos.SubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
-import com.example.schoolservlet.models.SchoolClass;
+import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-
 import java.io.IOException;
 import java.util.Map;
 
-@WebServlet(name = "admin-find-many-school-classes", value = "/admin/school-class/find-many")
-public class FindManySchoolClassesServlet extends HttpServlet {
+@WebServlet(name = "admin-subjects-find-many", value = "/admin/subject/find-many")
+public class FindManySubjectsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
 
         if (!AccessValidation.isAdmin(request, response)) return;
-
+        HttpSession session = request.getSession();
+        String error = (String) session.getAttribute("error");
         String pageParam = request.getParameter("page");
-
         int take = Constants.MAX_TAKE;
         int skip = 0;
         int page;
         int totalCount = 0;
+
+        session.removeAttribute("error");
+        request.setAttribute("error", error);
 
         try {
             page = Integer.parseInt(pageParam);
@@ -33,13 +35,13 @@ public class FindManySchoolClassesServlet extends HttpServlet {
             page = 1;
         }
 
-        SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+        SubjectDAO subjectDAO = new SubjectDAO();
         try{
-            totalCount = schoolClassDAO.totalCount();
+            totalCount = subjectDAO.totalCount();
         } catch (DataException de){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/school-class.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/subject.jsp")
                     .forward(request, response);
             return;
         }
@@ -50,22 +52,23 @@ public class FindManySchoolClassesServlet extends HttpServlet {
 
         skip = take * (page - 1);
 
-        Map<Integer, SchoolClass> schoolClassMap;
+        Map<Integer, Subject> subjectMap;
 
         try {
-            schoolClassMap = schoolClassDAO.findMany(skip, take);
+            subjectMap = subjectDAO.findMany(skip, take);
         } catch (DataException de){
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/school-class.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/subject.jsp")
                     .forward(request, response);
             return;
         }
 
-        request.setAttribute("schoolClassMap", schoolClassMap);
+        request.setAttribute("subjectMap", subjectMap);
+        request.setAttribute("totalPages", totalPages);
         request.setAttribute("page", page);
 
-        request.getRequestDispatcher("/WEB-INF/views/admin/findMany/school-class.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/admin/findMany/subject.jsp").forward(request, response);
     }
 
     @Override
