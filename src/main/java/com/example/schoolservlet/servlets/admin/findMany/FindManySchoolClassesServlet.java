@@ -28,6 +28,8 @@ public class FindManySchoolClassesServlet extends HttpServlet {
         int skip = 0;
         int page;
         int totalCount = 0;
+        request.setAttribute("page", 1);
+        request.setAttribute("totalPages", 1);
 
 
         request.setAttribute("page", 1);

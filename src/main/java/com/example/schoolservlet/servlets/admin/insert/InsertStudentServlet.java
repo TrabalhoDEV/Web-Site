@@ -21,7 +21,7 @@ import java.util.List;
  * This endpoint handles student registration with CPF and school year/grade validation.
  * Only administrators are allowed to access this functionality.
  */
-@WebServlet(name = "admin-add-student",value = "/admin/add-student")
+@WebServlet(name = "admin-add-student",value = "/admin/student/insert")
 public class InsertStudentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{

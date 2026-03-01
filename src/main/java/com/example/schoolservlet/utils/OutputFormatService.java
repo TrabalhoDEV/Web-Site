@@ -68,7 +68,7 @@ public class OutputFormatService {
      */
     public static String formatDate(Date date) {
         if (date == null) return "-";
-        return new java.text.SimpleDateFormat("dd/MM").format(date);
+        return new java.text.SimpleDateFormat("yyyy/MM/dd").format(date);
     }
 
     /**

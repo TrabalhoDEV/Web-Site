@@ -26,6 +26,9 @@ public class FindManyStudentsServlet extends HttpServlet {
         int page;
         int totalPages;
 
+        request.setAttribute("page", 1);
+        request.setAttribute("totalPages", 1);
+
         try {
             page = Integer.parseInt(pageParam);
         } catch (NumberFormatException nfe) {

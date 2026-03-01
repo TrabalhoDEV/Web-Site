@@ -73,7 +73,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         Map<Integer, Student> students = new HashMap<>();
 
         try (Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM student ORDER BY status DESC LIMIT ? OFFSET ?")){
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM student ORDER BY status DESC, id ASC LIMIT ? OFFSET ?")){
             pstmt.setInt(1, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
             pstmt.setInt(2, skip < 0 ? 0 : skip);
 
