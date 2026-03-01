@@ -50,6 +50,12 @@ import java.io.IOException;
 public class UpdateSchoolClassServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+
+        if (!AccessValidation.isAdmin(request, response)) return;
+
+        String idParam = request.getParameter("id");
+
 
     }
 
@@ -226,12 +232,21 @@ public class UpdateSchoolClassServlet extends HttpServlet {
 
             response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
         } catch (DataException | NotFoundException  | ValidationException e){
+            getAllData(request, response, Integer.parseInt(idParam));
             ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/update/school-class.jsp");
         } catch (NumberFormatException nfe){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             request.setAttribute("error", "ID da turma precisa ser um número");
             request.getRequestDispatcher("/WEB-INF/views/admin/update/school-class.jsp").forward(request, response);
         }
+    }
+
+    private void getAllData(HttpServletRequest request, HttpServletResponse response, int id) throws ValidationException, DataException, NotFoundException{
+        SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+
+        SchoolClass schoolClass = schoolClassDAO.findById(id);
+
+        request.setAttribute("schoolClass", schoolClassDAO);
     }
 }
 >>>>>>> 987874a (feat: creating routes to create or update school_class)
