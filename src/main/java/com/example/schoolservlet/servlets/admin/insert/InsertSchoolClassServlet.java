@@ -37,7 +37,7 @@ public class InsertSchoolClassServlet extends HttpServlet {
         try{
             InputValidation.validateIsNull("turma", name);
 
-            name = name.trim();
+            name = name.trim().toLowerCase();
 
             InputValidation.validateSchoolClassName(name);
 

@@ -3,7 +3,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Listar turmas</title>
 </head>
 <%
     Map<Integer, SchoolClass> schoolClassMap = (Map<Integer, SchoolClass>) request.getAttribute("schoolClassMap");
@@ -22,8 +22,9 @@
     <tbody>
     <%for (SchoolClass schoolClass: schoolClassMap.values()) {%>
     <tr>
-        <td><%=schoolClass.getSchoolYear()%></td>
-        <td><a href="${pageContext.request.contextPath}/admin/school-class/update">Editar</a></td>
+        <td><%=schoolClass.getSchoolYear().toUpperCase()%></td>
+        <td><a href="${pageContext.request.contextPath}/admin/school-class/update?id=<%=schoolClass.getId()%>">Editar</a></td>
+        <td><a href="${pageContext.request.contextPath}/admin/school-class/delete?id=<%=schoolClass.getId()%>">Deletar</a></td>
     </tr>
     <%}
     }else {%>
