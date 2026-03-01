@@ -6,6 +6,7 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
+import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import jakarta.servlet.ServletException;
@@ -37,7 +38,7 @@ public class UpdateServlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(UpdateServlet.class.getName());
     private static final String UPDATE_VIEW = "/WEB-INF/views/admin/update/student.jsp";
-    private static final String LIST_VIEW = "/WEB-INF/views/findMany/student.jsp";
+    private static final String LIST_VIEW = "/WEB-INF/views/admin/findMany/student.jsp";
     private static final String STUDENT_LIST_URL = "/admin/student/find-many";
 
     /**
@@ -60,7 +61,11 @@ public class UpdateServlet extends HttpServlet {
      * @throws IOException If input/output error occurs
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String enrollmentParam = request.getParameter("enrollment");
+        // Validate session:
+        if (!AccessValidation.isAdmin(request, response)) return;
+
+        // Get parameters:
+        String enrollmentParam = request.getParameter("id");
 
         try {
             // Validate and normalize enrollment parameter:
@@ -112,11 +117,24 @@ public class UpdateServlet extends HttpServlet {
      * @throws IOException If input/output error occurs
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Validate session:
+        if (!AccessValidation.isAdmin(request, response)) return;
+
         // Get form parameters:
-        String enrollmentParam = request.getParameter("enrollment");
+        String enrollmentParam = request.getParameter("id");
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String cpf = request.getParameter("cpf");
+
+        if (name != null) {
+            name = name.trim();
+        }
+        if (email != null) {
+            email = email.trim();
+        }
+        if (cpf != null) {
+            cpf = cpf.trim();
+        }
 
         try {
             // Validate all parameters:
