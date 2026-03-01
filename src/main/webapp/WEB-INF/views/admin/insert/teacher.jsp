@@ -25,21 +25,6 @@
 
 <body>
 
-<!-- JavaScript alert for error or success messages -->
-<%
-  if (request.getAttribute("error") != null) {
-%>
-<script>
-  alert("<%= request.getAttribute("error") %>");
-</script>
-<%
-} else if (request.getAttribute("success") != null){
-%>
-<script>
-  alert("Cadastro realizado com sucesso");
-</script>
-<%}%>
-
 <div class="app-layout">
 
   <!-- SIDEBAR -->
@@ -273,6 +258,22 @@
           <div class="form-actions">
             <input type="submit" value="Cadastrar Professor" class="btn-submit">
           </div>
+
+          <%
+            if (request.getAttribute("error") != null) {
+          %>
+          <p style="color: red;">
+            <%= request.getAttribute("error") %>
+          </p>
+          <%
+          } else if (request.getAttribute("success") != null) {
+          %>
+          <p style="color: red;">
+            Cadastro realizado com sucesso
+          </p>
+          <%
+            }
+          %>
         </form>
 
       </div>
