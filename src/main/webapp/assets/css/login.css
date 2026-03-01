@@ -1,6 +1,6 @@
-@import url('./topbar.css');
-@import url('./tokens.css');
-@import url('./navbar.css');
+@import url('./layout/topbar.css');
+@import url('./layout/tokens.css');
+@import url('./layout/navbar.css');
 
 /*Login*/
 

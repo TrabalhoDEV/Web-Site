@@ -1,5 +1,4 @@
-
-@import url("/assets/css/layout/tokens.css");
+@import url("./tokens.css");
 *{
     font-family: 'Poppins', sans-serif;
 }
