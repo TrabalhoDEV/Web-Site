@@ -18,7 +18,7 @@
         <th>Ações</th>
     </tr>
     </thead>
-    <%if (!schoolClassMap.isEmpty()) {%>
+    <%if (schoolClassMap != null && !schoolClassMap.isEmpty()) {%>
     <tbody>
     <%for (SchoolClass schoolClass: schoolClassMap.values()) {%>
     <tr>
@@ -28,7 +28,9 @@
     </tr>
     <%}
     }else {%>
+    <tr>
     <td colspan="2">Nenhuma turma foi encontrada</td>
+    </tr>
     <%}%>
     </tbody>
 </table>
