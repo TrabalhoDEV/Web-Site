@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -124,6 +126,10 @@ public class InsertStudentServlet extends HttpServlet {
             studentSubjectDAO.createManyByStudentClass(student.getId(), studentClassId);
 
             response.setStatus(HttpServletResponse.SC_OK);
+
+            String link = request.getRequestURL().toString().replace(request.getRequestURI(), "") +
+                    request.getContextPath() + "/pages/students/signup.jsp?enrollment=" +
+                    URLEncoder.encode(student.getEnrollment(), StandardCharsets.UTF_8);
 
             EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
             "<h2>Faça sua matrícula na Vértice</h2>" +
