@@ -220,7 +220,7 @@
                                     <button class="btn-edit">Modificar</button>
                                 </a>
 
-                                <a href="${pageContext.request.contextPath}/admin/subject/delete?id=<%=subject.getId()%>">
+                                <a href="#" onclick="openModalDelete(${pageContext.request.contextPath}/admin/subject/delete?id=<%=subject.getId()%>")>
                                     <button class="btn-delete">Deletar</button>
                                 </a>
                             </div>
@@ -277,7 +277,35 @@
 
     </main>
 
-</div>
+    <dialog id="deleteDialog">
+        <div class="modal-cardD">
+            <h3>Deseja deletar esta matéria?</h3>
+            <p id="deleteText"></p>
 
+            <div class="modal-actions">
+                <button id="closeDelete">Cancelar</button>
+                <button id="confirmDelete">Confirmar</button>
+            </div>
+        </div>
+    </dialog>
+
+
+</div>
+<script>
+    let deleteUrl = '';
+
+    function openModalDelete(url) {
+        deleteUrl = url;
+        document.getElementById('deleteDialog').showModal();
+    }
+
+    document.getElementById('closeDelete').onclick = function() {
+        document.getElementById('deleteDialog').close();
+    }
+
+    document.getElementById('confirmDelete').onclick = function() {
+        window.location.href = deleteUrl;
+    }
+</script>
 </body>
 </html>
