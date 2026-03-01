@@ -1,4 +1,4 @@
-package com.example.schoolservlet.servlets.admin.findMany;
+package com.example.schoolservlet.servlets.admin.findOne;
 
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.SubjectDAO;

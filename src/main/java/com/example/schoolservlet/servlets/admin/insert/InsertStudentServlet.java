@@ -28,7 +28,7 @@ public class InsertStudentServlet extends HttpServlet {
         if (!AccessValidation.isAdmin(request, response)) return;
         getAllData(request, response);
 
-        request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
+        request.getRequestDispatcher("/WEB-INF/views/admin/student.jsp")
                 .forward(request, response);
     }
 
@@ -67,7 +67,7 @@ public class InsertStudentServlet extends HttpServlet {
         } catch (ValidationException ve){
             getAllData(request, response);
             request.setAttribute("error", ve.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/admin/student.jsp")
                     .forward(request, response);
             return;
         }
@@ -82,7 +82,7 @@ public class InsertStudentServlet extends HttpServlet {
             FieldAlreadyUsedValidation.exists("student", "email", "email", email);
         } catch (DataException | ValueAlreadyExistsException e){
             getAllData(request, response);
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/index.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/student.jsp");
             return;
         }
 
@@ -92,7 +92,7 @@ public class InsertStudentServlet extends HttpServlet {
             studentClassId = Integer.parseInt(studentClassParam);
         } catch (NumberFormatException nfe) {
             getAllData(request, response);
-            ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST,"ID precisa ser um valor numérico inteiro", "/WEB-INF/views/admin/index.jsp");
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST,"ID precisa ser um valor numérico inteiro", "/WEB-INF/views/admin/insert/student.jsp");
             return;
         }
 
@@ -101,7 +101,7 @@ public class InsertStudentServlet extends HttpServlet {
             schoolClassDAO.findById(studentClassId);
         } catch (DataException | ValidationException | NotFoundException e){
             getAllData(request, response);
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/index.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/insert/student.jsp");
             return;
         }
 
@@ -131,19 +131,25 @@ public class InsertStudentServlet extends HttpServlet {
                     "<p><a href=\"#\">Clique aqui</a> para fazer o seu cadastro</p>"
                     );
         } catch (DataException de) {
+            getAllData(request, response);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             request.setAttribute("error", de.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/student.jsp")
+                    .forward(request, response);
         }  catch (NotFoundException nfe){
+            getAllData(request, response);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             request.setAttribute("error", nfe.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/student.jsp")
+                    .forward(request, response);
         } catch (Exception e){
+            getAllData(request, response);
             request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/student.jsp")
+                    .forward(request, response);
         }
 
-        getAllData(request, response);
-        // Forward to admin dashboard with result attributes
-        request.getRequestDispatcher("/WEB-INF/views/admin/index.jsp")
-                .forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/admin/student/find-many");
     }
 
     private void getAllData(HttpServletRequest request, HttpServletResponse response){

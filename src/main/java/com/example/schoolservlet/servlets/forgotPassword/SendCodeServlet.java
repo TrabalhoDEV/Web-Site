@@ -116,7 +116,7 @@ public class SendCodeServlet extends HttpServlet {
         } else if (role == UserRoleEnum.TEACHER) {
             try {
                 TeacherDAO teacherDAO = new TeacherDAO();
-                Teacher teacher = teacherDAO.findByUserName(input);
+                Teacher teacher = teacherDAO.findByUserName(InputNormalizer.normalizeUserName(input));
 
                 if (teacher != null) {
                     email = teacher.getEmail();
