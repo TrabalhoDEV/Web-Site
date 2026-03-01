@@ -10,7 +10,7 @@
 <head>
   <title>Perfil do Administrador</title>
   <link rel="stylesheet"
-        href="${pageContext.request.contextPath}/assets/css/adminProfile.css"/>
+        href="${pageContext.request.contextPath}/assets/css/editAdmin.css"/>
 </head>
 
 <body>
@@ -171,29 +171,49 @@
     <section class="profile-card">
 
       <div class="title">
-      <h1>Meu perfil</h1>
-      <div class="btn-action">
-        <a href="${pageContext.request.contextPath}/admin/update" class="btn-edit">
-          Alterar
-        </a>
-      </div>
+        <h1>Editar Perfil</h1>
       </div>
       <hr>
 
       <% if (admin != null) { %>
 
-      <div class="profile-info">
-        <p><strong>ID:</strong> <%= admin.getId() %></p>
-        <p><strong>Email:</strong> <%= admin.getEmail() %></p>
-        <p><strong>Documento:</strong> <%= admin.getDocument() %></p>
-      </div>
+      <form action="${pageContext.request.contextPath}/admin/update" method="post" class="profile-form">
+        <div class="form-group">
+          <label for="document">Documento</label>
+          <input type="text" name="document" id="document" value="<%= admin.getDocument() %>" required>
+        </div>
 
-      <% } else if (request.getAttribute("error") != null){ %>
-        <p><%=request.getAttribute("error")%></p>
-      <%} else {%>
-        <p>Administrador não encontrado.</p>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" name="email" id="email" value="<%= admin.getEmail() %>" required>
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">Nova Senha</label>
+          <input type="text" name="newPassword" id="newPassword" placeholder="Digite uma nova senha">
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirmar nova Senha</label>
+          <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirme sua nova senha">
+        </div>
+
+
+        <%if (request.getAttribute("error") != null) {%>
+        <p id="error" style="color: #9b0404; text-align: start; margin: 0"><%= request.getAttribute("error")%></p>
+        <%}%>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-save">Salvar</button>
+          <a href="${pageContext.request.contextPath}/admin/find-one" class="btn-cancel">
+            Cancelar
+          </a>
+        </div>
+      </form>
+
+      <% } else { %>
+      <p>Administrador não encontrado.</p>
       <% } %>
-
     </section>
 
   </main>

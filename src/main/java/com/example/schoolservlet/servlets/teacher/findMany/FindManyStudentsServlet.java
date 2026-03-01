@@ -34,7 +34,7 @@ public class FindManyStudentsServlet extends HttpServlet {
         } catch (NullPointerException npe) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             request.setAttribute("error", "Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/index.jsp")
+            request.getRequestDispatcher("/student.jsp")
                     .forward(request, response);
             return;
         }

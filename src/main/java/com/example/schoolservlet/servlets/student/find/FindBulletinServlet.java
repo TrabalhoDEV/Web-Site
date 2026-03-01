@@ -60,14 +60,14 @@ public class FindBulletinServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session == null) {
             LOGGER.log(Level.SEVERE, "Session not found for authenticated user");
-            response.sendRedirect("/WEB-INF/index.jsp");
+            response.sendRedirect("/WEB-INF/student.jsp");
             return;
         }
         
         AuthenticatedUser authenticatedUser = (AuthenticatedUser) session.getAttribute("user");
         if (authenticatedUser == null) {
             LOGGER.log(Level.SEVERE, "Authenticated user not found in session");
-            response.sendRedirect("/WEB-INF/index.jsp");
+            response.sendRedirect("/WEB-INF/student.jsp");
             return;
         }
 

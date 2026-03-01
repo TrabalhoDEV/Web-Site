@@ -33,9 +33,7 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
                 admin.setEmail(rs.getString("email"));
                 admin.setDocument(rs.getString("document"));
                 return admin;
-            } else {
-                throw new NotFoundException("admin", "id", String.valueOf(id));
-            }
+            } else throw new NotFoundException("admin", "id", String.valueOf(id));
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar admin", sqle);

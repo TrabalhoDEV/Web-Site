@@ -53,4 +53,8 @@ public class Admin {
     public void setDocument(String document) {
         this.document = document;
     }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
