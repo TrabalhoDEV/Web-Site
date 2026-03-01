@@ -1,16 +1,35 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+    <title>Recuperação de senha</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/login.css">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/Logo - Vértice.svg" type="image/x-icon">
 </head>
 <body>
+<main class="form-container">
+    <h2>Recuperação de senha</h2>
+    <p>Esqueceu sua senha? Sem problemas, aqui você pode recuperar</p>
+
     <form action="${pageContext.request.contextPath}/auth/forgot-password/send-code" method="post">
-        <label for="input">Digite seu identificador:</label>
-        <input name="input" id="input" type="text" placeholder="Digite aqui">
-        <%if (request.getAttribute("error") != null){%>
-            <p><%=request.getAttribute("error")%></p>
-        <%}%>
+        <div class="input-group">
+            <label for="input">Identificador:</label>
+            <input
+                    name="input"
+                    id="input"
+                    type="text"
+                    required
+                    placeholder="Digite seu identificador aqui">
+
+            <%if (request.getAttribute("error") != null){ %>
+            <p id="error" style="color: #9b0404; text-align: start; margin: 0"><%= request.getAttribute("error")%></p>
+            <%}%>
+        </div>
+
         <button type="submit">Enviar</button>
     </form>
+
+    <p>Se lembrou e quer voltar? <a href="${pageContext.request.contextPath}/index.jsp">Clique aqui</a></p>
+</main>
 </body>
 </html>

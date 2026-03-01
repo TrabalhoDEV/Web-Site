@@ -29,6 +29,7 @@ public class FindManyTeacherServlet extends HttpServlet {
         response.setContentType("text/html");
 
         if (!AccessValidation.isAdmin(request, response)) return;
+
         String sessionError = (String) request.getSession().getAttribute("error");
 
         if (sessionError != null) {
@@ -43,6 +44,8 @@ public class FindManyTeacherServlet extends HttpServlet {
         int page;
         int totalCount = 0;
         int totalPages;
+        request.setAttribute("page", 1);
+        request.setAttribute("totalPages", 1);
 
         try {
             page = Integer.parseInt(pageParam);
