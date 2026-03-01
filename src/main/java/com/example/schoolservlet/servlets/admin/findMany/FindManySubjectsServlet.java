@@ -28,6 +28,8 @@ public class FindManySubjectsServlet extends HttpServlet {
 
         session.removeAttribute("error");
         request.setAttribute("error", error);
+        request.setAttribute("page", 1);
+        request.setAttribute("totalPages", 1);
 
         try {
             page = Integer.parseInt(pageParam);

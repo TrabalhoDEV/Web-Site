@@ -47,7 +47,7 @@ public class AdminLoginServlet extends HttpServlet {
 
 
 //            TO DO: add context in AdminHomeServlet and change this redirect that brings all information necessarily to admin/index.jsp
-                response.sendRedirect(request.getContextPath() + "/admin/add-student");
+                response.sendRedirect(request.getContextPath() + "/admin/student/find-many");
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 request.setAttribute("error", "Cpf e/ou senha incorretos");
