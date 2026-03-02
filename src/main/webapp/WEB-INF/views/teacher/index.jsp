@@ -190,7 +190,10 @@
 
     <section class="hero">
       <div class="hero-content">
-        <h1>Olá, <%=teacher != null ? OutputFormatService.formatName(teacher.getName()) : "professor"%></h1>
+        <h1>Olá, <%=teacher != null ? OutputFormatService.formatName(teacher.getName()) : "professor"%>!</h1>
+        <p>Acompanhe atentamente o desenvolvimento dos seus alunos</p>
+
+        <a href="${pageContext.request.contextPath}/teacher/students"><button class="primary-button">Ver alunos</button></a>
 
       </div>
       <div class="hero-illustration">
