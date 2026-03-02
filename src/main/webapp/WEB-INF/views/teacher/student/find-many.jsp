@@ -77,7 +77,12 @@
     <td style="text-align: center"><%=studentSubject.getGrade2() != null ? studentSubject.getGrade2() : "-"%></td>
     <td style="text-align: center"><%=studentSubject.getAverage() != null ? studentSubject.getAverage() : "-"%></td>
     <td><%=studentSubject.getStatus()%></td>
-    <td>-</td>
+    <td>
+      <form action="${pageContext.request.contextPath}/teacher/students/grades/release" method="get">
+        <input type="hidden" name="studentSubjectId" value="<%=studentSubject.getId()%>">
+        <button type="submit">Atualizar notas</button>
+      </form>
+    </td>
   </tr>
   <%}%>
   <%}%>
