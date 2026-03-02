@@ -28,6 +28,7 @@
     %>
 
 <%
+<<<<<<< HEAD
     List<String> observationsList = (List<String>) request.getAttribute("observationsList");
     AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
 
@@ -35,6 +36,17 @@
     if (currentPage == null) currentPage = 0;
     Integer totalPages = (Integer) request.getAttribute("totalPages");
     if (totalPages == null) totalPages = 1;
+=======
+    Integer currentPage = 0;
+    Integer totalPages = 0;
+    try{
+        currentPage = request.getAttribute("currentPage") != null? (Integer) request.getAttribute("currentPage"):1;
+        totalPages =  request.getAttribute("totalPages") != null? (Integer) request.getAttribute("totalPages"):1;
+    } catch (ClassCastException e){
+        ;
+    }
+
+>>>>>>> 63f77063c860fd56ebdc6840a14e3eb6aa497adf
 %>
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -42,6 +54,7 @@
             <img src="<%= request.getContextPath() %>/assets/css/img/logo_pequena.svg" alt="Vertice Logo" />
         </div>
 
+<<<<<<< HEAD
         <nav class="sidebar-nav">
             <ul>
                 <li class="sidebar-item active">
@@ -176,6 +189,17 @@
         }
     });
 </script>
+=======
+<a href="${pageContext.request.contextPath}/student/home?nextPage=<%= currentPage - 1 %>"
+        <%= currentPage <= 0 ? "style='pointer-events:none; color: gray;'" : "" %>>
+    Anterior
+</a>
+
+<a href="${pageContext.request.contextPath}/student/home?nextPage=<%= currentPage + 1 %>"
+        <%= (int) totalPages <= currentPage ? "style='pointer-events:none; color: gray;'" : "" %>>
+    Próxima
+</a>
+>>>>>>> 63f77063c860fd56ebdc6840a14e3eb6aa497adf
 
 </body>
 </html>
