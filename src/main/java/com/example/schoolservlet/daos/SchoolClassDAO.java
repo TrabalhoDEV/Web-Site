@@ -16,7 +16,7 @@ import java.util.Map;
 public class SchoolClassDAO implements GenericDAO<SchoolClass> {
 
     @Override
-    public void create(SchoolClass schoolClass) throws DataException, RequiredFieldException {
+    public void create(SchoolClass schoolClass) throws DataException, ValidationException {
         if (schoolClass.getSchoolYear() == null || schoolClass.getSchoolYear().isEmpty()) throw new RequiredFieldException("nome da turma");
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO school_class (school_year) VALUES (?)")){
@@ -26,6 +26,9 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
             pstmt.executeUpdate();
         } catch(SQLException sqle){
             sqle.printStackTrace();
+            if (sqle.getSQLState().equals("23505")){
+                throw new ValidationException("Já existe essa turma cadastrada");
+            }
             throw new DataException("Erro ao criar turma", sqle);
         }
     }

@@ -28,7 +28,7 @@ public class InsertStudentServlet extends HttpServlet {
         if (!AccessValidation.isAdmin(request, response)) return;
         getAllData(request, response);
 
-        request.getRequestDispatcher("/WEB-INF/views/admin/student.jsp")
+        request.getRequestDispatcher("/WEB-INF/views/admin/insert/student.jsp")
                 .forward(request, response);
     }
 
@@ -67,7 +67,7 @@ public class InsertStudentServlet extends HttpServlet {
         } catch (ValidationException ve){
             getAllData(request, response);
             request.setAttribute("error", ve.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/student.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/student.jsp")
                     .forward(request, response);
             return;
         }
@@ -82,7 +82,7 @@ public class InsertStudentServlet extends HttpServlet {
             FieldAlreadyUsedValidation.exists("student", "email", "email", email);
         } catch (DataException | ValueAlreadyExistsException e){
             getAllData(request, response);
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/student.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/insert/student.jsp");
             return;
         }
 
