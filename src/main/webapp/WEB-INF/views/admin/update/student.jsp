@@ -11,6 +11,7 @@
         // Load Student object from request attributes for form pre-population
         Student student = (Student) request.getAttribute("student");
         String errorMessage = (String) request.getAttribute("error");
+        boolean hasError = errorMessage != null && !errorMessage.trim().isEmpty();
         String schoolYear = (String) request.getAttribute("schoolYear");
         
         // Verify that student object exists before rendering form
@@ -71,6 +72,11 @@
         
         <!-- Submit button -->
         <button type="submit">Update</button>
+        <%
+            if (hasError) {
+        %>
+        <p><%= errorMessage %></p>
+        <% } %>
     </form>
 </body>
 </html>

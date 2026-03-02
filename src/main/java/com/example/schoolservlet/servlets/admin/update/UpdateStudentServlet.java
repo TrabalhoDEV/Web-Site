@@ -121,7 +121,7 @@ public class UpdateStudentServlet extends HttpServlet {
         if (!AccessValidation.isAdmin(request, response)) return;
 
         // Get form parameters:
-        String enrollmentParam = request.getParameter("id");
+        String enrollmentParam = request.getParameter("enrollment");
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String cpf = request.getParameter("cpf");
@@ -130,14 +130,15 @@ public class UpdateStudentServlet extends HttpServlet {
             name = InputNormalizer.normalizeName(name);
         }
         if (email != null) {
-            name =InputNormalizer.normalizeEmail(email);
+            email =InputNormalizer.normalizeEmail(email);
         }
         if (cpf != null) {
-            name = InputNormalizer.normalizeCpf(cpf);
+            cpf = InputNormalizer.normalizeCpf(cpf);
         }
 
         try {
             // Validate all parameters:
+            enrollmentParam = String.valueOf(Integer.parseInt(enrollmentParam));
             int enrollment = validateAndNormalizeEnrollment(enrollmentParam);
             validateStudentFields(name, email, cpf);
 
@@ -165,7 +166,7 @@ public class UpdateStudentServlet extends HttpServlet {
             // Log unexpected exceptions:
             logger.log(Level.SEVERE, "Unexpected error during student update", e);
             request.setAttribute("error", "An unexpected error occurred. Please try again.");
-            request.getRequestDispatcher(LIST_VIEW).forward(request, response);
+            request.getRequestDispatcher(UPDATE_VIEW).forward(request, response);
         }
     }
 
@@ -239,7 +240,8 @@ public class UpdateStudentServlet extends HttpServlet {
             // If unable to reload student data, redirect to list:
             logger.log(Level.WARNING, "Error reloading student data during error handling", ex);
             request.setAttribute("error", "Error updating student. Please try again.");
-            request.getRequestDispatcher(LIST_VIEW).forward(request, response);
+            request.setAttribute("id", enrollmentParam);
+            response.sendRedirect(request.getContextPath() + "/admin/student/find-many");
         }
     }
 
