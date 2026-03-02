@@ -50,7 +50,7 @@ public class HomeServlet extends HttpServlet {
             // User not authenticated or session attribute missing
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             request.setAttribute("error", "Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/student.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/teacher/index.jsp")
                     .forward(request, response);
             return;
         }
@@ -79,6 +79,6 @@ public class HomeServlet extends HttpServlet {
         request.setAttribute("studentsToHelpMap", studentSubjectMap);
         request.setAttribute("studentsPerformance", studentsPerformance);
         request.setAttribute("pendencies", pendencies);
-        request.getRequestDispatcher("/WEB-INF/views/teacher/student.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/teacher/index.jsp").forward(request, response);
     }
 }

@@ -71,12 +71,12 @@ public class FindManyStudentsServlet extends HttpServlet {
             request.setAttribute("page", page);
             request.setAttribute("totalPages", totalPages);
         } catch (DataException | ValidationException e){
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student/find-many.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student/student.jsp");
             return;
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
-        request.getRequestDispatcher("/WEB-INF/views/teacher/student/find-many.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/teacher/student/student.jsp").forward(request, response);
     }
 
     @Override

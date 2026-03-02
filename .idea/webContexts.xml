@@ -8,6 +8,8 @@
         <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin/index.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin/insert/teacher.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin/insert" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin/update/teacher.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/admin/update" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/findMany/aaa.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/findMany" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/index.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher" />
       </map>
     </option>
   </component>
