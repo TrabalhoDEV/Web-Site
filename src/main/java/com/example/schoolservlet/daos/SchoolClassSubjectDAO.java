@@ -12,8 +12,7 @@ import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SchoolClassSubjectDAO implements GenericDAO<SchoolClassSubject> {
 
@@ -130,6 +129,43 @@ public class SchoolClassSubjectDAO implements GenericDAO<SchoolClassSubject> {
         }
     }
 
+    public void createMany(List<SchoolClassSubject> schoolClassSubjects)
+            throws DataException, ValidationException {
+
+        if (schoolClassSubjects == null || schoolClassSubjects.isEmpty()) {
+            throw new ValidationException("Lista de associações não pode ser vazia");
+        }
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO school_class_subject (id_school_class, id_subject) VALUES (?, ?)")) {
+
+            conn.setAutoCommit(false);
+
+            try {
+                for (SchoolClassSubject scs : schoolClassSubjects) {
+                    pstmt.setInt(1, scs.getSchoolClass().getId());
+                    pstmt.setInt(2, scs.getSubject().getId());
+                    pstmt.addBatch();
+                }
+
+                pstmt.executeBatch();
+                conn.commit();
+
+            } catch (SQLException e) {
+                conn.rollback();
+
+                if (e.getSQLState().equals("23505")) {
+                    throw new ValidationException("Uma ou mais matérias já estão associadas a esta turma");
+                }
+                throw e;
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao associar matérias à turma", sqle);
+        }
+    }
+
     @Override
     public void update(SchoolClassSubject scs) throws DataException, ValidationException, NotFoundException {
         InputValidation.validateId(scs.getId(), "id");
@@ -168,6 +204,37 @@ public class SchoolClassSubjectDAO implements GenericDAO<SchoolClassSubject> {
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new DataException("Erro ao deletar school_class_subject", sqle);
+        }
+    }
+
+    public void deleteManyBySchoolClassAndSubjects(int schoolClassId, Set<Integer> subjectIds)
+            throws DataException {
+
+        if (subjectIds == null || subjectIds.isEmpty()) {
+            return;
+        }
+
+        String placeholders = String.join(",", Collections.nCopies(subjectIds.size(), "?"));
+
+        String sql = "DELETE FROM school_class_subject " +
+                "WHERE id_school_class = ? " +
+                "AND id_subject IN (" + placeholders + ")";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, schoolClassId);
+
+            int paramIndex = 2;
+            for (Integer subjectId : subjectIds) {
+                pstmt.setInt(paramIndex++, subjectId);
+            }
+
+            pstmt.executeUpdate();
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao remover associações", sqle);
         }
     }
 }

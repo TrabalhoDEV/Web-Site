@@ -5,6 +5,7 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
+import com.example.schoolservlet.utils.ErrorHandler;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -20,12 +21,21 @@ public class FindManySchoolClassesServlet extends HttpServlet {
 
         if (!AccessValidation.isAdmin(request, response)) return;
 
+        HttpSession session = request.getSession(false);
         String pageParam = request.getParameter("page");
-
+        String error = (String) session.getAttribute("error");
         int take = Constants.MAX_TAKE;
         int skip = 0;
         int page;
         int totalCount = 0;
+
+
+        request.setAttribute("page", 1);
+        request.setAttribute("totalPages", 1);
+
+        if (error != null){
+            request.setAttribute("error", error);
+        }
 
         try {
             page = Integer.parseInt(pageParam);
@@ -37,10 +47,7 @@ public class FindManySchoolClassesServlet extends HttpServlet {
         try{
             totalCount = schoolClassDAO.totalCount();
         } catch (DataException de){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/school-class.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, de.getStatus(), de.getMessage(), "/WEB-INF/views/admin/findMany/school-class.jsp");
             return;
         }
 
@@ -55,15 +62,13 @@ public class FindManySchoolClassesServlet extends HttpServlet {
         try {
             schoolClassMap = schoolClassDAO.findMany(skip, take);
         } catch (DataException de){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/school-class.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, de.getStatus(), de.getMessage(), "/WEB-INF/views/admin/findMany/school-class.jsp");
             return;
         }
 
         request.setAttribute("schoolClassMap", schoolClassMap);
         request.setAttribute("page", page);
+        request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher("/WEB-INF/views/admin/findMany/school-class.jsp").forward(request, response);
     }
