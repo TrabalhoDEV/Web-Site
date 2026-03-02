@@ -228,8 +228,8 @@
             <td><%=OutputFormatService.formatStudentStatus(student.getStatus())%></td>
             <td class="actions">
               <div class="btn-action">
-                <a href="${pageContext.request.contextPath}/admin/teacher/update?id=<%=student.getId()%>"><button class="btn-edit">Modificar</button></a>
-                <a><button class="btn-delete">Deletar</button></a>
+                <a href="${pageContext.request.contextPath}/admin/student/update?id=<%=student.getId()%>"><button class="btn-edit">Modificar</button></a>
+                <a href="#" onclick=openModalDelete("${pageContext.request.contextPath}/admin/student/delete?id=<%=student.getId()%>")><button class="btn-delete">Deletar</button></a>
               </div>
             </td>
           </tr>
@@ -258,36 +258,49 @@
         </table>
 
       </div>
+      <!-- PAGINAÇÃO -->
+      <div class="pagination">
+
+        <% if (currentPage > 1) { %>
+        <a href="?page=<%=currentPage-1%>">Anterior</a>
+        <% } %>
+
+
+        <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1%></strong>
+
+        <% if (currentPage < totalPages) { %>
+        <a href="?page=<%=currentPage+1%>">Próxima</a>
+        <% } %>
+      </div>
     </section>
 
-    <!-- PAGINAÇÃO -->
+<dialog id="deleteDialog">
+  <div class="modal-cardD">
+    <h3>Deseja deletar esta matéria?</h3>
+    <p id="deleteText">Essa é uma ação irreversível</p>
 
-    <div class="pagination">
-
-      <% if (totalPages > 1) { %>
-
-      <% if (currentPage > 1) { %>
-      <a href="?page=<%=currentPage-1%>">Anterior</a>
-      <a href="?page=<%= currentPage - 1 %>"><%= currentPage - 1 %></a>
-      <% } %>
-
-
-      <strong><%= currentPage %></strong>
-
-      <% if (currentPage < totalPages) { %>
-      <a href="?page=<%= currentPage + 1 %>"><%= currentPage + 1 %></a>
-      <a href="?page=<%=currentPage+1%>">Próxima</a>
-      <% } %>
-
-      <% } %>
-
+    <div class="modal-actions">
+      <button id="closeDelete">Cancelar</button>
+      <button id="confirmDelete">Confirmar</button>
     </div>
+  </div>
+</dialog>
 
-      </main>
-
-</div>
 <script>
+  let deleteUrl = '';
 
+  function openModalDelete(url) {
+    deleteUrl = url;
+    document.getElementById('deleteDialog').showModal();
+  }
+
+  document.getElementById('closeDelete').onclick = function() {
+    document.getElementById('deleteDialog').close();
+  }
+
+  document.getElementById('confirmDelete').onclick = function() {
+    window.location.href = deleteUrl;
+  }
 </script>
 </body>
 </html>

@@ -214,7 +214,7 @@
                             <div class="btn-action">
                                 <a href="${pageContext.request.contextPath}/admin/teacher/details?id=<%=teacher.getId()%>"><button class="btn-details">Ver detalhes</button></a>
                                 <a href="${pageContext.request.contextPath}/admin/teacher/update?id=<%=teacher.getId()%>"><button class="btn-edit">Modificar</button></a>
-                                <a><button class="btn-delete">Deletar</button></a>
+                                <a onclick=openModalDelete("${pageContext.request.contextPath}/admin/teacher/delete?id=<%=teacher.getId()%>")><button class="btn-delete">Deletar</button></a>
                             </div>
                         </td>
                     </tr>
@@ -236,64 +236,51 @@
                     </tbody>
                 </table>
             </div>
-        </section>
-        <dialog id="deleteDialog">
-            <div class="modal-cardD">
-                <h3>Deseja deletar este professor?</h3>
-                <p id="deleteText"></p>
+            <!-- PAGINAÇÃO -->
+            <div class="pagination">
 
-                <div class="modal-actions">
-                    <button id="closeDelete">Cancelar</button>
-                    <button id="confirmDelete">Confirmar</button>
-                </div>
+                <% if (currentPage > 1) { %>
+                <a href="?page=<%=currentPage-1%>">Anterior</a>
+                <% } %>
+
+
+                <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1%></strong>
+
+                <% if (currentPage < totalPages) { %>
+                <a href="?page=<%=currentPage+1%>">Próxima</a>
+                <% } %>
             </div>
-        </dialog>
-
-        <div class="pagination">
-
-            <% if (totalPages > 1) { %>
-
-            <% if (currentPage > 1) { %>
-            <a href="?page=<%=currentPage-1%>">Anterior</a>
-            <a href="?page=<%= currentPage - 1 %>"><%= currentPage - 1 %></a>
-            <% } %>
-
-
-            <strong><%= currentPage %></strong>
-
-            <% if (currentPage < totalPages) { %>
-            <a href="?page=<%= currentPage + 1 %>"><%= currentPage + 1 %></a>
-            <a href="?page=<%=currentPage+1%>">Próxima</a>
-            <% } %>
-
-            <% } %>
-
-        </div>
+        </section>
     </main>
+</div>
+
+    <dialog id="deleteDialog">
+        <div class="modal-cardD">
+            <h3>Deseja deletar esta matéria?</h3>
+            <p id="deleteText">Essa é uma ação irreversível</p>
+
+            <div class="modal-actions">
+                <button id="closeDelete">Cancelar</button>
+                <button id="confirmDelete">Confirmar</button>
+            </div>
+        </div>
+    </dialog>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
+        let deleteUrl = '';
 
-            const deleteDialog = document.getElementById("deleteDialog");
+        function openModalDelete(url) {
+            deleteUrl = url;
+            document.getElementById('deleteDialog').showModal();
+        }
 
-            // Abrir modal ao clicar em Delete
-            document.querySelectorAll(".btn-delete").forEach(button => {
-                button.addEventListener("click", () => {
-                    deleteDialog.showModal();
-                });
-            });
+        document.getElementById('closeDelete').onclick = function() {
+            document.getElementById('deleteDialog').close();
+        }
 
-            // Botão Cancelar
-            document.getElementById("closeDelete").addEventListener("click", () => {
-                window.location.href = window.location.href;
-            });
-
-            // Botão Confirmar Delete
-            document.getElementById("confirmDelete").addEventListener("click", () => {
-                window.location.href = window.location.href;
-            });
-
-        });
+        document.getElementById('confirmDelete').onclick = function() {
+            window.location.href = deleteUrl;
+        }
     </script>
 </div>
 </body>

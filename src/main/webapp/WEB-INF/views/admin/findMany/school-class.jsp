@@ -191,7 +191,7 @@
                 <hr>
 
                 <table class="grade-table"
-                       style="--cols: 2">
+                       style="--cols: 2; grid-template-columns: 3fr 1fr">
 
                     <thead>
                     <tr>
@@ -208,7 +208,7 @@
 
                     <tr>
                         <td>
-                            <%= schoolClass.getSchoolYear() %>
+                            <%= schoolClass.getSchoolYear().toUpperCase()%>
                         </td>
 
                         <td class="actions">
@@ -248,30 +248,22 @@
                 </table>
 
             </div>
+
+            <!-- PAGINAÇÃO -->
+            <div class="pagination">
+
+                <% if (currentPage > 1) { %>
+                <a href="?page=<%=currentPage-1%>">Anterior</a>
+                <% } %>
+
+
+                <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1%></strong>
+
+                <% if (currentPage < totalPages) { %>
+                <a href="?page=<%=currentPage+1%>">Próxima</a>
+                <% } %>
+            </div>
         </section>
-
-        <!-- PAGINAÇÃO -->
-        <div class="pagination">
-
-            <% if (totalPages > 1) { %>
-
-            <% if (currentPage > 1) { %>
-            <a href="?page=<%=currentPage-1%>">Anterior</a>
-            <a href="?page=<%= currentPage - 1 %>"><%= currentPage - 1 %></a>
-            <% } %>
-
-
-            <strong><%= currentPage %></strong>
-
-            <% if (currentPage < totalPages) { %>
-            <a href="?page=<%= currentPage + 1 %>"><%= currentPage + 1 %></a>
-            <a href="?page=<%=currentPage+1%>">Próxima</a>
-            <% } %>
-
-            <% } %>
-
-        </div>
-
     </main>
 
 </div>

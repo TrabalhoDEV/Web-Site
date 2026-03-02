@@ -25,6 +25,11 @@ public class FindManyStudentsServlet extends HttpServlet {
         int skip = 0;
         int page;
         int totalPages;
+        HttpSession session = request.getSession(false);
+
+        if (session.getAttribute("error") != null){
+            request.setAttribute("error", session.getAttribute("error"));
+        }
 
         request.setAttribute("page", 1);
         request.setAttribute("totalPages", 1);
