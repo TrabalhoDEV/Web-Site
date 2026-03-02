@@ -1,0 +1,130 @@
+.boletim-grid {
+    background-color: var(--surface-color);
+    border-radius: var(--medium-radius);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    padding: 30px 40px;
+    width: 90%;
+    margin: 70px auto;
+}
+
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #3a4edc;
+    margin-bottom: 30px;
+}
+
+.close-btn {
+    font-size: x-large;
+    background-color: #ffffff;
+    color: #282828;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-btn:hover {
+    color: #4c63ff;
+}
+
+.info-section {
+    margin-bottom: 30px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 12px 0;
+}
+
+.label {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #181d42;
+}
+
+.value {
+    font-size: 1.1rem;
+    color: gray;
+}
+
+.lists-container {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.list-box {
+    flex: 1;
+    min-width: 250px;
+}
+
+.list-box h3 {
+    color: #3a4edc;
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+}
+
+.scroll-list {
+    max-height: 210px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    background: #ffffff;
+}
+
+.scroll-list li {
+    font-size: 1rem;
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+    list-style: none;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.modal-actions button {
+    font-size: var(--text-sm);
+    background: #4c63ff;
+    color: white;
+    border: none;
+    width: 120px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.modal-actions button:hover {
+    background-color: #3f52e6;
+}
+
+@media (max-width: 768px) {
+    .boletim-grid {
+        width: 95%;
+        padding: 24px 20px;
+    }
+
+    .lists-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .boletim-grid {
+        width: 100%;
+        padding: 16px 12px;
+        border-radius: 12px;
+    }
+
+    .info-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
