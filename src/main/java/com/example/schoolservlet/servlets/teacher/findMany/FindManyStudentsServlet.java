@@ -58,9 +58,6 @@ public class FindManyStudentsServlet extends HttpServlet {
         }
 
         request.setAttribute("studentSubjectMap",new HashMap<>());
-        request.setAttribute("page", 1);
-        request.setAttribute("totalPages", 1);
-        request.setAttribute("studentsPerformanceCount", new StudentsPerformanceCount(0,0,0));
 
         if (teacher == null) {
             try {
@@ -88,6 +85,7 @@ public class FindManyStudentsServlet extends HttpServlet {
                 InputValidation.validateEnrollment(enrollmentFilter);
                 id = InputNormalizer.normalizeEnrollment(enrollmentFilter);
             } catch (ValidationException e){
+                e.printStackTrace();
                 ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), responsePath);
                 return;
             }
@@ -133,6 +131,7 @@ public class FindManyStudentsServlet extends HttpServlet {
             request.setAttribute("studentsPerformanceCount", studentsPerformanceCount);
 
         } catch (DataException | ValidationException e){
+            e.printStackTrace();
             ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), responsePath);
             return;
         }
