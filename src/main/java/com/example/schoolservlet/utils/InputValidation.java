@@ -196,10 +196,26 @@ public class InputValidation {
         if (name.length() > Constants.MAX_SUBJECT_NAME_LENGTH) throw new MaxLengthException("nome", Constants.MAX_SUBJECT_NAME_LENGTH);
         if (name.length() < Constants.MIN_SUBJECT_NAME_LENGTH) throw new MinLengthException("nome", Constants.MIN_SUBJECT_NAME_LENGTH);
     }
-    
-    public static void validateName(String name) throws ValidationException{
-        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(name)) throw new ValidationException("Nome contém caracteres inválidos");
-        if (name.matches("^[\\p{L} ]*$")) throw new RegexException("nome");
+
+    /**
+     * Static method that validates if name contains only letters and whitespace characters.
+     *
+     * Validation rules:
+     * - Name cannot be null or blank
+     * - Name can only contain letters (A-Z, a-z) and whitespace
+     * - Special characters, numbers and symbols are not allowed
+     *
+     * @param name is the user's name to be validated
+     * @throws RequiredFieldException if name is null or blank
+     * @throws ValidationException if name contains invalid characters (numbers, special characters, symbols)
+     */
+    public static void validateStudentName(String name) throws ValidationException{
+        validateIsNull("nome", name);
+        for (char c : name.toCharArray()){
+            if (!Character.isLetter(c) && !Character.isWhitespace(c)){
+                throw new ValidationException("Nome contém caracteres inválidos");
+            }
+        }
     }
 
     public static void validateSchoolClassName(String name) throws ValidationException{

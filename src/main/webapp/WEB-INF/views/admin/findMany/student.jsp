@@ -4,7 +4,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
+  <title>Title</title>
 </head>
 <%
   Map<Integer, Student> studentMap = (Map<Integer, Student>) request.getAttribute("studentMap");
@@ -20,6 +20,7 @@
     <th>CPF</th>
     <th>Email</th>
     <th>Status</th>
+    <th>Ações</th>
   </tr>
   </thead>
   <tbody>
@@ -33,6 +34,12 @@
     <td><%=student.getEmail() != null ? student.getEmail() : "Não informado"%>
     </td>
     <td><%=student.getStatus()%>
+    </td>
+    <td>
+      <form action="${pageContext.request.contextPath}/admin/student/update" method="get">
+        <input type="hidden" name="id" value="<%= student.getId() %>">
+        <input type="submit" value="Atualizar estudante">
+      </form>
     </td>
   </tr>
   <%}%>
