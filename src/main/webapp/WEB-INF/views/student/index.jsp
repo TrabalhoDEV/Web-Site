@@ -29,6 +29,14 @@
 
 <%
 <<<<<<< HEAD
+    List<String> observationsList = (List<String>) request.getAttribute("observationsList");
+    AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
+
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    if (currentPage == null) currentPage = 0;
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    if (totalPages == null) totalPages = 1;
+=======
     Integer currentPage = 0;
     Integer totalPages = 0;
     try{
@@ -38,15 +46,7 @@
         ;
     }
 
-=======
-    List<String> observationsList = (List<String>) request.getAttribute("observationsList");
-    AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
-
-    Integer currentPage = (Integer) request.getAttribute("currentPage");
-    if (currentPage == null) currentPage = 0;
-    Integer totalPages = (Integer) request.getAttribute("totalPages");
-    if (totalPages == null) totalPages = 1;
->>>>>>> 7342b8cdaa2270ab57eb67fce8525a8c2e9aea4d
+>>>>>>> 63f77063c860fd56ebdc6840a14e3eb6aa497adf
 %>
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -55,16 +55,6 @@
         </div>
 
 <<<<<<< HEAD
-<a href="${pageContext.request.contextPath}/student/home?nextPage=<%= currentPage - 1 %>"
-        <%= currentPage <= 0 ? "style='pointer-events:none; color: gray;'" : "" %>>
-    Anterior
-</a>
-
-<a href="${pageContext.request.contextPath}/student/home?nextPage=<%= currentPage + 1 %>"
-        <%= (int) totalPages <= currentPage ? "style='pointer-events:none; color: gray;'" : "" %>>
-    Próxima
-</a>
-=======
         <nav class="sidebar-nav">
             <ul>
                 <li class="sidebar-item active">
@@ -199,7 +189,17 @@
         }
     });
 </script>
->>>>>>> 7342b8cdaa2270ab57eb67fce8525a8c2e9aea4d
+=======
+<a href="${pageContext.request.contextPath}/student/home?nextPage=<%= currentPage - 1 %>"
+        <%= currentPage <= 0 ? "style='pointer-events:none; color: gray;'" : "" %>>
+    Anterior
+</a>
+
+<a href="${pageContext.request.contextPath}/student/home?nextPage=<%= currentPage + 1 %>"
+        <%= (int) totalPages <= currentPage ? "style='pointer-events:none; color: gray;'" : "" %>>
+    Próxima
+</a>
+>>>>>>> 63f77063c860fd56ebdc6840a14e3eb6aa497adf
 
 </body>
 </html>
