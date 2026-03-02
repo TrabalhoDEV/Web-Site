@@ -3,14 +3,18 @@ package com.example.schoolservlet.servlets.teacher;
 import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.RequiredFieldException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.StudentSubject;
+import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.InputValidation;
+import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -55,10 +59,10 @@ public class ReleaseGradesServlet extends HttpServlet {
      * @throws RuntimeException if the StudentSubject is not found or a data error occurs
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        AccessValidation.isTeacher(request, response);
         // Get studentSubject id:
         String studentSubjectIdParam = request.getParameter("studentSubjectId");
         if (studentSubjectIdParam == null || studentSubjectIdParam.isEmpty()) {
-            request.setAttribute("error", "ID do aluno-matéria é obrigatório para liberar notas.");
             response.sendRedirect(request.getContextPath() + "/teacher/students");
             return;
         }
@@ -70,7 +74,7 @@ public class ReleaseGradesServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/teacher/student/releaseGrade.jsp")
                     .forward(request, response);
         } catch (NotFoundException | DataException | ValidationException e) {
-            throw new RuntimeException(e);
+            response.sendRedirect(request.getContextPath() + "/teacher/students");
         }
     }
 
@@ -119,6 +123,8 @@ public class ReleaseGradesServlet extends HttpServlet {
      * @see InputValidation#validateGrade(double)
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        AccessValidation.isTeacher(request, response);
+
         // Get parameter id:
         String studentSubjectIdParam = request.getParameter("studentSubjectId");
         String grade1Param = request.getParameter("grade1");
@@ -127,10 +133,10 @@ public class ReleaseGradesServlet extends HttpServlet {
 
 
         // Validate inputs:
-        if (studentSubjectIdParam == null || studentSubjectIdParam.isEmpty()) {
-            request.setAttribute("error", "ID do aluno-matéria é obrigatório para liberar notas.");
+        try {
+            InputValidation.validateIsNull("studentSubjectId", studentSubjectIdParam);
+        } catch (RequiredFieldException e) {
             response.sendRedirect(request.getContextPath() + "/teacher/students");
-            return;
         }
 
         try{

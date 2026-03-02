@@ -59,7 +59,7 @@
                 const grade1 = parseFloat(document.getElementById("grade1").value) || 0;
                 const grade2 = parseFloat(document.getElementById("grade2").value) || 0;
 
-                if (grade1 > 0 && grade2 > 0) {
+                if (grade1 >= 0 && grade2 >= 0) {
                     const media = ((grade1 + grade2) / 2).toFixed(2);
                     document.getElementById("mediaValue").textContent = media;
                 } else {
