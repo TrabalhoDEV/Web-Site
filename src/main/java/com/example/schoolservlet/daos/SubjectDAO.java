@@ -244,16 +244,74 @@ public class SubjectDAO implements GenericDAO<Subject> {
     }
 
     @Override
-    public void delete(int id) throws DataException, NotFoundException, ValidationException {
-        InputValidation.validateId(id, "id");
+    public void delete(int subjectId) throws DataException, ValidationException, NotFoundException {
+        InputValidation.validateId(subjectId, "id da matéria");
 
-        try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM subject WHERE id = ?")){
-            pstmt.setInt(1, id);
+        try (Connection conn = PostgreConnection.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement("""
+            SELECT 
+                s.id,
+                s.name,
+                s.deadline,
+                COUNT(ss.id) as total_enrollments,
+                COUNT(CASE WHEN ss.grade1 IS NULL AND ss.grade2 IS NULL THEN 1 END) as students_without_grades,
+                COUNT(CASE WHEN ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL THEN 1 END) as students_with_grades
+            FROM subject s
+            LEFT JOIN student_subject ss ON s.id = ss.id_subject
+            WHERE s.id = ?
+            GROUP BY s.id, s.name, s.deadline
+            """)) {
+            pstmt.setInt(1, subjectId);
 
-            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("matéria", "id", String.valueOf(id));
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.next()) {
+                    throw new NotFoundException("matéria", "id", String.valueOf(subjectId));
+                }
+
+                String name = rs.getString("name");
+                Date deadline = rs.getDate("deadline");
+                int totalEnrollments = rs.getInt("total_enrollments");
+                int studentsWithoutGrades = rs.getInt("students_without_grades");
+                int studentsWithGrades = rs.getInt("students_with_grades");
+
+                boolean canDelete = false;
+                String reason = "";
+
+                if (totalEnrollments == 0) {
+                    canDelete = true;
+                } else if (studentsWithoutGrades == totalEnrollments) {
+                    canDelete = true;
+                } else if (deadline.before(new java.util.Date()) && studentsWithGrades == totalEnrollments) {
+                    canDelete = true;
+                } else {
+                    int studentsWithPartialGrades = totalEnrollments - studentsWithoutGrades - studentsWithGrades;
+
+                    if (deadline.after(new java.util.Date()) || deadline.equals(new java.util.Date())) {
+                        reason = String.format(
+                                "Não é possível deletar a matéria '%s'. " +
+                                        "O prazo (%s) ainda não expirou e existem alunos com notas.",
+                                name, deadline
+                        );
+                    } else {
+                        reason = String.format(
+                                "Não é possível deletar a matéria '%s'. " +
+                                        "Existem %d alunos sem nenhuma nota registrada.",
+                                name, studentsWithoutGrades
+                        );
+                    }
+                }
+
+                if (!canDelete) {
+                    throw new ValidationException(reason);
+                }
+
+                String deleteSql = "DELETE FROM subject WHERE id = ?";
+                try (PreparedStatement deleteStmt = conn.prepareStatement(deleteSql)) {
+                    deleteStmt.setInt(1, subjectId);
+                    deleteStmt.executeUpdate();
+                }
+            }
         } catch (SQLException sqle){
-            sqle.printStackTrace();
             throw new DataException("Erro ao deletar matéria", sqle);
         }
     }

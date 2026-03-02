@@ -194,7 +194,7 @@
                     <thead>
                     <tr>
                         <th>Nome</th>
-                        <th>Data limite</th>
+                        <th>Data limite (dia/mês/ano)</th>
                         <th>Ações</th>
                     </tr>
                     </thead>
@@ -220,7 +220,7 @@
                                     <button class="btn-edit">Modificar</button>
                                 </a>
 
-                                <a href="#" onclick="openModalDelete(${pageContext.request.contextPath}/admin/subject/delete?id=<%=subject.getId()%>")>
+                                <a href="#" onclick=openModalDelete("${pageContext.request.contextPath}/admin/subject/delete?id=<%=subject.getId()%>")>
                                     <button class="btn-delete">Deletar</button>
                                 </a>
                             </div>
@@ -273,14 +273,28 @@
 
             <% } %>
 
-        </div>
+            <!-- PAGINAÇÃO -->
+            <div class="pagination">
 
+                <% if (currentPage > 1) { %>
+                <a href="?page=<%=currentPage-1%>">Anterior</a>
+                <% } %>
+
+
+                <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1%></strong>
+
+                <% if (currentPage < totalPages) { %>
+                <a href="?page=<%=currentPage+1%>">Próxima</a>
+                <% } %>
+            </div>
+        </div>
     </main>
+</div>
 
     <dialog id="deleteDialog">
         <div class="modal-cardD">
             <h3>Deseja deletar esta matéria?</h3>
-            <p id="deleteText"></p>
+            <p id="deleteText">Essa é uma ação irreversível</p>
 
             <div class="modal-actions">
                 <button id="closeDelete">Cancelar</button>
@@ -288,9 +302,6 @@
             </div>
         </div>
     </dialog>
-
-
-</div>
 <script>
     let deleteUrl = '';
 

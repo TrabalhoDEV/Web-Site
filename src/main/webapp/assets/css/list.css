@@ -2,12 +2,19 @@
 @import url('./layout/tokens.css');
 @import url('./layout/navbar.css');
 
+main > section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .boletim-grid{
     background-color: var(--surface-color);
     border-radius: var(--medium-radius);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 24px 32px;
-    max-width: 90%;
+    width: 65dvw;
     margin: 30px auto 0;
 }
 .header-grid{
@@ -15,6 +22,7 @@
     justify-content: space-between;
     align-items: center;
     font-size: var(--text-md);
+    padding: 12px;
 }
 
 .btn-add{
@@ -76,6 +84,8 @@ tr {
 .grade-table td{
     width: 100% / var(--cols);
     padding: 10px 5px;
+    text-align: start;
+    vertical-align: center;
     border-top: 1px solid #eef1f6;
 }
 
@@ -117,37 +127,42 @@ th{
 }
 
 dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     border: none;
     border-radius: 12px;
     padding: 0px;
+    text-align: center;
     border-radius: var(--medium-radius);
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.modal-cardU {
-    padding: 30px;
-    height: 480px;
-    width: 350px;
+.modal-cardD p{
+    color: #8b97b3;
+    width: 300px;
 }
 
 .modal-cardD {
-    padding: 30px;
-    height: 170px;
-    width: 350px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.modal-cardU input {
-    width: 90%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border-radius: var(--medium-radius);
-    border: 1px solid rgb(201, 201, 201);
+.model-cardD button:hover{
+    background-color: var(--button-hover-color);
 }
+
+.modal-cardD label{
+    text-align: start;
+}
+
 .modal-cardD input {
-    width: 90%;
+    width: 100%;
     padding: 8px;
-    margin-bottom: 15px;
     border-radius: var(--medium-radius);
     border: 1px solid rgb(201, 201, 201);
 }
@@ -156,10 +171,8 @@ dialog {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-top: 30px;
-    margin-bottom: 0px;
-
 }
+
 .modal-actions button{
     font-size: var(--text-sm) ;
     background: var(--primary-color);
@@ -176,11 +189,25 @@ dialog {
 }
 
 .pagination{
+    width: 100%;
     margin-top: 10px;
-    margin-left: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding-left: 12px;
+    gap: 12px;
 }
 
 .pagination > a{
     text-decoration: none;
-    color: black;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.pagination > a:hover{
+    background-color: var(--button-hover-color);
 }

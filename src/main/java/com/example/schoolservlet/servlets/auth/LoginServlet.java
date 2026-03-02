@@ -86,7 +86,7 @@ public class LoginServlet extends HttpServlet {
                     } else {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         request.setAttribute("error", "Usuário e/ou senha inválidos");
-                        request.getRequestDispatcher("student.jsp").forward(request, response);
+                        request.getRequestDispatcher("index.jsp").forward(request, response);
                     }
                 } catch (DataException dae){
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
