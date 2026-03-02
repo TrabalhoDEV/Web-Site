@@ -34,7 +34,7 @@ public class FindManyStudentsServlet extends HttpServlet {
         } catch (NullPointerException npe) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             request.setAttribute("error", "Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/student.jsp")
+            request.getRequestDispatcher("/index.jsp")
                     .forward(request, response);
             return;
         }
@@ -76,7 +76,7 @@ public class FindManyStudentsServlet extends HttpServlet {
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
-        request.getRequestDispatcher("/WEB-INF/views/teacher/student/student.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/teacher/findMany/student.jsp").forward(request, response);
     }
 
     @Override
