@@ -191,8 +191,6 @@
     <section class="hero">
       <div class="hero-content">
         <h1>Olá, <%=teacher != null ? OutputFormatService.formatName(teacher.getName()) : "professor"%></h1>
-        <p>Você atingiu 25 observações essa semana.</p>
-        <a href="history.html"><button class="primary-button">Revisar</button></a>
 
       </div>
       <div class="hero-illustration">
