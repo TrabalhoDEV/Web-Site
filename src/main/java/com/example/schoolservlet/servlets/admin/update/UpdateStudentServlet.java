@@ -1,4 +1,4 @@
-package com.example.schoolservlet.servlets.student;
+package com.example.schoolservlet.servlets.admin.update;
 
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.StudentDAO;
@@ -34,9 +34,9 @@ import java.util.logging.Logger;
  * @version 1.0
  */
 @WebServlet("/admin/student/update")
-public class UpdateServlet extends HttpServlet {
+public class UpdateStudentServlet extends HttpServlet {
 
-    private static final Logger logger = Logger.getLogger(UpdateServlet.class.getName());
+    private static final Logger logger = Logger.getLogger(UpdateStudentServlet.class.getName());
     private static final String UPDATE_VIEW = "/WEB-INF/views/admin/update/student.jsp";
     private static final String LIST_VIEW = "/WEB-INF/views/admin/findMany/student.jsp";
     private static final String STUDENT_LIST_URL = "/admin/student/find-many";
@@ -127,13 +127,13 @@ public class UpdateServlet extends HttpServlet {
         String cpf = request.getParameter("cpf");
 
         if (name != null) {
-            name = name.trim();
+            name = InputNormalizer.normalizeName(name);
         }
         if (email != null) {
-            email = email.trim();
+            name =InputNormalizer.normalizeEmail(email);
         }
         if (cpf != null) {
-            cpf = cpf.trim();
+            name = InputNormalizer.normalizeCpf(cpf);
         }
 
         try {
