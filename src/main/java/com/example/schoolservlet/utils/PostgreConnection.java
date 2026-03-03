@@ -23,9 +23,9 @@ public class PostgreConnection {
             dotenv = null;
         }
 
-        String dbUrl;
-        String dbUser;
-        String dbPassword;
+        String dbUrl = ConfigService.getEnv("DB_URL", dotenv);
+        String dbUser = ConfigService.getEnv("DB_USER", dotenv);
+        String dbPassword = ConfigService.getEnv("DB_PASSWORD", dotenv);
 
         try{
             Class.forName("org.postgresql.Driver");
