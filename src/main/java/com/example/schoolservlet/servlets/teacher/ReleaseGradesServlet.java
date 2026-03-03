@@ -1,0 +1,171 @@
+package com.example.schoolservlet.servlets.teacher;
+
+import com.example.schoolservlet.daos.StudentSubjectDAO;
+import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.RequiredFieldException;
+import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.models.StudentSubject;
+import com.example.schoolservlet.utils.AccessValidation;
+import com.example.schoolservlet.utils.InputValidation;
+import com.example.schoolservlet.utils.records.AuthenticatedUser;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+
+/**
+ * Servlet responsible for releasing student grades by teachers.
+ * This servlet handles both GET and POST requests for grade release operations:
+ * <ul>
+ *     <li>GET: Displays the grade release form with the student subject information</li>
+ *     <li>POST: Processes and saves the updated grades to the database</li>
+ * </ul>
+ *
+ * <p>The servlet requires a {@code studentSubjectId} parameter to identify the specific
+ * student-subject association for which grades are being released.</p>
+ *
+ * @author Teacher Management System
+ * @see StudentSubject
+ * @see StudentSubjectDAO
+ */
+@WebServlet("/teacher/students/grades/release")
+public class ReleaseGradesServlet extends HttpServlet {
+    /**
+     * Handles GET requests to display the grade release form.
+     *
+     * <p>This method retrieves the student-subject record from the database and
+     * forwards it to the releaseGrade.jsp view for the teacher to fill in grades.</p>
+     *
+     * <p>Required Parameters:</p>
+     * <ul>
+     *     <li>{@code studentSubjectId} - The ID of the StudentSubject record to retrieve</li>
+     * </ul>
+     *
+     * <p>Request Attributes Set:</p>
+     * <ul>
+     *     <li>{@code studentSubject} - The StudentSubject object retrieved from the database</li>
+     *     <li>{@code error} - Error message if studentSubjectId is missing or invalid</li>
+     * </ul>
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws IOException      if an I/O error occurs
+     * @throws ServletException if a servlet error occurs
+     * @throws RuntimeException if the StudentSubject is not found or a data error occurs
+     */
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        AccessValidation.isTeacher(request, response);
+        // Get studentSubject id:
+        String studentSubjectIdParam = request.getParameter("studentSubjectId");
+        if (studentSubjectIdParam == null || studentSubjectIdParam.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/teacher/students");
+            return;
+        }
+
+        // Load studentSubject from database:
+        try {
+            StudentSubject studentSubject = new StudentSubjectDAO().findById(Integer.parseInt(studentSubjectIdParam));
+            request.setAttribute("studentSubject", studentSubject);
+            request.getRequestDispatcher("/WEB-INF/views/teacher/student/releaseGrade.jsp")
+                    .forward(request, response);
+        } catch (NotFoundException | DataException | ValidationException e) {
+            response.sendRedirect(request.getContextPath() + "/teacher/students");
+        }
+    }
+
+    /**
+     * Handles POST requests to save updated student grades.
+     *
+     * <p>This method validates and processes grade submissions from the teacher,
+     * updating the StudentSubject record with the new grades and observations,
+     * then persisting the changes to the database.</p>
+     *
+     * <p>Required Parameters:</p>
+     * <ul>
+     *     <li>{@code studentSubjectId} - The ID of the StudentSubject record to update</li>
+     *     <li>{@code grade1} - The first grade (must be between 0 and 10)</li>
+     *     <li>{@code grade2} - The second grade (must be between 0 and 10)</li>
+     * </ul>
+     *
+     * <p>Optional Parameters:</p>
+     * <ul>
+     *     <li>{@code obs} - Observations or comments about the grades</li>
+     * </ul>
+     *
+     * <p>Request Attributes Set on Error:</p>
+     * <ul>
+     *     <li>{@code error} - Error message describing what went wrong</li>
+     * </ul>
+     *
+     * <p>Validation:</p>
+     * <ul>
+     *     <li>Both grades must be valid double values</li>
+     *     <li>Both grades must be within the range of 0 to 10</li>
+     *     <li>studentSubjectId parameter is required</li>
+     * </ul>
+     *
+     * <p>Behavior on Success:</p>
+     * <p>Redirects to the teacher students page after successfully updating the grades.</p>
+     *
+     * <p>Behavior on Error:</p>
+     * <p>Sets error attribute and forwards back to the grade release form with the original
+     * studentSubjectId to allow the teacher to correct and resubmit.</p>
+     *
+     * @param request  the HttpServletRequest object containing grade data
+     * @param response the HttpServletResponse object
+     * @throws IOException      if an I/O error occurs
+     * @throws ServletException if a servlet error occurs
+     * @see InputValidation#validateGrade(double)
+     */
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        AccessValidation.isTeacher(request, response);
+
+        // Get parameter id:
+        String studentSubjectIdParam = request.getParameter("studentSubjectId");
+        String grade1Param = request.getParameter("grade1");
+        String grade2Param = request.getParameter("grade2");
+        String observationsParam = request.getParameter("obs");
+
+
+        // Validate inputs:
+        try {
+            InputValidation.validateIsNull("studentSubjectId", studentSubjectIdParam);
+        } catch (RequiredFieldException e) {
+            response.sendRedirect(request.getContextPath() + "/teacher/students");
+        }
+
+        try{
+            StudentSubject studentSubject = new StudentSubjectDAO().findById(Integer.parseInt(studentSubjectIdParam));
+
+            double grade1 = Double.parseDouble(grade1Param);
+            double grade2 = Double.parseDouble(grade2Param);
+
+            if  (!(InputValidation.validateGrade(grade1) && InputValidation.validateGrade(grade2))) {
+                throw new ValidationException("Notas devem estar entre 0 e 10.");
+            }
+
+            studentSubject.setGrade1(grade1);
+            studentSubject.setGrade2(grade2);
+            studentSubject.setObs(observationsParam);
+
+            // Update in database:
+            new StudentSubjectDAO().update(studentSubject);
+
+            response.sendRedirect(request.getContextPath() + "/teacher/students");
+
+        } catch (NotFoundException | DataException | ValidationException e) {
+            request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/teacher/students/grades/release?studentSubjectId=" + studentSubjectIdParam)
+                    .forward(request, response);
+        } catch (NumberFormatException e){
+            request.setAttribute("error", "Notas devem ser números válidos.");
+            request.getRequestDispatcher("/teacher/students/grades/release?studentSubjectId=" + studentSubjectIdParam)
+                    .forward(request, response);
+        }
+    }
+}

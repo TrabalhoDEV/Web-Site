@@ -1,0 +1,74 @@
+package com.example.schoolservlet.daos.interfaces;
+
+import com.example.schoolservlet.exceptions.*;
+import com.example.schoolservlet.models.Student;
+
+import java.util.Map;
+
+/**
+ * Interface for define a contract in database's table student operations.
+ */
+public interface IStudentDAO {
+
+    /**
+     * Method that returns many records from database's table that has classes with a determined teacher
+     * @param skip  is how many records needed to skip
+     * @param take  is how many records it should return
+     * @param idTeacher is teacher's id
+     * @return      a map with key as id and value as the table's object
+     * @throws DataException if an error in database happen
+     */
+    Map<Integer, Student> findManyByTeacherId(int skip, int take, int idTeacher) throws DataException, ValidationException;
+
+    /**
+     * A method that count the number of records from database's table that is related with a teacher
+     * @param idTeacher is teacher's id
+     * @return      The total count
+     * @throws DataException if an error in database happen
+     */
+    int countByTeacherId(int idTeacher) throws DataException, ValidationException;
+
+    /**
+     * Updates the school class assigned to a specific student
+     * @param id            the unique identifier of the student to be updated
+     * @param idSchoolClass the unique identifier of the new school class to assign
+     * @throws NotFoundException   if no student or school class is found with the given IDs
+     * @throws DataException       if a database or persistence error occurs during the update
+     * @throws ValidationException if the provided IDs fail business rule validation
+     */
+    void updateIdSchoolClass(int id, int idSchoolClass)
+            throws NotFoundException, DataException, ValidationException;
+
+    /**
+     * Updates the password of a specific student
+     * @param id       the unique identifier of the student whose password will be updated
+     * @param password the new plain-text password to be stored (typically hashed by the implementation)
+     * @throws NotFoundException   if no student is found with the given ID
+     * @throws DataException       if a database or persistence error occurs during the update
+     * @throws ValidationException if the password does not meet the required format or strength rules
+     */
+    void updatePassword(int id, String password)
+            throws NotFoundException, DataException, ValidationException;
+
+    /**
+     * Confirms and finalizes the enrollment of a pre-enrolled student
+     * @param student the object containing all required enrollment data
+     * @throws NotFoundException   if the student record to be enrolled cannot be located
+     * @throws DataException       if a database or persistence error occurs during enrollment
+     * @throws ValidationException if the student object contains invalid or incomplete data
+     */
+    void enrollIn(Student student)
+            throws NotFoundException, DataException, ValidationException;
+
+    /**
+     * Authenticates a student by validating their enrollment number and password
+     * @param enrollment the student's unique enrollment number used as a login identifier
+     * @param password   the plain-text password to be verified against the stored hash
+     * @return           true if the credentials are valid and the student is authenticated;
+     * @throws NotFoundException   if no student is found by that enrollment number
+     * @throws DataException       if a database or persistence error occurs during authentication
+     * @throws ValidationException if the enrollment number or password fail format validation
+     */
+    boolean login(String enrollment, String password)
+            throws NotFoundException, DataException, ValidationException;
+}
