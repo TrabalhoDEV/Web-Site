@@ -14,6 +14,7 @@
   <title>Professor | Vértice</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/home.css"/>
   <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/Logo - Vértice.svg" type="image/x-icon">
+
   <script src="${pageContext.request.contextPath}/assets/js/theme.js"></script>
 </head>
 <%
@@ -186,7 +187,7 @@
 
       </div>
       <div class="hero-illustration">
-        <img src="${pageContext.request.contextPath}/assets/css/img/gato.svg" alt="Ilustração gato"/>
+        <img src="${pageContext.request.contextPath}/assets/img/gato.svg" alt="Ilustração gato"/>
       </div>
     </section>
     <!-- DASHBOARD GRID -->

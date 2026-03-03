@@ -43,7 +43,7 @@ public class FindManyStudentsServlet extends HttpServlet {
         AuthenticatedUser user;
         Teacher teacher = null;
         StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
-        String responsePath = "/WEB-INF/views/teacher/student/find-many.jsp";
+        String responsePath = "/WEB-INF/views/teacher/findMany/student.jsp";
 
         try {
             user = (AuthenticatedUser) session.getAttribute("user");
@@ -51,7 +51,7 @@ public class FindManyStudentsServlet extends HttpServlet {
         } catch (NullPointerException npe) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             request.setAttribute("error", "Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/student.jsp")
+            request.getRequestDispatcher(responsePath)
                     .forward(request, response);
             return;
         }
