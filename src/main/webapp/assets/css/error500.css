@@ -16,10 +16,6 @@ body{
     scroll-behavior: none;
     overflow-x: hidden;
 }
-
-img{
-    max-height: 100dvh;
-}
 .title{
     font-size: 100px;
     font-weight: 600;
@@ -45,9 +41,19 @@ button{
     font-size: 16px;
     border-radius: 10px;
     border: none;
-    margin-top: 40px;
+    margin-top: 30px;
 }
 button:hover{
     background-color: #3950BE;
     cursor: pointer;
+}
+.action-container{
+    justify-content: center;
+    margin-left: 100px;
+}
+.img-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 40px ;
 }
