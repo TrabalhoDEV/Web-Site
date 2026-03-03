@@ -1,18 +1,30 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Verify your CPF</title>
+    <title>Validar cpf</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/login.css">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/Logo - Vértice.svg" type="image/x-icon">
 </head>
 <body>
-<form action="${pageContext.request.contextPath}/pages/students/verifyCpf" method="post">
-    <label for="cpf">CPF:</label>
-    <input type="text" id="cpf" name="cpf" value="${param.cpf}" required>
+<main class="form-container">
+    <h2>Seja bem vindo</h2>
+    <p>Para se cadastrar, informe seu cpf</p>
 
-    <button type="submit">Verify</button>
+    <form action="${pageContext.request.contextPath}/student/validate/cpf" method="post">
+
+        <div class="input-group">
+            <label for="cpf">CPF:</label>
+            <input type="text" id="cpf" name="cpf" placeholder="Digite seu cpf" required>
+        </div>
 
     <% if (request.getAttribute("error") != null) { %>
-    <span style="color: red;"><%= request.getAttribute("error") %></span>
+    <p style="color: #9b0404; text-align: start"><%= request.getAttribute("error") %></p>
     <% } %>
+    <button type="submit">Enviar</button>
+    <p>Já tem conta? <a href="${pageContext.request.contextPath}/index.jsp">Clique aqui</a></p>
 </form>
+</main>
 </body>
 </html>
