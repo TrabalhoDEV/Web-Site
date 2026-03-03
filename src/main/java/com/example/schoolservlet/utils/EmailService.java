@@ -25,9 +25,9 @@ public class EmailService {
             dotenv = null;
         }
 
-        BREVO_API_URL;
-        BREVO_API_KEY;
-        BREVO_EMAIL;
+        BREVO_API_URL = ConfigService.getEnv("BREVO_API_URL", dotenv);
+        BREVO_API_KEY = ConfigService.getEnv("BREVO_API_KEY", dotenv);
+        BREVO_EMAIL = ConfigService.getEnv("BREVO_EMAIL", dotenv);
 
         if (BREVO_API_URL == null || BREVO_API_KEY == null ||BREVO_EMAIL == null){
             throw new RuntimeException("Brevo não está configurado");
