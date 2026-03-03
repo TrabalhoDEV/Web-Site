@@ -1,15 +1,10 @@
 @import url('./list.css');
 
-main{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 180px;
-}
-
 .title{
     display: flex;
     justify-content: space-between;
+    width: 40vw;
+    padding: 12px 0;
 }
 
 .title > div{
@@ -23,7 +18,9 @@ main{
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    max-width: 500px;
+    display: flex;
+    align-items: start;
+    flex-direction: column;
 }
 
 .profile-info p {

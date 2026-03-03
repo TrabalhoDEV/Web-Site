@@ -1,20 +1,29 @@
 package com.example.schoolservlet.servlets.admin.insert;
 
+import java.io.IOException;
+import java.util.List;
+
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.StudentSubjectDAO;
-import com.example.schoolservlet.exceptions.*;
+import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.exceptions.ValueAlreadyExistsException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
-import com.example.schoolservlet.utils.*;
+import com.example.schoolservlet.utils.AccessValidation;
+import com.example.schoolservlet.utils.EmailService;
+import com.example.schoolservlet.utils.ErrorHandler;
+import com.example.schoolservlet.utils.FieldAlreadyUsedValidation;
+import com.example.schoolservlet.utils.InputNormalizer;
+import com.example.schoolservlet.utils.InputValidation;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Servlet responsible for registering new students in the system.
@@ -28,7 +37,7 @@ public class InsertStudentServlet extends HttpServlet {
         if (!AccessValidation.isAdmin(request, response)) return;
         getAllData(request, response);
 
-        request.getRequestDispatcher("/WEB-INF/views/admin/student.jsp")
+        request.getRequestDispatcher("/WEB-INF/views/admin/insert/student.jsp")
                 .forward(request, response);
     }
 
@@ -67,7 +76,7 @@ public class InsertStudentServlet extends HttpServlet {
         } catch (ValidationException ve){
             getAllData(request, response);
             request.setAttribute("error", ve.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/student.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/admin/insert/student.jsp")
                     .forward(request, response);
             return;
         }
@@ -82,7 +91,7 @@ public class InsertStudentServlet extends HttpServlet {
             FieldAlreadyUsedValidation.exists("student", "email", "email", email);
         } catch (DataException | ValueAlreadyExistsException e){
             getAllData(request, response);
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/student.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/insert/student.jsp");
             return;
         }
 
@@ -128,7 +137,7 @@ public class InsertStudentServlet extends HttpServlet {
             EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
             "<h2>Faça sua matrícula na Vétice</h2>" +
                     "<p>Se você realmente for o próximo aluno da Vértice:</p>" +
-                    "<p><a href=\"#\">Clique aqui</a> para fazer o seu cadastro</p>"
+                    "<p><a href=\"https://colegio-vertice.onrender.com/student/register\">Clique aqui</a> para fazer o seu cadastro</p>"
                     );
         } catch (DataException de) {
             getAllData(request, response);

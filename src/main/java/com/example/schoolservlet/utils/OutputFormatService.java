@@ -1,8 +1,8 @@
 package com.example.schoolservlet.utils;
 
-import com.example.schoolservlet.utils.enums.StudentStatusEnum;
-
 import java.util.Date;
+
+import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 
 /**
  * Public class that has static methods to format the data in the database to the output.
@@ -68,7 +68,7 @@ public class OutputFormatService {
      */
     public static String formatDate(Date date) {
         if (date == null) return "-";
-        return new java.text.SimpleDateFormat("yyyy/MM/dd").format(date);
+        return new java.text.SimpleDateFormat("dd/MM/yyyy").format(date);
     }
 
     /**

@@ -100,7 +100,7 @@ public class Student {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
+                ", password='" + "****" + '\'' +
                 ", cpf='" + cpf + '\'' +
                 ", status=" + status +
                 ", idSchoolClass=" + idSchoolClass +

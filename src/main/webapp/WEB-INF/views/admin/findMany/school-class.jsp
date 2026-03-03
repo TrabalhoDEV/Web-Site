@@ -2,7 +2,6 @@
 <%@ page import="com.example.schoolservlet.models.SchoolClass" %>
 <%@ page import="java.util.TreeMap" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <%
     Map<Integer, SchoolClass> schoolClassMap =
             (Map<Integer, SchoolClass>) request.getAttribute("schoolClassMap");
@@ -24,7 +23,6 @@
 
 <div class="app-layout">
 
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="sidebar-logo">
             <svg class="l" xmlns="http://www.w3.org/2000/svg" width="101" height="51" viewBox="0 0 101 51" fill="none">
@@ -188,7 +186,7 @@
                 <hr>
 
                 <table class="grade-table"
-                       style="--cols: 2">
+                       style="--cols: 2; grid-template-columns: 3fr 1fr">
 
                     <thead>
                     <tr>
@@ -205,7 +203,7 @@
 
                     <tr>
                         <td>
-                            <%= schoolClass.getSchoolYear() %>
+                            <%= schoolClass.getSchoolYear().toUpperCase()%>
                         </td>
 
                         <td class="actions">
@@ -214,7 +212,7 @@
                                     <button class="btn-edit">Modificar</button>
                                 </a>
 
-                                <a href="${pageContext.request.contextPath}/admin/school-class/delete?id=<%=schoolClass.getId()%>">
+                                <a href="#" onclick=openModalDelete("${pageContext.request.contextPath}/admin/school-class/delete?id=<%=schoolClass.getId()%>")>
                                     <button class="btn-delete">Deletar</button>
                                 </a>
                             </div>
@@ -226,7 +224,7 @@
                     <% } else if (request.getAttribute("error") != null) { %>
 
                     <tr>
-                        <td colspan="2" style="text-align:center">
+                        <td colspan="2" style="color: #9b0404; text-align: start">
                             <%= request.getAttribute("error") %>
                         </td>
                     </tr>
@@ -245,33 +243,51 @@
                 </table>
 
             </div>
+
+            <!-- PAGINAÇÃO -->
+            <div class="pagination">
+
+                <% if (currentPage > 1) { %>
+                <a href="?page=<%=currentPage-1%>">Anterior</a>
+                <% } %>
+
+
+                <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1%></strong>
+
+                <% if (currentPage < totalPages) { %>
+                <a href="?page=<%=currentPage+1%>">Próxima</a>
+                <% } %>
+            </div>
         </section>
-
-        <!-- PAGINAÇÃO -->
-        <div class="pagination">
-
-            <% if (totalPages > 1) { %>
-
-            <% if (currentPage > 1) { %>
-            <a href="?page=<%=currentPage-1%>">Anterior</a>
-            <a href="?page=<%= currentPage - 1 %>"><%= currentPage - 1 %></a>
-            <% } %>
-
-
-            <strong><%= currentPage %></strong>
-
-            <% if (currentPage < totalPages) { %>
-            <a href="?page=<%= currentPage + 1 %>"><%= currentPage + 1 %></a>
-            <a href="?page=<%=currentPage+1%>">Próxima</a>
-            <% } %>
-
-            <% } %>
-
-        </div>
-
     </main>
-
 </div>
 
+<dialog id="deleteDialog">
+    <div class="modal-cardD">
+        <h3>Deseja deletar esta matéria?</h3>
+        <p id="deleteText">Essa é uma ação irreversível</p>
+
+        <div class="modal-actions">
+            <button id="closeDelete">Cancelar</button>
+            <button id="confirmDelete">Confirmar</button>
+        </div>
+    </div>
+</dialog>
+<script>
+    let deleteUrl = '';
+
+    function openModalDelete(url) {
+        deleteUrl = url;
+        document.getElementById('deleteDialog').showModal();
+    }
+
+    document.getElementById('closeDelete').onclick = function () {
+        document.getElementById('deleteDialog').close();
+    }
+
+    document.getElementById('confirmDelete').onclick = function () {
+        window.location.href = deleteUrl;
+    }
+</script>
 </body>
 </html>
