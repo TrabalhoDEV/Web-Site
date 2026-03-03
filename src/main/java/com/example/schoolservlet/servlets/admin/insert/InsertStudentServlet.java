@@ -128,8 +128,7 @@ public class InsertStudentServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
 
             String link = request.getRequestURL().toString().replace(request.getRequestURI(), "") +
-                    request.getContextPath() + "/pages/students/signup.jsp?enrollment=" +
-                    URLEncoder.encode(student.getEnrollment(), StandardCharsets.UTF_8);
+                    request.getContextPath() + "/pages/students/signupCpf.jsp";
 
             EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
             "<h2>Faça sua matrícula na Vértice</h2>" +
