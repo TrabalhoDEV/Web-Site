@@ -140,7 +140,7 @@ public class InsertStudentServlet extends HttpServlet {
             EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
             "<h2>Faça sua matrícula na Vértice</h2>" +
                     "<p>Se você realmente for o próximo aluno da Vértice:</p>" +
-                    "<p><a href=\"https://colegio-vertice.onrender.com/student/validate/cpf\">Clique aqui</a> para fazer o seu cadastro</p>"
+                    "<p><a href=\"https://vertice-yw2e.onrender.com//student/validate/cpf\">Clique aqui</a> para fazer o seu cadastro</p>"
                     );
         } catch (DataException de) {
             getAllData(request, response);

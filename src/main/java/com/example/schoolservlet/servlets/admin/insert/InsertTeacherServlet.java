@@ -99,7 +99,7 @@ public class InsertTeacherServlet extends HttpServlet {
                 String mensagem = "Olá " + teacher.getName() + ",<br><br>"
                         + "Você já pode acessar o sistema escolar.<br>"
                         + "A senha será enviada pelo administrador da escola.<br>"
-                        + "<a href=\"https://colegio-vertice.onrender.com/index.jsp\">Clique aqui para logar</a><br><br>"
+                        + "<a href=\"https://vertice-yw2e.onrender.com/index.jsp\">Clique aqui para logar</a><br><br>"
                         + "Atenciosamente,<br>"
                         + "Secretaria Vértice";
 
