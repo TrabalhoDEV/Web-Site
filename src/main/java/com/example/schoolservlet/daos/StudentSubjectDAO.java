@@ -94,18 +94,29 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                              "    sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline\n" +
                              "FROM student st\n" +
                              "JOIN school_class sc ON sc.id = st.id_school_class\n" +
-                             "JOIN school_class_teacher sct ON sct.id_school_class = sc.id\n" +
                              "JOIN student_subject ss ON ss.id_student = st.id\n" +
-                             "JOIN school_class_subject scs ON scs.id_school_class = sc.id\n AND scs.id_subject = ss.id_subject\n" +
                              "JOIN subject sb ON sb.id = ss.id_subject\n" +
-                             "WHERE sct.id_teacher = ? AND st.status = ?\n" +
+                             "WHERE st.status = ?\n" +
+                             "AND EXISTS (\n" +
+                             "    SELECT 1\n" +
+                             "    FROM school_class_teacher sct\n" +
+                             "    WHERE sct.id_school_class = sc.id\n" +
+                             "    AND sct.id_teacher = ?\n" +
+                             ")\n" +
+                             "AND EXISTS (\n" +
+                             "    SELECT 1\n" +
+                             "    FROM subject_teacher stt\n" +
+                             "    WHERE stt.id_subject = sb.id\n" +
+                             "    AND stt.id_teacher = ?\n" +
+                             ")\n" +
                              "ORDER BY st.id\n" +
                              "LIMIT ? OFFSET ?;")) {
 
-            pstmt.setInt(1, teacherId);
-            pstmt.setInt(2, StudentStatusEnum.ACTIVE.ordinal() + 1);
-            pstmt.setInt(3, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
-            pstmt.setInt(4, skip < 0 ? 0 : skip);
+            pstmt.setInt(1, StudentStatusEnum.ACTIVE.ordinal() + 1);
+            pstmt.setInt(2, teacherId);
+            pstmt.setInt(3, teacherId);
+            pstmt.setInt(4, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(5, skip < 0 ? 0 : skip);
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -303,12 +314,12 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                 subject.setDeadline(rs.getDate("subject_deadline"));
 
                 return new StudentSubject(
-                    rs.getInt("id"),
-                    rs.getString("obs"),
-                    rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
-                    rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
-                    student,
-                    subject
+                        rs.getInt("id"),
+                        rs.getString("obs"),
+                        rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
+                        rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
+                        student,
+                        subject
                 );
             } else throw new NotFoundException("student_subject", "id", String.valueOf(id));
         } catch (SQLException sqle){
@@ -483,7 +494,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()){
-                 return new StudentsPerformance(rs.getInt("approved"),  rs.getInt("pending"), rs.getInt("failed"));
+                return new StudentsPerformance(rs.getInt("approved"),  rs.getInt("pending"), rs.getInt("failed"));
             }
             return new StudentsPerformance(0, 0, 0);
         } catch (SQLException sqle){
