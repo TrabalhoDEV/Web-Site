@@ -1,17 +1,21 @@
 package com.example.schoolservlet.servlets.admin.findMany;
 
+import java.io.IOException;
+import java.util.Map;
+
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.ErrorHandler;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
 
-import java.io.IOException;
-import java.util.Map;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet(name = "admin-find-many-school-classes", value = "/admin/school-class/find-many")
 public class FindManySchoolClassesServlet extends HttpServlet {
@@ -28,10 +32,6 @@ public class FindManySchoolClassesServlet extends HttpServlet {
         int skip = 0;
         int page;
         int totalCount = 0;
-        request.setAttribute("page", 1);
-        request.setAttribute("totalPages", 1);
-
-
         request.setAttribute("page", 1);
         request.setAttribute("totalPages", 1);
 

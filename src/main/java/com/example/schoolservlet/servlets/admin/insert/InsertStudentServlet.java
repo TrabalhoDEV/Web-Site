@@ -1,22 +1,29 @@
 package com.example.schoolservlet.servlets.admin.insert;
 
+import java.io.IOException;
+import java.util.List;
+
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.daos.StudentSubjectDAO;
-import com.example.schoolservlet.exceptions.*;
+import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.exceptions.ValueAlreadyExistsException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
-import com.example.schoolservlet.utils.*;
+import com.example.schoolservlet.utils.AccessValidation;
+import com.example.schoolservlet.utils.EmailService;
+import com.example.schoolservlet.utils.ErrorHandler;
+import com.example.schoolservlet.utils.FieldAlreadyUsedValidation;
+import com.example.schoolservlet.utils.InputNormalizer;
+import com.example.schoolservlet.utils.InputValidation;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 /**
  * Servlet responsible for registering new students in the system.

@@ -1,8 +1,8 @@
 package com.example.schoolservlet.utils;
 
-import com.example.schoolservlet.utils.enums.StudentStatusEnum;
-
 import java.util.Date;
+
+import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 
 /**
  * Public class that has static methods to format the data in the database to the output.

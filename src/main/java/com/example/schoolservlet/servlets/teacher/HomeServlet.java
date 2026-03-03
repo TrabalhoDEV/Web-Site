@@ -50,7 +50,7 @@ public class HomeServlet extends HttpServlet {
             // User not authenticated or session attribute missing
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             request.setAttribute("error", "Sessão expirada, faça login novamente");
-            request.getRequestDispatcher("/index.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/teacher/index.jsp")
                     .forward(request, response);
             return;
         }
@@ -71,7 +71,7 @@ public class HomeServlet extends HttpServlet {
             studentsPerformance = studentSubjectDAO.studentsPerformance(teacher.getId());
             pendencies = studentSubjectDAO.teacherPendency(teacher.getId());
         } catch (ValidationException | NotFoundException | DataException e) {
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/index.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student.jsp");
             return;
         }
 

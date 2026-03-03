@@ -1,23 +1,31 @@
 package com.example.schoolservlet.daos;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentSubjectDAO;
-import com.example.schoolservlet.exceptions.*;
+import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputValidation;
-import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import com.example.schoolservlet.utils.PostgreConnection;
+import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import com.example.schoolservlet.utils.records.StudentsPerformance;
 import com.example.schoolservlet.utils.records.StudentsPerformanceCount;
 import com.example.schoolservlet.utils.records.TeacherPendency;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSubjectDAO {
@@ -367,8 +375,16 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                 "JOIN student st ON st.id = ss.id_student " +
                 "JOIN subject sb ON sb.id = ss.id_subject " +
                 "JOIN school_class sc ON sc.id = st.id_school_class " +
-                "JOIN school_class_teacher sct ON sct.id_school_class = sc.id " +
-                "WHERE sct.id_teacher = ? " +
+                "WHERE EXISTS ( " +
+                "   SELECT 1 FROM school_class_teacher sct " +
+                "   WHERE sct.id_school_class = sc.id " +
+                "   AND sct.id_teacher = ? " +
+                ") " +
+                "AND EXISTS ( " +
+                "   SELECT 1 FROM subject_teacher stt " +
+                "   WHERE stt.id_subject = sb.id " +
+                "   AND stt.id_teacher = ? " +
+                ") " +
                 "AND (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL)" +
                 ") AS sub " +
                 "WHERE media < ? " +
@@ -379,8 +395,9 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, teacherId);
-            pstmt.setInt(2, Constants.MAX_GRADE_TO_HELP);
-            pstmt.setInt(3, Constants.STUDENTS_HELP_TAKE);
+            pstmt.setInt(2, teacherId);
+            pstmt.setInt(3, Constants.MAX_GRADE_TO_HELP);
+            pstmt.setInt(4, Constants.STUDENTS_HELP_TAKE);
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -497,13 +514,24 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                     "JOIN student st ON st.id = ss.id_student\n" +
                     "JOIN subject sb ON sb.id = ss.id_subject\n" +
                     "JOIN school_class sc ON sc.id = st.id_school_class\n" +
-                    "JOIN school_class_teacher sct ON sct.id_school_class = sc.id\n" +
-                    "WHERE sct.id_teacher = ? AND st.status = ?\n" +
-                    "AND (ss.grade1 IS NULL or ss.grade2 IS NULL)\n" +
-                    "ORDER BY sb.deadline ASC LIMIT ?;")){
+                    "WHERE EXISTS ( " +
+                    "   SELECT 1 FROM school_class_teacher sct " +
+                    "   WHERE sct.id_school_class = sc.id " +
+                    "   AND sct.id_teacher = ? " +
+                    ") " +
+                    "AND EXISTS ( " +
+                    "   SELECT 1 FROM subject_teacher stt " +
+                    "   WHERE stt.id_subject = sb.id " +
+                    "   AND stt.id_teacher = ? " +
+                    ") " + "AND st.status = ? " +
+                    "AND (ss.grade1 IS NULL OR ss.grade2 IS NULL) " +
+                    "ORDER BY sb.deadline ASC " +
+                    "LIMIT ?")){
             pstmt.setInt(1, idTeacher);
-            pstmt.setInt(2, StudentStatusEnum.ACTIVE.ordinal() + 1);
-            pstmt.setInt(3, Constants.PENDENCIES_TAKE);
+            pstmt.setInt(2,idTeacher);
+            pstmt.setInt(3, StudentStatusEnum.ACTIVE.ordinal() + 1);
+
+            pstmt.setInt(4, Constants.PENDENCIES_TAKE);
 
             ResultSet rs = pstmt.executeQuery();
 
