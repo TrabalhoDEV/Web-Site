@@ -47,7 +47,7 @@ public class AccessValidation {
             return false;
         } catch (UnauthorizedException ue){
             ue.printStackTrace();
-            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/student.jsp");
+            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/index.jsp");
             return false;
         }
     }
@@ -67,7 +67,7 @@ public class AccessValidation {
             return false;
         } catch (UnauthorizedException ue){
             ue.printStackTrace();
-            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/student.jsp");
+            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/index.jsp");
             return false;
         }
     }

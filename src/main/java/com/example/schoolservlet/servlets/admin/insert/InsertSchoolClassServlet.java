@@ -87,6 +87,7 @@ public class InsertSchoolClassServlet extends HttpServlet {
 
             response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
         } catch (DataException | NotFoundException | ValidationException e){
+            getAllSubjects(request);
             ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/insert/school-class.jsp");
         }
     }

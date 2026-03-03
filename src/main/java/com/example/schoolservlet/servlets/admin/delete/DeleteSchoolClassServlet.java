@@ -43,7 +43,7 @@ public class DeleteSchoolClassServlet extends HttpServlet {
             if (howManyStudents <= 0){
                 schoolClassDAO.delete(id);
             } else {
-                getAllData(request, response);
+                getAllData(request, response, id);
                 request.setAttribute("id", id);
                 request.getRequestDispatcher("/WEB-INF/views/admin/delete/school-class.jsp").forward(request, response);
                 return;
@@ -88,13 +88,13 @@ public class DeleteSchoolClassServlet extends HttpServlet {
             schoolClassDAO.delete(id);
         } catch (NumberFormatException nfe){
             session.setAttribute("error", "ID deve ser um número");
-            getAllData(request, response);
+            getAllData(request, response, 0);
             request.setAttribute("id", idParam);
             request.getRequestDispatcher("/WEB-INF/views/admin/delete/school-class.jsp").forward(request, response);
             return;
         } catch (DataException | NotFoundException | ValidationException e){
             session.setAttribute("error", e.getMessage());
-            getAllData(request, response);
+            getAllData(request, response, Integer.parseInt(idParam));
             request.setAttribute("id", idParam);
             request.getRequestDispatcher("/WEB-INF/views/admin/delete/school-class.jsp").forward(request, response);
             return;
@@ -103,12 +103,16 @@ public class DeleteSchoolClassServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + responsePath);
     }
 
-    private void getAllData(HttpServletRequest request, HttpServletResponse response){
+    private void getAllData(HttpServletRequest request, HttpServletResponse response, int id){
         SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
 
         try {
             List<SchoolClass> schoolClasses = schoolClassDAO.findAll();
             request.setAttribute("schoolClasses", schoolClasses);
+
+            if (schoolClasses.isEmpty() || (schoolClasses.size() == 1 && schoolClasses.get(0).getId() == id)){
+                request.setAttribute("error", "Nenhuma turma disponível para troca");
+            }
         } catch (DataException de){
             request.setAttribute("error", de.getMessage());
         }
