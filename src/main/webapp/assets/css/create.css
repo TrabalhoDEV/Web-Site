@@ -171,7 +171,7 @@ select{
 }
 
 /* ===== FORM STYLING ===== */
-
+.update-school-class-form,
 .student-form,
 .teacher-form,
 .generic-form {
