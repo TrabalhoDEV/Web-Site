@@ -183,6 +183,7 @@ public class UpdateTeacherServlet extends HttpServlet {
                 String assunto = "Edição dos dados do Sistema Escolar";
                 String mensagem = "Olá " + teacher.getName() + ",<br><br>"
                         + "Seus dados já foram atualizados!.<br>"
+                        + "<a href=\"https://colegio-vertice.onrender.com/index.jsp\">Clique aqui para logar</a><br><br>"
                         + "Atenciosamente,<br>"
                         + "Secretaria Vértice";
 
