@@ -21,48 +21,52 @@ public class SignUpServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        String enrollment = request.getParameter("enrollment");
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        String cpf = request.getParameter("cpf");
 
         Student newStudent = new Student();
-        int enrollNum = 0;
+        StudentDAO dao = new StudentDAO();
+
         try {
-            enrollNum = Integer.parseInt(enrollment);
-            newStudent.setId(enrollNum);
-        } catch (NumberFormatException nfe) {
+            newStudent = dao.findByCpf(cpf);
+        } catch (ValidationException ve) {
+            request.setAttribute("error", ve.getMessage());
+            request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
+        } catch (NotFoundException nfe) {
             request.setAttribute("error", nfe.getMessage());
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
-            return;
+        } catch (DataException de) {
+            request.setAttribute("error", de.getMessage());
+            request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
         }
 
         newStudent.setName(name);
+
         try {
             InputValidation.validateEmail(email);
             newStudent.setEmail(email);
-        } catch (ValidationException ve) {
-            request.setAttribute("error", ve.getMessage());
-            request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
-            return;
-        }
-        try {
             InputValidation.validatePassword(password);
+            newStudent.setPassword(password);
         } catch (ValidationException ve) {
             request.setAttribute("error", ve.getMessage());
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
             return;
         }
 
-        StudentDAO dao = new StudentDAO();
         try {
-            dao.update(newStudent);
-            dao.updatePassword(enrollNum, password);
-            response.sendRedirect(request.getContextPath() + "/pages/students/signup.jsp?register=sucess");
+            dao.enrollIn(newStudent);
+            response.sendRedirect(request.getContextPath() + "/pages/students/signup.jsp?register=success");
             return;
-        } catch (Exception e) {
-            request.setAttribute("error", e.getMessage());
-            request.setAttribute("enrollment", enrollment);
+        } catch (ValidationException ve) {
+            request.setAttribute("error", ve.getMessage());
+            request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
+        } catch (NotFoundException nfe) {
+            request.setAttribute("error", "Matrícula Inválida");
+            request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
+        } catch (DataException de) {
+            request.setAttribute("error", de.getMessage());
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
         }
     }
