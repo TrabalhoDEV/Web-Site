@@ -113,7 +113,7 @@
 
     <nav class="sidebar-nav">
       <ul>
-        <li class="sidebar-item active">
+        <li class="sidebar-item non-active">
           <a href="${pageContext.request.contextPath}/teacher">
               <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="21" height="22" viewBox="0 0 21 22" fill="none">
@@ -124,7 +124,7 @@
           </a>
         </li>
 
-        <li class="sidebar-item non-active">
+        <li class="sidebar-item active">
           <a href="${pageContext.request.contextPath}/teacher/students">
               <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="21" height="22" viewBox="0 0 21 22" fill="none">
