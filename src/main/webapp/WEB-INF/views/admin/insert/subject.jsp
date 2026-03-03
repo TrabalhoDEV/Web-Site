@@ -207,7 +207,7 @@
           <%
             if (request.getAttribute("error") != null) {
           %>
-          <p style="color: red;">
+          <p style="color: #9b0404; text-align: start">
             <%= request.getAttribute("error") %>
           </p>
           <%

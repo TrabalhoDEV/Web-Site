@@ -1,5 +1,7 @@
 <%@ page import="com.example.schoolservlet.models.SchoolClass" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.example.schoolservlet.models.Subject" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <!DOCTYPE html>
@@ -17,6 +19,7 @@
   <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/logo_pequena.svg" type="image/x-icon">
 </head>
 <%
+  List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
   List<SchoolClass> schoolClasses= (List<SchoolClass>) request.getAttribute("schoolClasses");
 %>
 
@@ -184,22 +187,33 @@
 
         <hr>
 
-        <!-- Display error messages inline with form -->
-        <%
-          String error = (String) request.getAttribute("error");
-          if (error != null) {
-        %>
-        <p style="color:red;"><%= error %></p>
-        <%
-          }
-        %>
-
-        <form action="${pageContext.request.contextPath}/admin/insert/school-class" method="post" class="generic-form">
+        <form action="${pageContext.request.contextPath}/admin/school-class/insert" method="post" class="generic-form">
 
           <!-- Example form group -->
           <div class="form-group">
             <label for="name">Ano Letivo:</label>
-            <input type="text" id="name" name="schoolYear" placeholder="Digite o nome" required>
+            <input type="text" id="name" name="name" placeholder="Digite o nome" required>
+          </div>
+
+          <!-- Subjects Fieldset -->
+          <div class="fieldset-group">
+            <fieldset class="checkbox-fieldset">
+              <legend>Selecione as Matérias:</legend>
+              <div class="checkbox-grid">
+                <%
+                  if (subjects != null) {
+                    for (Subject subject : subjects) {
+                %>
+                <div class="checkbox-item">
+                  <input type="checkbox" id="subject_<%= subject.getId() %>" name="subjectIds" value="<%= subject.getId() %>">
+                  <label for="subject_<%= subject.getId() %>"><%= OutputFormatService.formatName(subject.getName()) %></label>
+                </div>
+                <%
+                    }
+                  }
+                %>
+              </div>
+            </fieldset>
           </div>
 
           <!-- Submit button -->

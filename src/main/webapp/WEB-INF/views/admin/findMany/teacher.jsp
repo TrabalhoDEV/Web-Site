@@ -221,7 +221,7 @@
                     <% } } else if (request.getAttribute("error") != null) { %>
 
                     <tr>
-                    <td colspan="4" style="text-align: center"><%= request.getAttribute("error") %></td>
+                    <td colspan="4" style="color: #9b0404; text-align: start"><%= request.getAttribute("error") %></td>
                     </tr>
 
                     <% } else { %>
