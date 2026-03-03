@@ -37,7 +37,6 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <div class="sidebar-logo">
       <svg class="l" xmlns="http://www.w3.org/2000/svg" width="101" height="51" viewBox="0 0 101 51" fill="none">
         <mask id="mask0_1031_100" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="22" y="16" width="23" height="35">
@@ -129,7 +128,7 @@
           </a>
         </li>
 
-        <li class="sidebar-item active">
+        <li class="sidebar-item non-active">
           <a href="${pageContext.request.contextPath}/admin/teacher/find-many">
                   <span class="icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="18" viewBox="0 0 28 18" fill="none">
@@ -140,7 +139,7 @@
           </a>
         </li>
 
-        <li class="sidebar-item non-active">
+        <li class="sidebar-item active">
           <a href="${pageContext.request.contextPath}/admin/school-class/find-many">
                         <span class="icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-school-icon lucide-school"><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M18 5v16"/><path d="m4 6 7.106-3.79a2 2 0 0 1 1.788 0L20 6"/><path d="m6 11-3.52 2.147a1 1 0 0 0-.48.854V19a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a1 1 0 0 0-.48-.853L18 11"/><path d="M6 5v16"/><circle cx="12" cy="9" r="2"/></svg>
@@ -232,6 +231,8 @@
             <button type="submit" class="btn-submit">Enviar</button>
           </div>
         </form>
+
+        <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="blue_button">Voltar</a>
       </div>
     </section>
   </main>
