@@ -10,7 +10,6 @@ import java.util.Base64;
 
 public class EmailService {
     private static final String BREVO_API_URL;
-
     private static final String BREVO_API_KEY;
     private static final String BREVO_EMAIL;
 

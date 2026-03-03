@@ -94,6 +94,10 @@ public class Student {
         this.idSchoolClass = idSchoolClass;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         return "Student{" +

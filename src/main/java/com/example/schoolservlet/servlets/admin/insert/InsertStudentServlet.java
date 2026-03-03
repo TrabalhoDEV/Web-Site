@@ -134,10 +134,13 @@ public class InsertStudentServlet extends HttpServlet {
 
             response.setStatus(HttpServletResponse.SC_OK);
 
+            String link = request.getRequestURL().toString().replace(request.getRequestURI(), "") +
+                    request.getContextPath() + "/pages/students/signupCpf.jsp";
+
             EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
-            "<h2>Faça sua matrícula na Vétice</h2>" +
+            "<h2>Faça sua matrícula na Vértice</h2>" +
                     "<p>Se você realmente for o próximo aluno da Vértice:</p>" +
-                    "<p><a href=\"https://colegio-vertice.onrender.com/student/register\">Clique aqui</a> para fazer o seu cadastro</p>"
+                    "<p><a href=\"https://colegio-vertice.onrender.com/student/validate/cpf\">Clique aqui</a> para fazer o seu cadastro</p>"
                     );
         } catch (DataException de) {
             getAllData(request, response);
