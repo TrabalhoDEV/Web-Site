@@ -132,7 +132,7 @@ public class LoginServlet extends HttpServlet {
 
             request.getRequestDispatcher("index.jsp").forward(request, response);
         } catch (ValidationException e){
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "index.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), "Identificador ou senha incorreto. Tente novamente.", "index.jsp");
         }
     }
 }
