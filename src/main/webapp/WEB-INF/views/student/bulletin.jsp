@@ -2,6 +2,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="com.example.schoolservlet.models.StudentSubject" %>
 <%@ page import="com.example.schoolservlet.utils.records.AuthenticatedUser" %>
+<%@ page import="com.example.schoolservlet.utils.Constants" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -30,30 +31,20 @@
     if (studentSubjectMap != null && !studentSubjectMap.isEmpty()) {
         for (StudentSubject ss : studentSubjectMap.values()) {
             Double avg = ss.getAverage();
-%>
-<tr>
-    <td><%= (ss.getSubject() != null && ss.getSubject().getName() != null)
-            ? ss.getSubject().getName()
-            : "—" %>
-    </td>
 
-    <td><%= (ss.getGrade1() != null) ? ss.getGrade1() : "—" %>
-    </td>
-
-    <td><%= (ss.getGrade2() != null) ? ss.getGrade2() : "—" %>
-    </td>
-
-    <td>
-        <%= avg != null ? String.format("%.2f", avg) : "-"%>
-    </td>
-
-    <td><%= (ss.getGrade1() == null && ss.getGrade2() == null) ? "Pendente" : (avg >= 7 ? "Aprovado" : "Reprovado")%>
-    </td>
-</tr>
-<%
+            if (ss.getGrade1() == null || ss.getGrade2() == null) {
+                pending++;
+            } else if (avg != null && avg >= Constants.MIN_GRADE_TO_BE_APPROVAL) {
+                approved++;
+            } else if (avg != null && avg < Constants.MIN_GRADE_TO_BE_APPROVAL) {
+                reproved++;
+            }
         }
     }
+
+
 %>
+
 
 <div class="app-layout">
 
