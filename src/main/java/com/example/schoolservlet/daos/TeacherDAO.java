@@ -3,11 +3,7 @@ package com.example.schoolservlet.daos;
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Teacher;
-import com.example.schoolservlet.utils.Constants;
-import com.example.schoolservlet.utils.InputNormalizer;
-import com.example.schoolservlet.utils.InputValidation;
-import com.example.schoolservlet.utils.PostgreConnection;
-import org.mindrot.jbcrypt.BCrypt;
+import com.example.schoolservlet.utils.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -140,7 +136,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             pstmt.setString(1, teacher.getName());
             pstmt.setString(2, teacher.getEmail());
             pstmt.setString(3 , teacher.getUsername());
-            pstmt.setString(4, BCrypt.hashpw(teacher.getPassword(), BCrypt.gensalt(12)));
+            pstmt.setString(4, Argon.hash(teacher.getPassword()));
 
             pstmt.executeUpdate();
         } catch (SQLException sqle){
@@ -180,7 +176,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             PreparedStatement pstmt = conn.prepareStatement(
                     "UPDATE teacher SET password = ? WHERE id = ?"
             )){
-            pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt(12)));
+            pstmt.setString(1, Argon.hash(newPassword));
             pstmt.setInt(2, id);
 
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("professor", "id", String.valueOf(id));
@@ -202,7 +198,7 @@ public class TeacherDAO implements GenericDAO<Teacher> {
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return BCrypt.checkpw(password, rs.getString("password"));
+                return Argon.verify(rs.getString("password"), password);
             } else throw new NotFoundException("professor", "usuário", username);
         } catch (SQLException sqle) {
             sqle.printStackTrace();
