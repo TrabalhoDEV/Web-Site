@@ -50,7 +50,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout/navbar.css" />
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/logo_pequena.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/img/logo_pequena.svg" type="image/x-icon">
 </head>
 
 
