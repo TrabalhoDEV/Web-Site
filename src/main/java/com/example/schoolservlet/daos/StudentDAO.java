@@ -7,7 +7,6 @@ import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.*;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
-import org.mindrot.jbcrypt.BCrypt;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -274,7 +273,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET password = ? WHERE id = ?")){
-            pstmt.setString(1, BCrypt.hashpw(password, BCrypt.gensalt(12)));
+            pstmt.setString(1, Argon.hash(password));
             pstmt.setInt(2, id);
 
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "matrícula", String.valueOf(id));
@@ -292,7 +291,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET name = ?, email = ?, password = ?, status = ? WHERE id = ?")){
             pstmt.setString(1, InputNormalizer.normalizeName(student.getName()));
             pstmt.setString(2, InputNormalizer.normalizeEmail(student.getEmail()));
-            pstmt.setString(3, BCrypt.hashpw(student.getPassword(), BCrypt.gensalt(12)));
+            pstmt.setString(3, Argon.hash(student.getPassword()));
             pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal() + 1);
             pstmt.setInt(5, student.getId());
 
@@ -333,7 +332,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
 
             if (rs.next()){
                 String hash = rs.getString("password");
-                return BCrypt.checkpw(password, hash);
+                return Argon.verify(hash, password);
             } else throw new NotFoundException("aluno", "matrícula", enrollment);
         } catch (SQLException sqle) {
             sqle.printStackTrace();

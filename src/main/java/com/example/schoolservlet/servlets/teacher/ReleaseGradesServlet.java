@@ -72,7 +72,7 @@ public class ReleaseGradesServlet extends HttpServlet {
         try {
             StudentSubject studentSubject = new StudentSubjectDAO().findById(Integer.parseInt(studentSubjectIdParam));
             request.setAttribute("studentSubject", studentSubject);
-            request.getRequestDispatcher("/WEB-INF/views/teacher/student/releaseGrade.jsp")
+            request.getRequestDispatcher("/WEB-INF/views/teacher/findMany/releaseGrade.jsp")
                     .forward(request, response);
         } catch (NotFoundException | DataException | ValidationException e) {
             response.sendRedirect(request.getContextPath() + "/teacher/students");

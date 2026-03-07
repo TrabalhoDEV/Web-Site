@@ -86,7 +86,8 @@ public class LoginServlet extends HttpServlet {
                     } else {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         request.setAttribute("error", "Usuário e/ou senha inválidos");
-                        request.getRequestDispatcher("index.jsp").forward(request, response);
+                        request.getRequestDispatcher("/index.jsp").forward(request, response);
+                        return;
                     }
                 } catch (DataException dae){
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -100,6 +101,7 @@ public class LoginServlet extends HttpServlet {
                 }
 
                 request.getRequestDispatcher("index.jsp").forward(request, response);
+                return;
             } else if (role == UserRoleEnum.STUDENT){
                 try {
                     InputValidation.validateEnrollment(identifier);
@@ -132,7 +134,7 @@ public class LoginServlet extends HttpServlet {
 
             request.getRequestDispatcher("index.jsp").forward(request, response);
         } catch (ValidationException e){
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "index.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), "Identificador ou senha incorreto. Tente novamente.", "index.jsp");
         }
     }
 }

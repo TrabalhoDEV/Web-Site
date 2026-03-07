@@ -4,11 +4,8 @@ import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IAdminDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Admin;
-import com.example.schoolservlet.utils.Constants;
-import com.example.schoolservlet.utils.InputNormalizer;
-import com.example.schoolservlet.utils.InputValidation;
-import com.example.schoolservlet.utils.PostgreConnection;
-import org.mindrot.jbcrypt.BCrypt;
+import com.example.schoolservlet.utils.*;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
@@ -115,7 +112,7 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO admin (document, email, password) VALUES (?, ?,?)")){
             pstmt.setString(1, admin.getDocument());
             pstmt.setString(2, admin.getEmail());
-            pstmt.setString(3, BCrypt.hashpw(admin.getPassword(), BCrypt.gensalt(12)));
+            pstmt.setString(3, Argon.hash(admin.getPassword()));
 
             pstmt.executeUpdate();
         } catch (SQLException sqle){
@@ -144,7 +141,7 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
 
         try(Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE admin SET password = ? WHERE id = ?")){
-            pstmt.setString(1, BCrypt.hashpw(newPassword, BCrypt.gensalt(12)));
+            pstmt.setString(1, Argon.hash(newPassword));
             pstmt.setInt(2, id);
 
             if(pstmt.executeUpdate() <= 0) throw new NotFoundException("admin", "id", String.valueOf(id));
@@ -182,7 +179,7 @@ public class AdminDAO implements GenericDAO<Admin>, IAdminDAO {
 
             if (rs.next()){
                 String hash = rs.getString("password");
-                return BCrypt.checkpw(password, hash);
+                return Argon.verify(hash, password);
             }
             return false;
         } catch (SQLException sqle) {
