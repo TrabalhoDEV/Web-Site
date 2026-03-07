@@ -5,6 +5,7 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
+import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
@@ -37,15 +38,12 @@ public class ValidateCpfServlet extends HttpServlet {
                 request.setAttribute("student", student);
                 request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
             } else {
-                request.setAttribute("error", "Aluno já cadastrado");
-                request.getRequestDispatcher("/pages/students/signupCpf.jsp").forward(request, response);
+                ErrorHandler.forward(request, response, HttpServletResponse.SC_NOT_FOUND, "Aluno não encontrado", "/pages/students/signupCpf.jsp");
             }
         } catch (DataException | ValidationException e) {
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/pages/students/signupCpf.jsp").forward(request, response);
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), "/pages/students/signupCpf.jsp");
         } catch (NotFoundException nfe) {
-            request.setAttribute("error", "Aluno não encontrado");
-            request.getRequestDispatcher("/pages/students/signupCpf.jsp").forward(request, response);
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_NOT_FOUND, nfe.getMessage(), "/pages/students/signupCpf.jsp");
         }
     }
 }
