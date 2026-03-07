@@ -83,6 +83,9 @@ public class SendCodeServlet extends HttpServlet {
                     session.setAttribute("userId", student.getId());
                     session.setAttribute("role", UserRoleEnum.STUDENT);
                     session.setMaxInactiveInterval(60 * 15);
+                } else {
+                    request.setAttribute("error", "Usuário não encontrado");
+                    hasException = true;
                 }
             } catch (ValidationException e) {
                 request.setAttribute("error", e.getMessage());
@@ -105,6 +108,9 @@ public class SendCodeServlet extends HttpServlet {
                     session.setAttribute("userId", admin.getId());
                     session.setAttribute("role", UserRoleEnum.ADMIN);
                     session.setMaxInactiveInterval(60 * 15);
+                } else {
+                    request.setAttribute("error", "Usuário não encontrado");
+                    hasException = true;
                 }
             } catch (DataException | ValidationException e) {
                 request.setAttribute("error", e.getMessage());
@@ -124,6 +130,9 @@ public class SendCodeServlet extends HttpServlet {
                     session.setAttribute("userId", teacher.getId());
                     session.setAttribute("role", UserRoleEnum.TEACHER);
                     session.setMaxInactiveInterval(60 * 15);
+                } else {
+                    request.setAttribute("error", "Usuário não encontrado");
+                    hasException = true;
                 }
             } catch (DataException | RequiredFieldException e) {
                 request.setAttribute("error", e.getMessage());

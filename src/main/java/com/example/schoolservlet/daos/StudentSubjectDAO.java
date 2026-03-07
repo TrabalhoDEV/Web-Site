@@ -680,6 +680,48 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    public void createManyBySchoolClass(int idSchoolClass, List<Integer> addedSubjectIds)
+            throws DataException, ValidationException {
+
+        if (addedSubjectIds == null || addedSubjectIds.isEmpty()) return;
+
+        String sql = """
+            INSERT INTO student_subject (id_student, id_subject)
+            SELECT s.id, ?
+            FROM student s
+            WHERE s.id_school_class = ?
+            """;
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false);
+
+            try {
+                for (Integer idSubject : addedSubjectIds) {
+                    pstmt.setInt(1, idSubject);
+                    pstmt.setInt(2, idSchoolClass);
+                    pstmt.addBatch();
+                }
+
+                pstmt.executeBatch();
+                conn.commit();
+
+            } catch (SQLException e) {
+                conn.rollback();
+
+                if (e.getSQLState().equals("23505")) {
+                    throw new ValidationException("Um ou mais alunos já possuem essa matéria associada");
+                }
+                throw e;
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao adicionar matérias aos alunos da turma", sqle);
+        }
+    }
+
     public void createManyByStudentClass(int studentId, int schoolClassId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         InputValidation.validateId(schoolClassId, "id da turma");
@@ -760,6 +802,45 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao deletar matéria de um aluno");
+        }
+    }
+
+    public void deleteManyBySchoolClass(int idSchoolClass, List<Integer> removedSubjectIds)
+            throws DataException {
+
+        if (removedSubjectIds == null || removedSubjectIds.isEmpty()) return;
+
+        String sql = """
+            DELETE FROM student_subject
+            WHERE id_student IN (
+                SELECT id FROM student WHERE id_school_class = ?
+            )
+            AND id_subject = ?
+            """;
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false);
+
+            try {
+                for (Integer idSubject : removedSubjectIds) {
+                    pstmt.setInt(1, idSchoolClass);
+                    pstmt.setInt(2, idSubject);
+                    pstmt.addBatch();
+                }
+
+                pstmt.executeBatch();
+                conn.commit();
+
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao remover matérias dos alunos da turma", sqle);
         }
     }
 }

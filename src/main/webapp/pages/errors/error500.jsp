@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error 500 | Vértice</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/error500.css" />
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/img/Logo - Vértice.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
   </head>
 </head>
 <body>

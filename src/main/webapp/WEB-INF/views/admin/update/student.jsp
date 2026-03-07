@@ -1,4 +1,5 @@
 <%@ page import="com.example.schoolservlet.models.Student" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 
@@ -7,11 +8,8 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Update Student</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout/tokens.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout/topbar.css"/>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout/navbar.css"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css"/>
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/img/logo_pequena.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 
 </head>
 <body>
@@ -249,7 +247,7 @@
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name"
-                           value="<%= student.getName() != null ? student.getName() : "" %>" required/>
+                           value="<%= student.getName() != null ? OutputFormatService.formatName(student.getName()) : "-" %>" required/>
                 </div>
 
                 <!-- Email field (editable) -->
@@ -263,7 +261,7 @@
                 <div class="form-group">
                     <label for="cpf">CPF</label>
                     <input type="text" id="cpf" name="cpf"
-                           value="<%= student.getCpf() != null ? student.getCpf() : "" %>" readonly/>
+                           value="<%= student.getCpf() != null ? OutputFormatService.formatCpf(student.getCpf()) : "-" %>" readonly/>
                 </div>
 
                 <%if (hasError) {%>
