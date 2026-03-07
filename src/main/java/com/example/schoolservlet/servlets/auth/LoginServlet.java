@@ -101,6 +101,7 @@ public class LoginServlet extends HttpServlet {
                 }
 
                 request.getRequestDispatcher("index.jsp").forward(request, response);
+                return;
             } else if (role == UserRoleEnum.STUDENT){
                 try {
                     InputValidation.validateEnrollment(identifier);
