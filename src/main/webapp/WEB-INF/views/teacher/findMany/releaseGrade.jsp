@@ -254,22 +254,27 @@
 </div>
 
 <script>
-    function calcularMedia() {
-        const grade1 = parseFloat(document.getElementById("grade1").value) || 0;
-        const grade2 = parseFloat(document.getElementById("grade2").value) || 0;
+    const grade1Input = document.getElementById("grade1");
+    const grade2Input = document.getElementById("grade2");
 
-        if (grade1 >= 0 && grade2 >= 0) {
-            const media = ((grade1 + grade2) / 2).toFixed(2);
-            document.getElementById("mediaValue").textContent = media;
-        } else {
-            document.getElementById("mediaValue").textContent = "-";
+    if (grade1Input && grade2Input) {
+        function calcularMedia() {
+            const grade1 = parseFloat(grade1Input.value) || 0;
+            const grade2 = parseFloat(grade2Input.value) || 0;
+
+            if (grade1 >= 0 && grade2 >= 0) {
+                const media = ((grade1 + grade2) / 2).toFixed(2);
+                document.getElementById("mediaValue").textContent = media;
+            } else {
+                document.getElementById("mediaValue").textContent = "-";
+            }
         }
+
+        grade1Input.addEventListener("input", calcularMedia);
+        grade2Input.addEventListener("input", calcularMedia);
+
+        calcularMedia();
     }
-
-    document.getElementById("grade1").addEventListener("input", calcularMedia);
-    document.getElementById("grade2").addEventListener("input", calcularMedia);
-
-    calcularMedia();
 </script>
 
 </body>
