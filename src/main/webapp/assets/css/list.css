@@ -2,12 +2,52 @@
 @import url('./layout/tokens.css');
 @import url('./layout/navbar.css');
 
+.hero{
+    position: relative;
+    background: linear-gradient(to left, #9094ff 0%, #5750de 50%, #4361EE 100%);
+    border-radius: 1rem;
+    padding: 24px 32px;
+    overflow: hidden;
+    width: 80%;
+    height: 14vh;
+    max-height: 200px;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+    color: white;
+}
+
+.hero h1{
+    font-weight: var(--text-semi-bold);
+    font-size: var(--text-2xl);
+    margin-bottom:var(--space-2);
+}
+.hero p{
+    margin: 0;
+}
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("../img/fundo-hero.svg") no-repeat center;
+    background-size: cover;
+    pointer-events: none;
+    z-index: 0;
+}
+.hero-illustration {
+    position: absolute;
+    right: 3%;
+    bottom: 16%;
+    height: 80%;
+    z-index: 1;
+}
+
 .boletim-grid{
     background-color: var(--surface-color);
     border-radius: var(--medium-radius);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 24px 32px;
-    max-width: 90%;
+    width: 65dvw;
     margin: 30px auto 0;
 }
 .header-grid{
@@ -169,10 +209,6 @@ dialog {
     height: 40px;
     border-radius: 8px;
     cursor: pointer;
-}
-
-.logout-button{
-    text-decoration: none;
 }
 
 .pagination{

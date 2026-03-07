@@ -35,6 +35,7 @@ import java.io.IOException;
  */
 @WebServlet("/teacher/students/grades/release")
 public class ReleaseGradesServlet extends HttpServlet {
+    private final StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
     /**
      * Handles GET requests to display the grade release form.
      *
@@ -140,7 +141,7 @@ public class ReleaseGradesServlet extends HttpServlet {
         }
 
         try{
-            StudentSubject studentSubject = new StudentSubjectDAO().findById(Integer.parseInt(studentSubjectIdParam));
+            StudentSubject studentSubject = studentSubjectDAO.findById(Integer.parseInt(studentSubjectIdParam));
 
             double grade1 = Double.parseDouble(grade1Param);
             double grade2 = Double.parseDouble(grade2Param);
@@ -154,7 +155,7 @@ public class ReleaseGradesServlet extends HttpServlet {
             studentSubject.setObs(observationsParam);
 
             // Update in database:
-            new StudentSubjectDAO().update(studentSubject);
+            studentSubjectDAO.update(studentSubject);
 
             response.sendRedirect(request.getContextPath() + "/teacher/students");
 

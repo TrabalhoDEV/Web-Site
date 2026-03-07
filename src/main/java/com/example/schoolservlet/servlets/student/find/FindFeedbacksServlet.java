@@ -69,7 +69,7 @@ public class FindFeedbacksServlet extends HttpServlet {
         }
 
         // Forward to view
-        request.getRequestDispatcher("/WEB-INF/views/student/student.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/student/index.jsp").forward(request, response);
     }
 
     /**

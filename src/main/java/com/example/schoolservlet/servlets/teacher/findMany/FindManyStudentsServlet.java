@@ -43,7 +43,7 @@ public class FindManyStudentsServlet extends HttpServlet {
         AuthenticatedUser user;
         Teacher teacher = null;
         StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
-        String responsePath = "/WEB-INF/views/teacher/findMany/student.jsp";
+        String responsePath = "/WEB-INF/views/teacher/student/find-many.jsp";
 
         try {
             user = (AuthenticatedUser) session.getAttribute("user");

@@ -8,13 +8,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>CRUD | Cadastro aluno</title>
-
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout/tokens.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout/topbar.css" />
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout/navbar.css" />
-
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/logo_pequena.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
 <%
     List<SchoolClass> schoolClasses= (List<SchoolClass>) request.getAttribute("schoolClasses");
