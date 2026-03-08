@@ -40,11 +40,11 @@ public class Model {
         this.systemPromptPath = systemPromptPath;
     }
 
-    public String getaiModelApiKey() {
+    public String getAiModelApiKey() {
         return aiModelApiKey;
     }
 
-    public void setaiModelApiKey(String aiModelApiKey) {
+    public void setAiModelApiKey(String aiModelApiKey) {
         this.aiModelApiKey = aiModelApiKey;
     }
 
@@ -174,10 +174,10 @@ public class Model {
      * Generates a configuration object for the prompt generation parameters.
      * This includes settings like temperature, topP, and max output tokens.
      *
-     * @return a generationConfig object with predefined settings
+     * @return a GenerationConfig object with predefined settings
      */
-    private Prompt.generationConfig generateConfig() {
-        Prompt.generationConfig config = new Prompt.generationConfig();
+    private Prompt.GenerationConfig generateConfig() {
+        Prompt.GenerationConfig config = new Prompt.GenerationConfig();
         config.setTemperature(temperature);
         config.setTopP(topP);
         config.setMaxOutputTokens(maxOutputTokens);

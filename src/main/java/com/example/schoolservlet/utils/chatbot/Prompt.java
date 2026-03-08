@@ -5,7 +5,7 @@ import java.util.List;
 public class Prompt {
     private SystemInstruction systemInstruction;
     private List<Content> contents;
-    private generationConfig generationConfig;
+    private GenerationConfig generationConfig;
 
     public SystemInstruction getSystemInstruction() {
         return systemInstruction;
@@ -23,11 +23,11 @@ public class Prompt {
         this.contents = contents;
     }
 
-    public generationConfig getGenerationConfig() {
+    public GenerationConfig getGenerationConfig() {
         return generationConfig;
     }
 
-    public void setGenerationConfig(generationConfig generationConfig) {
+    public void setGenerationConfig(GenerationConfig generationConfig) {
         this.generationConfig = generationConfig;
     }
 
@@ -69,7 +69,7 @@ public class Prompt {
         }
     }
 
-    public static class generationConfig {
+    public static class GenerationConfig {
         private double temperature;
         private double topP;
         private int maxOutputTokens;
