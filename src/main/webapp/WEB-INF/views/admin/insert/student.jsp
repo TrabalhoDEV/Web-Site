@@ -1,5 +1,6 @@
 <%@ page import="com.example.schoolservlet.models.SchoolClass" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <!DOCTYPE html>
@@ -198,30 +199,26 @@
                             <select id="anoEscolar" name="anoEscolar" required>
                                 <option value="" selected disabled>-- Selecione um ano --</option>
                                 <%for (SchoolClass schoolClass: schoolClasses) {%>
-                                    <option value="<%=schoolClass.getId()%>"><%= schoolClass.getSchoolYear()%></option>
+                                    <option value="<%=schoolClass.getId()%>"><%=OutputFormatService.formatName(schoolClass.getSchoolYear())%></option>
                                 <%}%>
                             </select>
                         </div>
 
-                        <!-- Submit button to send the form -->
-                        <div class="form-actions">
-                            <input type="submit" value="Enviar" class="btn-submit">
-                        </div>
                         <%
                             if (request.getAttribute("error") != null) {
                         %>
                         <p style="color: #9b0404; text-align: start">
                             <%= request.getAttribute("error") %>
                         </p>
-                        <%
-                        } else if (request.getAttribute("success") != null) {
-                        %>
-                        <p style="color: red;">
-                            Cadastro realizado com sucesso
-                        </p>
-                        <%
-                            }
-                        %>
+                        <%}%>
+
+                        <!-- Submit button to send the form -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save">Salvar</button>
+                            <a href="${pageContext.request.contextPath}/admin/student/find-many" class="btn-cancel">
+                                Cancelar
+                            </a>
+                        </div>
                     </form>
 
                 </div>

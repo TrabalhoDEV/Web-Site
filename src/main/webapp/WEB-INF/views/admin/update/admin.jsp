@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.schoolservlet.models.Admin" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 
 <%
   Admin admin = (Admin) request.getAttribute("admin");
@@ -181,7 +182,7 @@
       <form action="${pageContext.request.contextPath}/admin/update" method="post" class="profile-form">
         <div class="form-group">
           <label for="document">Documento</label>
-          <input type="text" name="document" id="document" value="<%= admin.getDocument() %>" required>
+          <input type="text" name="document" id="document" value="<%= OutputFormatService.formatCpf(admin.getDocument())%>" required>
         </div>
 
         <div class="form-group">

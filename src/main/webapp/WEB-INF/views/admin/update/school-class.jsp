@@ -224,11 +224,12 @@
           <% } %>
 
           <div class="form-actions">
-            <button type="submit" class="btn-submit">Enviar</button>
+            <button type="submit" class="btn-save">Salvar</button>
+            <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="btn-cancel">
+              Cancelar
+            </a>
           </div>
         </form>
-
-        <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="blue_button">Voltar</a>
       </div>
     </section>
   </main>

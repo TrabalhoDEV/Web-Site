@@ -8,7 +8,7 @@
   <title>Deletar professor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet"
-        href="${pageContext.request.contextPath}/assets/css/list.css"/>
+        href="${pageContext.request.contextPath}/assets/css/create.css.css"/>
   <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
 
@@ -188,7 +188,13 @@
           <p style="color: #9b0404; text-align: start"><%=request.getAttribute("error")%></p>
           <%}%>
 
-          <button type="submit">Enviar</button>
+          <!-- Submit button -->
+          <div class="form-actions">
+            <button type="submit" class="btn-save">Enviarr</button>
+            <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="btn-cancel">
+              Cancelar
+            </a>
+          </div>
         </form>
       </div>
     </section>

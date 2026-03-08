@@ -1,10 +1,9 @@
-.boletim-grid {
+.detail-grid {
     background-color: var(--surface-color);
     border-radius: var(--medium-radius);
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
     padding: 30px 40px;
     width: 90%;
-    margin: 70px auto;
 }
 
 .dialog-header {
@@ -127,4 +126,16 @@
         flex-direction: column;
         gap: 4px;
     }
+}
+
+#btn-delete{
+    background: transparent;
+    border: solid 3px var(--primary-color);
+    color: var(--primary-color);
+}
+
+#btn-delete:hover{
+    background: transparent;
+    border: solid 3px var(--button-hover-color);
+    color: var(--button-hover-color);
 }

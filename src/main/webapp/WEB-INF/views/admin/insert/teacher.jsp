@@ -249,26 +249,21 @@
             </fieldset>
           </div>
 
-          <!-- Submit button to send the form -->
-          <div class="form-actions">
-            <input type="submit" value="Cadastrar Professor" class="btn-submit">
-          </div>
-
           <%
             if (request.getAttribute("error") != null) {
           %>
           <p style="color: #9b0404; text-align: start">
             <%= request.getAttribute("error") %>
           </p>
-          <%
-          } else if (request.getAttribute("success") != null) {
-          %>
-          <p style="color: red;">
-            Cadastro realizado com sucesso
-          </p>
-          <%
-            }
-          %>
+          <%}%>
+
+          <!-- Submit button to send the form -->
+          <div class="form-actions">
+            <button type="submit" class="btn-save">Salvar</button>
+            <a href="${pageContext.request.contextPath}/admin/teacher/find-many" class="btn-cancel">
+              Cancelar
+            </a>
+          </div>
         </form>
 
       </div>

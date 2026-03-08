@@ -67,8 +67,8 @@
     cursor: pointer;
 }
 
-td button{
-    font-size: var(--text-sm) ;
+td button, #confirmDelete{
+    font-size: var(--text-sm);
     background: var(--primary-color);
     color: white;
     border: none;
@@ -78,7 +78,7 @@ td button{
     cursor: pointer;
 }
 
-button:hover{
+button:hover, #confirmDelete:hover{
     background-color: var(--button-hover-color);
 }
 
@@ -86,6 +86,18 @@ button:hover{
     display: flex;
     justify-content: space-between;
     gap: 8px;
+}
+
+.btn-delete, #closeDelete{
+    background: transparent;
+    border: solid 3px var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-delete:hover, #closeDelete:hover{
+    background: transparent;
+    border: solid 3px var(--button-hover-color);
+    color: var(--button-hover-color);
 }
 
 .grade-table{
@@ -157,12 +169,15 @@ th{
 }
 
 dialog {
-    border: none;
-    border-radius: 12px;
+    margin: auto;
     padding: 0px;
     border-radius: var(--medium-radius);
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.7);
 }
 
 .modal-cardU {
@@ -175,6 +190,10 @@ dialog {
     padding: 30px;
     height: 170px;
     width: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .modal-cardU input {
@@ -198,8 +217,8 @@ dialog {
     gap: 10px;
     margin-top: 30px;
     margin-bottom: 0px;
-
 }
+
 .modal-actions button{
     font-size: var(--text-sm) ;
     background: var(--primary-color);

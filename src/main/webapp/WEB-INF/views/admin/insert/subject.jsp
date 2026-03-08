@@ -194,26 +194,21 @@
             <input type="date" id="deadline" name="deadline" required>
           </div>
 
-          <!-- Submit button -->
-          <div class="form-actions">
-            <input type="submit" value="Cadastrar" class="btn-submit">
-          </div>
-
           <%
             if (request.getAttribute("error") != null) {
           %>
           <p style="color: #9b0404; text-align: start">
             <%= request.getAttribute("error") %>
           </p>
-          <%
-          } else if (request.getAttribute("success") != null) {
-          %>
-          <p style="color: red;">
-            Cadastro realizado com sucesso
-          </p>
-          <%
-            }
-          %>
+          <%}%>
+
+          <!-- Submit button -->
+          <div class="form-actions">
+            <button type="submit" class="btn-save">Salvar</button>
+            <a href="${pageContext.request.contextPath}/admin/subject/find-many" class="btn-cancel">
+              Cancelar
+            </a>
+          </div>
         </form>
 
       </div>

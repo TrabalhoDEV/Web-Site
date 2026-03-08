@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.schoolservlet.models.Admin" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 
 <%
   Admin admin = (Admin) request.getAttribute("admin");
@@ -185,7 +186,7 @@
 
       <div class="profile-info">
         <p><strong>Email:</strong> <%= admin.getEmail() %></p>
-        <p><strong>Documento:</strong> <%= admin.getDocument() %></p>
+        <p><strong>Documento:</strong> <%= OutputFormatService.formatCpf(admin.getDocument())%></p>
       </div>
 
       <% } else if (request.getAttribute("error") != null){ %>
