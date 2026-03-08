@@ -43,11 +43,11 @@ public class AccessValidation {
 
             return true;
         } catch (NullPointerException npe) {
-            ErrorHandler.forward(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Sessão expirada, faça login novamente", "student.jsp");
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Sessão expirada, faça login novamente", "/index.jsp");
             return false;
         } catch (UnauthorizedException ue){
             ue.printStackTrace();
-            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/student.jsp");
+            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/index.jsp");
             return false;
         }
     }
@@ -63,11 +63,11 @@ public class AccessValidation {
 
             return true;
         } catch (NullPointerException npe) {
-            ErrorHandler.forward(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Sessão expirada, faça login novamente", "student.jsp");
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Sessão expirada, faça login novamente", "/index.jsp");
             return false;
         } catch (UnauthorizedException ue){
             ue.printStackTrace();
-            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/student.jsp");
+            ErrorHandler.forward(request, response, ue.getStatus(), ue.getMessage(), "/index.jsp");
             return false;
         }
     }

@@ -33,10 +33,8 @@
         reproved = performanceCount.failed();
         pending = performanceCount.pending();
     }
-
-
-%>
-
+    int totalPages = (Integer) request.getAttribute("totalPages");
+    int currentPage = (Integer) request.getAttribute("page");
 %>
 
 <div class="app-layout">
@@ -147,10 +145,15 @@
         <!-- GRADES TABLE SECTION -->
         <section>
             <div class="boletim-grid">
+                <div class="boletim-header">
+                    <h3>Boletim</h3>
+                    <a href="${pageContext.request.contextPath}/student/bulletin/generate-pdf" target="_blank">Exportar para PDF</a>
+                </div>
+                <hr>
                 <% if (studentSubjectMap == null || studentSubjectMap.isEmpty()) { %>
                 <p>Nenhuma disciplina encontrada.</p>
                 <% } else { %>
-                <table class="grade-table">
+                <table class="grade-table" style="--cols: 5; grid-template-columns: 2fr 60px 60px 60px fit-content(120px)">
                     <thead>
                     <tr>
                         <th>Matéria</th>
@@ -194,7 +197,7 @@
                             <%= avg != null ? String.format("%.2f", avg) : "-"%>
                         </td>
 
-                        <td><span class="status <%= statusClass %>"><%= statusText %></span></td>
+                        <td style="padding: 12px 0 12px 0"><span class="status <%= statusClass %>"><%= statusText %></span></td>
                     </tr>
                     <%
                         }
@@ -202,26 +205,22 @@
 
                     </tbody>
                 </table>
+                <% } %>
+            </div>
 
-                <div style="margin-top:12px;">
-                    <form method="get" action="<%= request.getContextPath() %>/student/bulletin"
-                          style="display:inline;">
-                        <input type="hidden" name="nextPage" value="<%=(int) request.getAttribute("currentPage") - 1%>">
-                        <button type="submit" <%= (int) request.getAttribute("currentPage") == 0 ? "disabled" : ""%>>
-                            Anterior
-                        </button>
-                    </form>
+            <!-- PAGINAÇÃO -->
+            <div class="pagination">
 
-                    &nbsp;
+                <% if (currentPage > 1) { %>
+                <a href="?page=<%=currentPage-1%>">Anterior</a>
+                <% } %>
 
-                    <form method="get" action="<%= request.getContextPath() %>/student/bulletin"
-                          style="display:inline;">
-                        <input type="hidden" name="nextPage" value="<%=(int) request.getAttribute("currentPage") + 1%>">
-                        <button type="submit" <%= (int) request.getAttribute("totalPages") <= (int) request.getAttribute("currentPage") ? "disabled" : "" %>>
-                            Próxima
-                        </button>
-                    </form>
-                </div>
+
+                <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1%>
+                </strong>
+
+                <% if (currentPage < totalPages) { %>
+                <a href="?page=<%=currentPage+1%>">Próxima</a>
                 <% } %>
             </div>
         </section>
