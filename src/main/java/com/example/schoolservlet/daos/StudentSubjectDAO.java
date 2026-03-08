@@ -223,6 +223,66 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         return studentsSubjects;
     }
 
+    public Map<Integer, StudentSubject> findManyThatHasFeedbacks(int skip, int take, int studentId) throws DataException, ValidationException {
+        InputValidation.validateId(studentId, "id do aluno");
+        Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("SELECT " +
+                     "ss.id, " +
+                     "ss.obs, " +
+                     "ss.grade1, " +
+                     "ss.grade2, " +
+                     "st.id AS student_id, " +
+                     "st.name AS student_name, " +
+                     "st.cpf AS student_cpf, " +
+                     "st.email AS student_email, " +
+                     "sb.id AS subject_id, " +
+                     "sb.name AS subject_name, " +
+                     "sb.deadline AS subject_deadline " +
+                     "FROM student_subject ss JOIN student st ON st.id = ss.id_student JOIN subject sb " +
+                     "ON sb.id = ss.id_subject " +
+                     "WHERE st.ID = ? AND ss.obs IS NOT NULL " +
+                     "ORDER BY ss.id LIMIT ? OFFSET ?")
+        ) {
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(3, skip < 0 ? 0 : skip);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                Student student = new Student();
+                student.setId(rs.getInt("student_id"));
+                student.setName(rs.getString("student_name"));
+                student.setCpf(rs.getString("student_cpf"));
+                student.setEmail(rs.getString("student_email"));
+                student.setStatus(StudentStatusEnum.ACTIVE);
+
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("subject_id"));
+                subject.setName(rs.getString("subject_name"));
+                subject.setDeadline(rs.getDate("subject_deadline"));
+
+                studentsSubjects.put(rs.getInt("id"),
+                        new StudentSubject(
+                                rs.getInt("id"),
+                                rs.getString("obs"),
+                                rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
+                                rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
+                                student,
+                                subject
+                        )
+                );
+            }
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar matérias por aluno", sqle);
+        }
+
+        return studentsSubjects;
+    }
+
     public Map<Integer, List<StudentSubject>> findManyByStudentId(int skip, int take, int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         Map<Integer, List<StudentSubject>> studentsMap = new HashMap<>();

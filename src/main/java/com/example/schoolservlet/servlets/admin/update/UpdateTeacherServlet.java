@@ -181,9 +181,9 @@ public class UpdateTeacherServlet extends HttpServlet {
 
             try {
                 String assunto = "Edição dos dados do Sistema Escolar";
-                String mensagem = "Olá " + teacher.getName() + ",<br><br>"
-                        + "Seus dados já foram atualizados!.<br>"
-                        + "<a href=\"https://vertice-yw2e.onrender.com/index.jsp\">Clique aqui para logar</a><br><br>"
+                String mensagem = "Olá " + OutputFormatService.formatName(teacher.getName()) + ",<br><br>"
+                        + "Seus dados foram atualizados!.<br>"
+                        + String.format("<a href=\"%s/index.jsp\">Clique aqui para logar</a><br><br>", request.getContextPath())
                         + "Atenciosamente,<br>"
                         + "Secretaria Vértice";
 

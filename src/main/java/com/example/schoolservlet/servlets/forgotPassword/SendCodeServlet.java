@@ -156,9 +156,12 @@ public class SendCodeServlet extends HttpServlet {
                 EmailService.sendEmail(email, "Recuperação de senha", "<h1>Recuperação da sua senha na Vértice</h1>" +
                         "<p>Esse código expirará em 15 minutos, caso não tenha sido você, ignore.</p>" +
                         "<br>" +
-                        "<div style=\"background-color:#DDF8FF; border-radius:20px; height:200px;" +
-                        "display:flex; flex-direction:column; justify-content: space-around\"><h3 style=\"text-align:center;\">Código:</h3>" +
-                        "<h2 style=\"text-align:center;\">" + code + "</h2></div>");
+                        "<div><h3 style=\"text-align:center;\">Código:</h3>" +
+                        "<h2 style=\"text-align:center;\">" + code + "</h2></div>"
+                        + "<br>"
+                        + "Atenciosamente,<br>"
+                        + "Secretaria Vértice"
+                );
             } catch (Exception e) {
                 e.printStackTrace();
                 response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
