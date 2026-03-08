@@ -244,7 +244,7 @@
         70px
         70px
         70px
-        100px
+        120px
         140px;">
 
           <thead>
@@ -279,8 +279,8 @@
             </td>
             <td><%= ss.getAverage() != null ? ss.getAverage() : "-" %>
             </td>
-            <td><p><%= ss.getStatus()%>
-            </p></td>
+            <td><span class="status <%= ss.getStatus() == "Aprovado" ? "approved" : (ss.getStatus() == "Reprovado" ? "reproved" : "pending")%>"><%= ss.getStatus()%>
+            </span></td>
             <td>
               <form action="${pageContext.request.contextPath}/teacher/students/grades/release">
                 <input type="hidden" name="studentSubjectId" value="<%= ss.getId() %>">

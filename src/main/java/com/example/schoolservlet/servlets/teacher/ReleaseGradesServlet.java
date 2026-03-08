@@ -126,6 +126,7 @@ public class ReleaseGradesServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         if (session == null){
             ErrorHandler.forward(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Sessão expirada, faça login novamente", "/index.jsp");
+            return;
         }
         String studentSubjectIdParam = request.getParameter("studentSubjectId");
         String grade1Param = request.getParameter("grade1");
@@ -170,13 +171,14 @@ public class ReleaseGradesServlet extends HttpServlet {
         } catch (NotFoundException e) {
             session.setAttribute("error", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/teacher/students");
-        } catch (DataException | ValidationException | NumberFormatException e) {
-            request.setAttribute("error", e instanceof NumberFormatException
-                    ? "Notas devem ser números válidos."
-                    : e.getMessage());
+        } catch (DataException | ValidationException e) {
+            request.setAttribute("error", e.getMessage());
             getAllData(request, response, studentSubjectIdParam);
             request.getRequestDispatcher("/WEB-INF/views/teacher/student/releaseGrade.jsp")
                     .forward(request, response);
+        } catch (NumberFormatException e){
+            session.setAttribute("error", "ID deve ser um número");
+            response.sendRedirect(request.getContextPath() + "/teacher/students");
         }
     }
 
