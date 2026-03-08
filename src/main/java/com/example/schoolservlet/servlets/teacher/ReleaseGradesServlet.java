@@ -8,6 +8,7 @@ import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.ErrorHandler;
+import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.ServletException;
@@ -130,6 +131,8 @@ public class ReleaseGradesServlet extends HttpServlet {
         String grade1Param = request.getParameter("grade1");
         String grade2Param = request.getParameter("grade2");
         String observationsParam = request.getParameter("obs");
+        double grade1 = 0;
+        double grade2 = 0;
 
         if (studentSubjectIdParam == null || studentSubjectIdParam.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/teacher/students");
@@ -148,16 +151,18 @@ public class ReleaseGradesServlet extends HttpServlet {
         try {
             StudentSubject studentSubject = studentSubjectDAO.findById(studentSubjectId);
 
-            double grade1 = Double.parseDouble(grade1Param);
-            double grade2 = Double.parseDouble(grade2Param);
-
-            if (!(InputValidation.validateGrade(grade1) && InputValidation.validateGrade(grade2))) {
-                throw new ValidationException("Notas devem estar entre 0 e 10.");
+            if (grade1Param != null || !grade1Param.isEmpty()) {
+                grade1 = Double.parseDouble(grade1Param);
+                InputValidation.validateGrade(grade1);
+            }
+            if (grade2Param != null || !grade2Param.isEmpty()) {
+                grade2 = Double.parseDouble(grade2Param);
+                InputValidation.validateGrade(grade2);
             }
 
             studentSubject.setGrade1(grade1);
             studentSubject.setGrade2(grade2);
-            studentSubject.setObs(observationsParam);
+            studentSubject.setObs(observationsParam.isEmpty() ? null : InputNormalizer.normalizeObs(observationsParam));
 
             studentSubjectDAO.update(studentSubject);
             response.sendRedirect(request.getContextPath() + "/teacher/students");

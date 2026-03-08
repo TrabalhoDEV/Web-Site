@@ -206,13 +206,13 @@
                         <div class="form-group">
                             <label for="grade1">Nota 1ª Avaliação:</label>
                             <input type="number" id="grade1" name="grade1" step="0.1" min="0" max="10"
-                                   value="<%= ss.getGrade1() != null ? ss.getGrade1() : "" %>" required>
+                                   value="<%= ss.getGrade1() != null ? ss.getGrade1() : 0 %>">
                         </div>
 
                         <div class="form-group">
                             <label for="grade2">Nota 2ª Avaliação:</label>
                             <input type="number" id="grade2" name="grade2" step="0.1" min="0" max="10"
-                                   value="<%= ss.getGrade2() != null ? ss.getGrade2() : "" %>" required>
+                                   value="<%= ss.getGrade2() != null ? ss.getGrade2() : 0 %>">
                         </div>
 
                         <div class="media-display">
