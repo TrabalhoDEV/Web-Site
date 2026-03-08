@@ -99,20 +99,14 @@ public class FindFeedbacksServlet extends HttpServlet {
             
             // Query database for student's subjects and observations
             StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
-            Map<Integer, StudentSubject> studentSubjectMap = studentSubjectDAO.findMany(
+            Map<Integer, StudentSubject> studentSubjectMap = studentSubjectDAO.findManyThatHasFeedbacks(
                     offset,
                     Constants.MAX_TAKE,
                     authenticatedUser.id()
             );
 
             // Extract non-empty observations and store list in request for view rendering
-            request.setAttribute("observationsList",
-                    studentSubjectMap.values().stream()
-                            .map(StudentSubject::getObs)
-                            .filter(obs -> obs != null && !obs.isBlank())
-                            .toList()
-
-            );
+            request.setAttribute("studentSubjectMap", studentSubjectMap);
             LOGGER.log(Level.INFO, "Feedbacks loaded successfully.");
 
             return studentSubjectDAO.totalCount(authenticatedUser.id());
