@@ -5,6 +5,7 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
+import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
@@ -27,30 +28,22 @@ public class ValidateCpfServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String cpf = request.getParameter("cpf");
 
-        StudentDAO dao = new StudentDAO();
-
         try {
             InputValidation.validateCpf(cpf);
             cpf = InputNormalizer.normalizeCpf(cpf);
 
-            Student student = dao.findByCpf(cpf);
+            Student student = new StudentDAO().findByCpf(cpf);
 
             if (student.getStatus() == StudentStatusEnum.INACTIVE) {
                 request.setAttribute("student", student);
                 request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
             } else {
-                request.setAttribute("error", "Aluno não encontrado");
-                request.getRequestDispatcher("/pages/students/signupCpf.jsp").forward(request, response);
+                ErrorHandler.forward(request, response, HttpServletResponse.SC_NOT_FOUND, "Aluno não encontrado", "/pages/students/signupCpf.jsp");
             }
-        } catch (DataException de) {
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/pages/students/signupCpf.jsp").forward(request, response);
-        } catch (ValidationException ve) {
-            request.setAttribute("error", ve.getMessage());
-            request.getRequestDispatcher("/pages/students/signupCpf.jsp").forward(request, response);
+        } catch (DataException | ValidationException e) {
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), "/pages/students/signupCpf.jsp");
         } catch (NotFoundException nfe) {
-            request.setAttribute("error", "Aluno não encontrado");
-            request.getRequestDispatcher("/pages/students/signuCpfp.jsp").forward(request, response);
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_NOT_FOUND, nfe.getMessage(), "/pages/students/signupCpf.jsp");
         }
     }
 }
