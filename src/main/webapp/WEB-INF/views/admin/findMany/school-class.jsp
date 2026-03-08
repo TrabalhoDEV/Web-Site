@@ -270,18 +270,7 @@
                     </td>
                 </tr>
 
-                <% } %>
-
-                <% } else if (request.getAttribute("error") != null) { %>
-
-                <tr>
-                    <td colspan="2" style="color: #9b0404; text-align: start">
-                        <%= request.getAttribute("error") %>
-                    </td>
-                </tr>
-
-                <% } else { %>
-
+                <% } } else { %>
                 <tr>
                     <td colspan="2" style="text-align:center">
                         Nenhuma turma foi encontrada

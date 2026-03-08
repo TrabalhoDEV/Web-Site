@@ -247,7 +247,7 @@
                 <div class="form-group">
                     <label for="name">Name</label>
                     <input type="text" id="name" name="name"
-                           value="<%= student.getName() != null ? OutputFormatService.formatName(student.getName()) : "-" %>" required/>
+                           value="<%= student.getName() != null ? OutputFormatService.formatName(student.getName()) : "" %>" required/>
                 </div>
 
                 <!-- Email field (editable) -->
@@ -261,7 +261,7 @@
                 <div class="form-group">
                     <label for="cpf">CPF</label>
                     <input type="text" id="cpf" name="cpf"
-                           value="<%= student.getCpf() != null ? OutputFormatService.formatCpf(student.getCpf()) : "-" %>" readonly/>
+                           value="<%= student.getCpf() != null ? OutputFormatService.formatCpf(student.getCpf()) : "" %>" readonly/>
                 </div>
 
                 <%if (hasError) {%>

@@ -82,10 +82,12 @@ public class UpdateStudentServlet extends HttpServlet {
             request.getRequestDispatcher(UPDATE_VIEW).forward(request, response);
 
         } catch (ValidationException | NotFoundException | DataException e) {
+            if(session == null) session = request.getSession();
+
             // Log error and redirect to student list:
             logger.log(Level.WARNING, "Error loading student data: " + e.getMessage());
             session.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher(STUDENT_LIST_URL).forward(request, response);
+            response.sendRedirect(request.getContextPath() + STUDENT_LIST_URL);
         }
     }
 
@@ -236,6 +238,8 @@ public class UpdateStudentServlet extends HttpServlet {
             request.getRequestDispatcher(UPDATE_VIEW).forward(request, response);
 
         } catch (NotFoundException | DataException | ValidationException e) {
+            if (session == null) session = request.getSession();
+
             // If unable to reload student data, redirect to list:
             logger.log(Level.WARNING, "Error reloading student data during error handling", e);
             session.setAttribute("error", "Não foi possível atualizar o aluno");
