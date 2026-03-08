@@ -192,18 +192,30 @@ public class Model {
      * @throws IOException if there's an error during the HTTP request
      */
     public String request(String json) throws IOException {
-        HttpURLConnection conn = createConnection();
-        
-        // Send request
-        sendRequest(conn, json);
-        
-        // Read response
-        int status = conn.getResponseCode();
-        String response = extractText(readResponse(conn, status));
-        
-        handleRateLimiting(status);
-        
-        return response;
+        HttpURLConnection conn = null;
+        try {
+            conn = createConnection();
+
+
+            // Send request
+            sendRequest(conn, json);
+
+            // Read response
+            int status = conn.getResponseCode();
+            String response = extractText(readResponse(conn, status));
+
+            handleRateLimiting(status);
+
+            return response;
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error during API request", e);
+            throw new IOException("Failed to communicate with Gemini API", e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+
     }
 
     private String extractText(String json) throws JsonProcessingException {
