@@ -2,7 +2,6 @@ package com.example.schoolservlet.utils.chatbot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;

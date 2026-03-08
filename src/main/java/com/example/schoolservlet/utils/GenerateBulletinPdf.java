@@ -98,11 +98,11 @@ public class GenerateBulletinPdf {
 
         String situacao_final = "Aprovado";
         for (StudentSubject studentSubject: studentSubjects){
-            if(studentSubject.getStatus().equals("Reprovado")){
+            if(studentSubject.getStatus().equals("Reprovado") && studentSubject.getSubject().getDeadline().before(new Date())){
                 situacao_final = "Reprovado";
                 break;
             }
-            if(studentSubject.getStatus().equals("Pendente")){
+            if(studentSubject.getStatus().equals("Pendente") || studentSubject.getSubject().getDeadline().before(new Date())){
                 situacao_final = "Pendente";
                 break;
             }

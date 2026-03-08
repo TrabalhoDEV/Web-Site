@@ -279,7 +279,7 @@
             </td>
             <td><%= ss.getAverage() != null ? ss.getAverage() : "-" %>
             </td>
-            <td><p><%= ss.getStatus() != null ? ss.getStatus() : "Pendente" %>
+            <td><p><%= ss.getStatus()%>
             </p></td>
             <td>
               <form action="${pageContext.request.contextPath}/teacher/students/grades/release">
