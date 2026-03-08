@@ -11,6 +11,7 @@
   <title>Perfil do Administrador</title>
   <link rel="stylesheet"
         href="${pageContext.request.contextPath}/assets/css/editAdmin.css"/>
+  <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
 
 <body>

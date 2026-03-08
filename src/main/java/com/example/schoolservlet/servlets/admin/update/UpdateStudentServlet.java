@@ -14,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -38,7 +39,6 @@ public class UpdateStudentServlet extends HttpServlet {
 
     private static final Logger logger = Logger.getLogger(UpdateStudentServlet.class.getName());
     private static final String UPDATE_VIEW = "/WEB-INF/views/admin/update/student.jsp";
-    private static final String LIST_VIEW = "/WEB-INF/views/admin/findMany/student.jsp";
     private static final String STUDENT_LIST_URL = "/admin/student/find-many";
 
     /**
@@ -61,6 +61,8 @@ public class UpdateStudentServlet extends HttpServlet {
      * @throws IOException If input/output error occurs
      */
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+
         // Validate session:
         if (!AccessValidation.isAdmin(request, response)) return;
 
@@ -80,10 +82,12 @@ public class UpdateStudentServlet extends HttpServlet {
             request.getRequestDispatcher(UPDATE_VIEW).forward(request, response);
 
         } catch (ValidationException | NotFoundException | DataException e) {
+            if(session == null) session = request.getSession();
+
             // Log error and redirect to student list:
             logger.log(Level.WARNING, "Error loading student data: " + e.getMessage());
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher(LIST_VIEW).forward(request, response);
+            session.setAttribute("error", e.getMessage());
+            response.sendRedirect(request.getContextPath() + STUDENT_LIST_URL);
         }
     }
 
@@ -162,11 +166,6 @@ public class UpdateStudentServlet extends HttpServlet {
 
             // Handle validation and data access errors by reloading form:
             handleUpdateError(request, response, enrollmentParam, e.getMessage());
-        } catch (Exception e) {
-            // Log unexpected exceptions:
-            logger.log(Level.SEVERE, "Unexpected error during student update", e);
-            request.setAttribute("error", "An unexpected error occurred. Please try again.");
-            request.getRequestDispatcher(UPDATE_VIEW).forward(request, response);
         }
     }
 
@@ -224,6 +223,8 @@ public class UpdateStudentServlet extends HttpServlet {
      */
     private void handleUpdateError(HttpServletRequest request, HttpServletResponse response,
                                    String enrollmentParam, String errorMessage) throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+
         try {
             // Attempt to reload student data for form re-population:
             int enrollment = validateAndNormalizeEnrollment(enrollmentParam);
@@ -236,12 +237,13 @@ public class UpdateStudentServlet extends HttpServlet {
             // Forward back to update form with error message:
             request.getRequestDispatcher(UPDATE_VIEW).forward(request, response);
 
-        } catch (Exception ex) {
+        } catch (NotFoundException | DataException | ValidationException e) {
+            if (session == null) session = request.getSession();
+
             // If unable to reload student data, redirect to list:
-            logger.log(Level.WARNING, "Error reloading student data during error handling", ex);
-            request.setAttribute("error", "Error updating student. Please try again.");
-            request.setAttribute("id", enrollmentParam);
-            response.sendRedirect(request.getContextPath() + "/admin/student/find-many");
+            logger.log(Level.WARNING, "Error reloading student data during error handling", e);
+            session.setAttribute("error", "Não foi possível atualizar o aluno");
+            response.sendRedirect(request.getContextPath() + STUDENT_LIST_URL);
         }
     }
 

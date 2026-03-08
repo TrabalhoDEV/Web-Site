@@ -25,11 +25,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Listar professores</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/list.css" />
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/Logo - Vértice.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
 <body>
-
-<div class="app-layout">
 
     <!-- SIDEBAR -->
 
@@ -193,6 +191,13 @@
                 </div>
 
                 <hr>
+
+                <%if (request.getAttribute("error") != null) { %>
+                <p style="color: #9b0404; text-align: start; padding: 8px">
+                    <%= request.getAttribute("error") %>
+                </p>
+                <% }%>
+
                 <table class="grade-table" style="--cols: 4">
                     <thead>
                     <tr>
@@ -218,13 +223,7 @@
                             </div>
                         </td>
                     </tr>
-                    <% } } else if (request.getAttribute("error") != null) { %>
-
-                    <tr>
-                    <td colspan="4" style="color: #9b0404; text-align: start"><%= request.getAttribute("error") %></td>
-                    </tr>
-
-                    <% } else { %>
+                    <% } } else { %>
 
                     <tr>
                     <td colspan="4" style="text-align: center">Nenhum professor foi encontrado</td>
@@ -252,7 +251,6 @@
             </div>
         </section>
     </main>
-</div>
 
     <dialog id="deleteDialog">
         <div class="modal-cardD">

@@ -4,6 +4,7 @@
 <%@ page import="com.example.schoolservlet.utils.records.AuthenticatedUser" %>
 <%@ page import="com.example.schoolservlet.utils.Constants" %>
 <%@ page import="com.example.schoolservlet.utils.records.StudentsPerformanceCount" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -11,11 +12,8 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Aluno | Vértice - Boletim</title>
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/layout/tokens.css"/>
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/layout/topbar.css"/>
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/layout/navbar.css"/>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/student/boletim.css"/>
-    <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/logo_pequena.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
 
 <body>
@@ -39,6 +37,7 @@
 
 %>
 
+%>
 
 <div class="app-layout">
 
@@ -92,7 +91,6 @@
                 Sair</a>
         </div>
     </aside>
-
 
     <!-- MAIN CONTENT -->
 
@@ -182,7 +180,7 @@
                     %>
                     <tr>
                         <td class="subject"><%= (ss.getSubject() != null && ss.getSubject().getName() != null)
-                                ? ss.getSubject().getName()
+                                ? OutputFormatService.formatName(ss.getSubject().getName())
                                 : "—" %>
                         </td>
 

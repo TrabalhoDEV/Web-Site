@@ -5,6 +5,7 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Admin;
+import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
@@ -54,15 +55,11 @@ public class AdminLoginServlet extends HttpServlet {
                 request.setAttribute("error", "Cpf e/ou senha incorretos");
                 request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
             }
-        } catch (ValidationException e){
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
-        } catch (DataException dae){
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", dae.getMessage());
-            request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);
-        } catch (NotFoundException nfe){
+        } catch (ValidationException | DataException e){
+            e.printStackTrace();
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/pages/admin/login.jsp");
+        }  catch (NotFoundException nfe){
+            nfe.printStackTrace();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             request.setAttribute("error", "Cpf e/ou senha incorretos");
             request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);

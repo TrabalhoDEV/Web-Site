@@ -19,11 +19,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet"
           href="${pageContext.request.contextPath}/assets/css/list.css"/>
+    <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
 
 <body>
-
-<div class="app-layout">
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -231,6 +230,11 @@
                 </div>
 
                 <hr>
+                <%if (request.getAttribute("error") != null) { %>
+                <p style="color: #9b0404; text-align: start; padding: 8px">
+                    <%= request.getAttribute("error") %>
+                </p>
+                <% }%>
 
                 <table class="grade-table"
                        style="--cols: 3">
@@ -274,14 +278,6 @@
 
                     <% } %>
 
-                    <% } else if (request.getAttribute("error") != null) { %>
-
-                    <tr>
-                        <td colspan="3" style="color: #9b0404; text-align: start">
-                            <%= request.getAttribute("error") %>
-                        </td>
-                    </tr>
-
                     <% } else { %>
 
                     <tr>
@@ -313,8 +309,6 @@
             </div>
         </section>
     </main>
-</div>
-
 <dialog id="deleteDialog">
     <div class="modal-cardD">
         <h3>Deseja deletar esta matéria?</h3>

@@ -11,6 +11,7 @@
   <title>Perfil do Administrador</title>
   <link rel="stylesheet"
         href="${pageContext.request.contextPath}/assets/css/adminProfile.css"/>
+  <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
 
 <body>
@@ -183,7 +184,6 @@
       <% if (admin != null) { %>
 
       <div class="profile-info">
-        <p><strong>ID:</strong> <%= admin.getId() %></p>
         <p><strong>Email:</strong> <%= admin.getEmail() %></p>
         <p><strong>Documento:</strong> <%= admin.getDocument() %></p>
       </div>
