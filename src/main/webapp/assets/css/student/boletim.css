@@ -1,6 +1,6 @@
-@import url('/assets/css/layout/topbar.css');
-@import url('/assets/css/layout/tokens.css');
-@import url('/assets/css/layout/navbar.css');
+@import url('./../layout/topbar.css');
+@import url('./../layout/tokens.css');
+@import url('./../layout/navbar.css');
 /* Notes */
 
 .card-note{
@@ -105,7 +105,7 @@
     border-radius: var(--medium-radius);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 24px 32px;
-    width: 90%;
+    width: 50vw;
     margin: 32px auto;
     padding-top: 30px;
 }
@@ -124,7 +124,6 @@
 }
 
 .grade-table td{
-    width: 20%;
     padding: 20px 0px;
     border-top: 1px solid #eef1f6;
     padding-bottom: 30px;

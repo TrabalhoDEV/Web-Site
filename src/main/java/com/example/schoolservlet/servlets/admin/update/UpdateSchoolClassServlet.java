@@ -2,6 +2,7 @@ package com.example.schoolservlet.servlets.admin.update;
 
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.SchoolClassSubjectDAO;
+import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.daos.SubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.InvalidNumberException;
@@ -25,6 +26,7 @@ public class UpdateSchoolClassServlet extends HttpServlet {
     private SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
     private SubjectDAO subjectDAO = new SubjectDAO();
     private SchoolClassSubjectDAO schoolClassSubjectDAO = new SchoolClassSubjectDAO();
+    private StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -89,6 +91,16 @@ public class UpdateSchoolClassServlet extends HttpServlet {
             SchoolClass schoolClass = schoolClassDAO.findById(schoolClassId);
 
             String[] subjectIdsParam = request.getParameterValues("subjectIds");
+            String name = request.getParameter("schoolYear");
+
+            InputValidation.validateSchoolClassName(name);
+
+            name = InputNormalizer.normalizeName(name);
+
+            if (!name.equals(schoolClass.getSchoolYear())){
+                schoolClass.setSchoolYear(name);
+                schoolClassDAO.update(schoolClass);
+            }
 
             List<Integer> validSubjectIds = InputValidation.validateIdsExist(
                     subjectIdsParam,
@@ -126,9 +138,11 @@ public class UpdateSchoolClassServlet extends HttpServlet {
                 }
 
                 schoolClassSubjectDAO.createMany(schoolClassSubjectsToInsert);
+                studentSubjectDAO.createManyBySchoolClass(schoolClassId, new ArrayList<>(toAddSubjects));
             }
 
             schoolClassSubjectDAO.deleteManyBySchoolClassAndSubjects(schoolClassId, toRemoveSubjects);
+            studentSubjectDAO.deleteManyBySchoolClass(schoolClassId, new ArrayList<>(toRemoveSubjects));
 
             response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
 
