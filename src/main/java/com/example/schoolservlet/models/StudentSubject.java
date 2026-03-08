@@ -2,6 +2,8 @@ package com.example.schoolservlet.models;
 
 import com.example.schoolservlet.utils.Constants;
 
+import java.util.Date;
+
 public class StudentSubject {
     // Attributes:
     private int id;
@@ -65,7 +67,7 @@ public class StudentSubject {
     }
 
     public String getStatus(){
-        if (grade1 != null && grade2 != null){
+        if ((grade1 != null && grade2 != null) && this.subject.getDeadline().before(new Date())){
             return getAverage() >= Constants.MIN_GRADE_TO_BE_APPROVAL ? "Aprovado" : "Reprovado";
         }
         return "Pendente";

@@ -168,18 +168,6 @@
                     <%
                         for (StudentSubject ss : studentSubjectMap.values()) {
                             Double avg = ss.getAverage();
-                            String statusClass = "pending";
-                            String statusText = "Pendente";
-
-                            if (ss.getGrade1() != null && ss.getGrade2() != null) {
-                                if (avg >= 7) {
-                                    statusClass = "approved";
-                                    statusText = "Aprovado";
-                                } else {
-                                    statusClass = "reproved";
-                                    statusText = "Reprovado";
-                                }
-                            }
                     %>
                     <tr>
                         <td class="subject"><%= (ss.getSubject() != null && ss.getSubject().getName() != null)
@@ -197,7 +185,7 @@
                             <%= avg != null ? String.format("%.2f", avg) : "-"%>
                         </td>
 
-                        <td style="padding: 12px 0 12px 0"><span class="status <%= statusClass %>"><%= statusText %></span></td>
+                        <td style="padding: 12px 0 12px 0"><span class="status <%= ss.getStatus() == "Aprovado" ? "approved" : (ss.getStatus() == "Reprovado" ? "reproved" : "pending")%>"><%= ss.getStatus() %></span></td>
                     </tr>
                     <%
                         }
