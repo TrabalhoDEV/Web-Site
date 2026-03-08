@@ -2,6 +2,8 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="com.example.schoolservlet.models.StudentSubject" %>
 <%@ page import="com.example.schoolservlet.utils.records.AuthenticatedUser" %>
+<%@ page import="com.example.schoolservlet.utils.Constants" %>
+<%@ page import="com.example.schoolservlet.utils.records.StudentsPerformanceCount" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 
 <!DOCTYPE html>
@@ -24,6 +26,17 @@
     int approved = 0;
     int reproved = 0;
     int pending = 0;
+
+    StudentsPerformanceCount performanceCount = (StudentsPerformanceCount) request.getAttribute("performanceCount");
+    if (performanceCount != null) {
+        approved = performanceCount.approved();
+        reproved = performanceCount.failed();
+        pending = performanceCount.pending();
+    }
+
+
+%>
+
 %>
 
 <div class="app-layout">

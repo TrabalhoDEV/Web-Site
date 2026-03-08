@@ -13,6 +13,7 @@ import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.PaginationUtilities;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 
+import com.example.schoolservlet.utils.records.StudentsPerformanceCount;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -84,13 +85,17 @@ public class FindBulletinServlet extends HttpServlet {
             // Fetch student's subjects and grades from database with pagination
             StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
             Map<Integer, StudentSubject> studentSubjectMap = null;
-            
+
+            StudentsPerformanceCount performanceCount = null;
             try {
                 studentSubjectMap = studentSubjectDAO.findMany(
                         skip,
                         Constants.MAX_TAKE,
                         authenticatedUser.id()
                 );
+
+                performanceCount = studentSubjectDAO.studentPerformanceCount(authenticatedUser.id());
+                request.setAttribute("performanceCount", performanceCount);
             } catch (DataException de) {
                 LOGGER.log(Level.SEVERE, "Data access error while fetching student subjects for student ID: " + authenticatedUser.id(), de);
                 treatUnexpectedError(request, response);
@@ -109,6 +114,7 @@ public class FindBulletinServlet extends HttpServlet {
 
             // Prepare request attributes for view rendering
             request.setAttribute("studentSubjectMap", studentSubjectMap);
+            request.setAttribute("performanceCount", performanceCount);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);
 
