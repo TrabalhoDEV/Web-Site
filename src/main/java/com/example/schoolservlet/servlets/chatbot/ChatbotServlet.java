@@ -1,5 +1,6 @@
 package com.example.schoolservlet.servlets.chatbot;
 
+import com.example.schoolservlet.utils.ConfigService;
 import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.chatbot.Model;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -54,10 +55,7 @@ public class ChatbotServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            this.apiKey = Dotenv.configure()
-                    .ignoreIfMissing()
-                    .load()
-                    .get("AI_MODEL_API_KEY");
+            this.apiKey = ConfigService.getEnv("AI_MODEL_API_KEY", Dotenv.load());
 
             if (apiKey == null || apiKey.trim().isEmpty()) {
                 logger.warning("AI_MODEL_API_KEY environment variable is not set");

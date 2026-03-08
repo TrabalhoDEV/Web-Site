@@ -72,7 +72,7 @@ public class Prompt {
     public static class generationConfig {
         private double temperature;
         private double topP;
-        private double maxOutputTokens;
+        private int maxOutputTokens;
 
         public double getTemperature() {
             return temperature;
@@ -94,7 +94,7 @@ public class Prompt {
             return maxOutputTokens;
         }
 
-        public void setMaxOutputTokens(double maxOutputTokens) {
+        public void setMaxOutputTokens(int maxOutputTokens) {
             this.maxOutputTokens = maxOutputTokens;
         }
     }

@@ -26,26 +26,26 @@ public class Model {
     private static final String CHARSET = "utf-8";
     private static final int HTTP_TOO_MANY_REQUESTS = 429;
 
-    private String AI_MODEL_API_KEY = null;
+    private String aiModelApiKey = null;
     private int maxOutputTokens;
     private double temperature;
     private double topP;
     private String systemPromptPath;
 
-    public Model(String AI_MODEL_API_KEY, int maxOutputTokens, double temperature, double topP, String systemPromptPath) {
-        this.AI_MODEL_API_KEY = AI_MODEL_API_KEY;
+    public Model(String aiModelApiKey, int maxOutputTokens, double temperature, double topP, String systemPromptPath) {
+        this.aiModelApiKey = aiModelApiKey;
         this.maxOutputTokens = maxOutputTokens;
         this.temperature = temperature;
         this.topP = topP;
         this.systemPromptPath = systemPromptPath;
     }
 
-    public String getAI_MODEL_API_KEY() {
-        return AI_MODEL_API_KEY;
+    public String getaiModelApiKey() {
+        return aiModelApiKey;
     }
 
-    public void setAI_MODEL_API_KEY(String AI_MODEL_API_KEY) {
-        this.AI_MODEL_API_KEY = AI_MODEL_API_KEY;
+    public void setaiModelApiKey(String aiModelApiKey) {
+        this.aiModelApiKey = aiModelApiKey;
     }
 
     public int getMaxOutputTokens() {
@@ -231,7 +231,7 @@ public class Model {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");
-        conn.setRequestProperty("X-goog-api-key", AI_MODEL_API_KEY);
+        conn.setRequestProperty("X-goog-api-key", aiModelApiKey);
         conn.setDoOutput(true);
         return conn;
     }
