@@ -189,7 +189,7 @@
         <% if (teacher != null) { %>
 
         <section>
-            <div class="boletim-grid">
+            <div class="detail-grid">
                 <div class="dialog-header">
                     <h1>Detalhes do Professor</h1>
                     <a href="${pageContext.request.contextPath}/admin/teacher/find-many">
@@ -250,7 +250,7 @@
                         <button>Editar</button>
                     </a>
                     <a href="${pageContext.request.contextPath}/admin/teacher/delete?id=<%=teacher.getId()%>">
-                        <button>Excluir</button>
+                        <button  id="btn-delete">Excluir</button>
                     </a>
                 </div>
 

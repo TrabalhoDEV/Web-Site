@@ -254,12 +254,12 @@
 
     <dialog id="deleteDialog">
         <div class="modal-cardD">
-            <h3>Deseja deletar esta matéria?</h3>
+            <h3>Deseja deletar este professor?</h3>
             <p id="deleteText">Essa é uma ação irreversível</p>
 
             <div class="modal-actions">
-                <button id="closeDelete">Cancelar</button>
                 <button id="confirmDelete">Confirmar</button>
+                <button id="closeDelete">Cancelar</button>
             </div>
         </div>
     </dialog>

@@ -1,6 +1,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="com.example.schoolservlet.models.SchoolClass" %>
 <%@ page import="java.util.TreeMap" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
     Map<Integer, SchoolClass> schoolClassMap =
@@ -253,7 +254,7 @@
 
                 <tr>
                     <td>
-                        <%= schoolClass.getSchoolYear().toUpperCase()%>
+                        <%=OutputFormatService.formatName(schoolClass.getSchoolYear())%>
                     </td>
 
                     <td class="actions">
@@ -304,12 +305,12 @@
 
 <dialog id="deleteDialog">
     <div class="modal-cardD">
-        <h3>Deseja deletar esta matéria?</h3>
+        <h3>Deseja deletar esta turma?</h3>
         <p id="deleteText">Essa é uma ação irreversível</p>
 
         <div class="modal-actions">
-            <button id="closeDelete">Cancelar</button>
             <button id="confirmDelete">Confirmar</button>
+            <button id="closeDelete">Cancelar</button>
         </div>
     </div>
 </dialog>

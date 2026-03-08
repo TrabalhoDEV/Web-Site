@@ -271,7 +271,10 @@
 
                 <!-- Submit button -->
                 <div class="form-actions">
-                <button type="submit" class="btn-submit">Editar</button>
+                    <button type="submit" class="btn-save">Salvar</button>
+                    <a href="${pageContext.request.contextPath}/admin/student/find-many" class="btn-cancel">
+                        Cancelar
+                    </a>
                 </div>
             </form>
         </div>

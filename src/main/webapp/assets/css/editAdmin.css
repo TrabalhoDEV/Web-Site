@@ -38,7 +38,8 @@
 .form-actions {
     display: flex;
     width: 100%;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 64px;
     margin-top: 10px;
 }
 

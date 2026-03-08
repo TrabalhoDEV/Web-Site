@@ -186,8 +186,8 @@
 
           <!-- Example form group -->
           <div class="form-group">
-            <label for="name">Ano Letivo:</label>
-            <input type="text" id="name" name="name" placeholder="Digite o nome" required>
+            <label for="name">Nome da turma:</label>
+            <input type="text" id="name" name="name" placeholder="Digite o nome da turma" required>
           </div>
 
           <!-- Subjects Fieldset -->
@@ -211,26 +211,21 @@
             </fieldset>
           </div>
 
-          <!-- Submit button -->
-          <div class="form-actions">
-            <input type="submit" value="Cadastrar" class="btn-submit">
-          </div>
-
           <%
             if (request.getAttribute("error") != null) {
           %>
-          <p style="color: red;">
+          <p style="color: #9b0404; text-align: start">
             <%= request.getAttribute("error") %>
           </p>
-          <%
-          } else if (request.getAttribute("success") != null) {
-          %>
-          <p style="color: red;">
-            Cadastro realizado com sucesso
-          </p>
-          <%
-            }
-          %>
+          <%}%>
+
+          <!-- Submit button -->
+          <div class="form-actions">
+            <button type="submit" class="btn-save">Salvar</button>
+            <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="btn-cancel">
+              Cancelar
+            </a>
+          </div>
         </form>
 
       </div>
