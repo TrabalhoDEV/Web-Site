@@ -3,6 +3,7 @@
 <%@ page import="com.example.schoolservlet.models.StudentSubject" %>
 <%@ page import="com.example.schoolservlet.utils.records.AuthenticatedUser" %>
 <%@ page import="com.example.schoolservlet.utils.Constants" %>
+<%@ page import="com.example.schoolservlet.utils.records.StudentsPerformanceCount" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -28,18 +29,11 @@
     int reproved = 0;
     int pending = 0;
 
-    if (studentSubjectMap != null && !studentSubjectMap.isEmpty()) {
-        for (StudentSubject ss : studentSubjectMap.values()) {
-            Double avg = ss.getAverage();
-
-            if (ss.getGrade1() == null || ss.getGrade2() == null) {
-                pending++;
-            } else if (avg != null && avg >= Constants.MIN_GRADE_TO_BE_APPROVAL) {
-                approved++;
-            } else if (avg != null && avg < Constants.MIN_GRADE_TO_BE_APPROVAL) {
-                reproved++;
-            }
-        }
+    StudentsPerformanceCount performanceCount = (StudentsPerformanceCount) request.getAttribute("performanceCount");
+    if (performanceCount != null) {
+        approved = performanceCount.approved();
+        reproved = performanceCount.failed();
+        pending = performanceCount.pending();
     }
 
 

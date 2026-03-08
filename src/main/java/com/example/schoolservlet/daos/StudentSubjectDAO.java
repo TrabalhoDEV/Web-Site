@@ -368,6 +368,52 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    public StudentsPerformanceCount studentPerformanceCount(int studentId) throws DataException, ValidationException {
+        InputValidation.validateId(studentId, "id do aluno");
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "SELECT " +
+                             "SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) AS approved, " +
+                             "SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) AS failed, " +
+                             "SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) AS pending " +
+                             "FROM (" +
+                             "    SELECT " +
+                             "        CASE " +
+                             "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
+                             "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
+                             "            WHEN ss.grade2 IS NOT NULL THEN ss.grade2 " +
+                             "            ELSE NULL " +
+                             "        END AS media " +
+                             "    FROM student_subject ss " +
+                             "    JOIN student st ON st.id = ss.id_student " +
+                             "    WHERE ss.id_student = ? AND st.status = ? " +
+                             ") AS sub"
+             )) {
+
+            pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APPROVAL);
+            pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APPROVAL);
+            pstmt.setInt(3, studentId);
+            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal() + 1);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new StudentsPerformanceCount(
+                        rs.getInt("approved"),
+                        rs.getInt("pending"),
+                        rs.getInt("failed")
+                );
+            }
+
+            return new StudentsPerformanceCount(0, 0, 0);
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar desempenho do aluno", sqle);
+        }
+    }
+
     @Override
     public Map<Integer, StudentSubject> findStudentsThatRequireTeacher(int teacherId) throws DataException, ValidationException {
         InputValidation.validateId(teacherId, "id do professor");
