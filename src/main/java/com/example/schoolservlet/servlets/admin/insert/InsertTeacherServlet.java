@@ -96,10 +96,10 @@ public class InsertTeacherServlet extends HttpServlet {
 
             try {
                 String assunto = "Acesso ao Sistema Escolar";
-                String mensagem = "Olá " + teacher.getName() + ",<br><br>"
+                String mensagem = "Olá " + OutputFormatService.formatName(teacher.getName()) + ",<br><br>"
                         + "Você já pode acessar o sistema escolar.<br>"
                         + "A senha será enviada pelo administrador da escola.<br>"
-                        + "<a href=\"https://vertice-yw2e.onrender.com/index.jsp\">Clique aqui para logar</a><br><br>"
+                        + String.format("<a href=\"%s/index.jsp\">Clique aqui para logar</a><br><br>", request.getContextPath())
                         + "Atenciosamente,<br>"
                         + "Secretaria Vértice";
 
@@ -115,37 +115,31 @@ public class InsertTeacherServlet extends HttpServlet {
             getAllSubjects(request);
             request.setAttribute("error", nfe.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
-            return;
         } catch (NotFoundException nfe){
             getAllSchoolClasses(request);
             getAllSubjects(request);
             request.setAttribute("error", nfe.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
-            return;
         } catch (RequiredFieldException rfe){
             getAllSchoolClasses(request);
             getAllSubjects(request);
             request.setAttribute("error", rfe.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
-            return;
         } catch (ValueAlreadyExistsException vaee) {
             getAllSchoolClasses(request);
             getAllSubjects(request);
             request.setAttribute("error", vaee.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
-            return;
         } catch (ValidationException ve){
             getAllSchoolClasses(request);
             getAllSubjects(request);
             request.setAttribute("error",ve.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
-            return;
         }catch (DataException de) {
             getAllSchoolClasses(request);
             getAllSubjects(request);
             request.setAttribute("error", de.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
-            return;
         }
 
     }

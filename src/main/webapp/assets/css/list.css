@@ -62,7 +62,7 @@
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 15px 35px;
+    padding: 8px 12px;
     border-radius: 8px;
     cursor: pointer;
 }
@@ -72,9 +72,9 @@ td button, #confirmDelete{
     background: var(--primary-color);
     color: white;
     border: none;
-    width: 110px;
-    height: 40px;
+    padding: 8px 12px;
     border-radius: 8px;
+    width: 120px;
     cursor: pointer;
 }
 
@@ -231,11 +231,22 @@ dialog::backdrop {
 }
 
 .pagination{
-    margin-top: 10px;
+    margin-top: 20px;
     margin-left: 40px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
 }
 
 .pagination > a{
     text-decoration: none;
-    color: black;
+    font-size: var(--text-sm) ;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
 }

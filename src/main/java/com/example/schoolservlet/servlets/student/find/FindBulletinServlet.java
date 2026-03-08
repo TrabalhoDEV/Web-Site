@@ -7,9 +7,11 @@ import java.util.logging.Logger;
 
 import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
+import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.PaginationUtilities;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 
@@ -96,14 +98,11 @@ public class FindBulletinServlet extends HttpServlet {
 
                 performanceCount = studentSubjectDAO.studentPerformanceCount(authenticatedUser.id());
                 request.setAttribute("performanceCount", performanceCount);
-            } catch (DataException de) {
-                LOGGER.log(Level.SEVERE, "Data access error while fetching student subjects for student ID: " + authenticatedUser.id(), de);
-                treatUnexpectedError(request, response);
-                studentSubjectMap = Map.of();
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Database error while fetching student subjects for student ID: " + authenticatedUser.id(), e);
-                treatUnexpectedError(request, response);
-                studentSubjectMap = Map.of();
+            } catch (DataException | ValidationException e) {
+                LOGGER.log(Level.SEVERE, "Data access error while fetching student subjects for student ID: " + authenticatedUser.id(), e);
+                response.setStatus(e.getStatus());
+                treatUnexpectedError(request, response, e.getMessage());
+                return;
             }
 
             // Validate returned data
@@ -115,21 +114,19 @@ public class FindBulletinServlet extends HttpServlet {
             // Prepare request attributes for view rendering
             request.setAttribute("studentSubjectMap", studentSubjectMap);
             request.setAttribute("performanceCount", performanceCount);
-            request.setAttribute("currentPage", page);
+            request.setAttribute("page", page);
             request.setAttribute("totalPages", totalPages);
 
             // Forward to bulletin view template for display
             request.getRequestDispatcher("/WEB-INF/views/student/bulletin.jsp").forward(request, response);
             
-        } catch (ServletException | IOException e) {
-            LOGGER.log(Level.SEVERE, "Error processing bulletin request for student ID: " + authenticatedUser.id(), e);
-            treatUnexpectedError(request, response);
         } catch (DataException de) {
             LOGGER.log(Level.SEVERE, "Data access error while processing bulletin for student ID: " + authenticatedUser.id(), de);
-            treatUnexpectedError(request, response);
+            response.setStatus(de.getStatus());
+            treatUnexpectedError(request, response, de.getMessage());
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected error in bulletin servlet", e);
-            treatUnexpectedError(request, response);
+            treatUnexpectedError(request, response, "Ocorreu um erro ao buscar boletim");
         }
     }
 
@@ -146,12 +143,14 @@ public class FindBulletinServlet extends HttpServlet {
      * @param request the HTTP servlet request to set error attributes on
      * @param response the HTTP servlet response for the forward operation
      */
-    private void treatUnexpectedError(HttpServletRequest request, HttpServletResponse response) {
+    private void treatUnexpectedError(HttpServletRequest request, HttpServletResponse response, String error) {
         request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
         request.setAttribute("studentSubjectMap", Map.of());
-        request.setAttribute("currentPage", 0);
+        request.setAttribute("page", 1);
+        request.setAttribute("totalPages", 1);
+
         try {
-            request.getRequestDispatcher("/WEB-INF/views/student/bulletin.jsp").forward(request, response);
+            ErrorHandler.forward(request, response, response.getStatus(), error, "/WEB-INF/views/student/bulletin.jsp");
         } catch (ServletException | IOException forwardException) {
             LOGGER.log(Level.SEVERE, "Failed to forward to bulletin page", forwardException);
         }

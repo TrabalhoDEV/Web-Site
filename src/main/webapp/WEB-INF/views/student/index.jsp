@@ -1,6 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.schoolservlet.utils.records.AuthenticatedUser" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="com.example.schoolservlet.models.StudentSubject" %>
+<%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -29,7 +32,7 @@
     %>
 
     <%
-        List<String> observationsList = (List<String>) request.getAttribute("observationsList");
+        Map<Integer, StudentSubject> studentSubjectMap = (Map<Integer, StudentSubject>) request.getAttribute("studentSubjectMap");
         AuthenticatedUser user = (AuthenticatedUser) session.getAttribute("user");
 
         Integer currentPage = (Integer) request.getAttribute("currentPage");
@@ -122,56 +125,53 @@
         <section class="hero">
             <div class="hero-content">
                 <h1>Olá! </h1>
-                <p>Nota: Os feedbacks dos professores são sempre anônimos.</p>
+                <p>Veja os feedbacks dos seus professores.</p>
             </div>
             <div class="hero-illustration">
                 <img src="<%= request.getContextPath() %>/assets/img/gato.svg" alt="Ilustração gato"/>
             </div>
         </section>
 
-        <section class="observations-grid">
-            <%
-                if (observationsList != null && !observationsList.isEmpty()) {
-                    for (String obs : observationsList) {
-            %>
-            <div class="card-tasks">
-                <p class="materia">Matéria: <span>anônima.</span></p>
-                <p class="descricao">Feedback: <span><%= obs %></span></p>
+        <section class="obs">
+            <section class="observations-grid">
+                <%
+                    if (studentSubjectMap != null && !studentSubjectMap.isEmpty()) {
+                        for (StudentSubject studentSubject : studentSubjectMap.values()) {
+                %>
+                <div class="card-tasks">
+                    <p class="materia"><%= OutputFormatService.formatName(studentSubject.getSubject().getName())%>
+                    </p>
+                    <p class="descricao"><%= studentSubject.getObs() %>
+                    </p>
+                </div>
+                <%
+                    }
+                } else {
+                %>
+                <div class="card-tasks">
+                    <p>Nenhuma observação encontrada.</p>
+                </div>
+                <%
+                    }
+                %>
+            </section>
+
+            <!-- PAGINAÇÃO -->
+            <div class="pagination">
+
+                <% if (currentPage > 1) { %>
+                <a href="?page=<%=currentPage-1%>">Anterior</a>
+                <% } %>
+
+
+                <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1%>
+                </strong>
+
+                <% if (currentPage < totalPages) { %>
+                <a href="?page=<%=currentPage+1%>">Próxima</a>
+                <% } %>
             </div>
-            <%
-                }
-            } else {
-            %>
-            <div class="card-tasks">
-                <p>Nenhuma observação encontrada.</p>
-            </div>
-            <%
-                }
-            %>
         </section>
-
-        <div style="margin: 20px; display: flex; gap: 10px;">
-            <%
-                if (currentPage > 0) {
-            %>
-            <form method="get" action="<%= request.getContextPath() %>/student/home?nextPage=<%= currentPage - 1 %>">
-                <button type="submit">Anterior</button>
-            </form>
-            <%
-                }
-            %>
-
-            <%
-                if (totalPages > currentPage) {
-            %>
-            <form method="get" action="<%= request.getContextPath() %>/student/home?nextPage=<%= currentPage + 1 %>">
-                <button type="submit">Próxima</button>
-            </form>
-            <%
-                }
-            %>
-
-        </div>
     </main>
 </div>
 
