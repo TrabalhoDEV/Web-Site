@@ -7,6 +7,7 @@ import com.example.schoolservlet.exceptions.RequiredFieldException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
+import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.ServletException;
@@ -68,15 +69,10 @@ public class ReleaseGradesServlet extends HttpServlet {
             return;
         }
 
-        // Load studentSubject from database:
-        try {
-            StudentSubject studentSubject = new StudentSubjectDAO().findById(Integer.parseInt(studentSubjectIdParam));
-            request.setAttribute("studentSubject", studentSubject);
-            request.getRequestDispatcher("/WEB-INF/views/teacher/findMany/releaseGrade.jsp")
+        // Load studentSubject from database:=
+        getAllData(request, response, studentSubjectIdParam);
+        request.getRequestDispatcher("/WEB-INF/views/teacher/student/releaseGrade.jsp")
                     .forward(request, response);
-        } catch (NotFoundException | DataException | ValidationException e) {
-            response.sendRedirect(request.getContextPath() + "/teacher/students");
-        }
     }
 
     /**
@@ -124,29 +120,38 @@ public class ReleaseGradesServlet extends HttpServlet {
      * @see InputValidation#validateGrade(double)
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        AccessValidation.isTeacher(request, response);
+        if (!AccessValidation.isTeacher(request, response)) return;
 
-        // Get parameter id:
+        HttpSession session = request.getSession(false);
+        if (session == null){
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_UNAUTHORIZED, "Sessão expirada, faça login novamente", "/index.jsp");
+        }
         String studentSubjectIdParam = request.getParameter("studentSubjectId");
         String grade1Param = request.getParameter("grade1");
         String grade2Param = request.getParameter("grade2");
         String observationsParam = request.getParameter("obs");
 
-
-        // Validate inputs:
-        try {
-            InputValidation.validateIsNull("studentSubjectId", studentSubjectIdParam);
-        } catch (RequiredFieldException e) {
+        if (studentSubjectIdParam == null || studentSubjectIdParam.isEmpty()) {
             response.sendRedirect(request.getContextPath() + "/teacher/students");
+            return;
         }
 
-        try{
-            StudentSubject studentSubject = studentSubjectDAO.findById(Integer.parseInt(studentSubjectIdParam));
+        int studentSubjectId;
+        try {
+            studentSubjectId = Integer.parseInt(studentSubjectIdParam);
+        } catch (NumberFormatException e) {
+            session.setAttribute("error", "ID deve ser um número inteiro");
+            response.sendRedirect(request.getContextPath() + "/teacher/students");
+            return;
+        }
+
+        try {
+            StudentSubject studentSubject = studentSubjectDAO.findById(studentSubjectId);
 
             double grade1 = Double.parseDouble(grade1Param);
             double grade2 = Double.parseDouble(grade2Param);
 
-            if  (!(InputValidation.validateGrade(grade1) && InputValidation.validateGrade(grade2))) {
+            if (!(InputValidation.validateGrade(grade1) && InputValidation.validateGrade(grade2))) {
                 throw new ValidationException("Notas devem estar entre 0 e 10.");
             }
 
@@ -154,19 +159,28 @@ public class ReleaseGradesServlet extends HttpServlet {
             studentSubject.setGrade2(grade2);
             studentSubject.setObs(observationsParam);
 
-            // Update in database:
             studentSubjectDAO.update(studentSubject);
-
             response.sendRedirect(request.getContextPath() + "/teacher/students");
 
-        } catch (NotFoundException | DataException | ValidationException e) {
-            request.setAttribute("error", e.getMessage());
-            request.getRequestDispatcher("/teacher/students/grades/release?studentSubjectId=" + studentSubjectIdParam)
+        } catch (NotFoundException e) {
+            session.setAttribute("error", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/teacher/students");
+        } catch (DataException | ValidationException | NumberFormatException e) {
+            request.setAttribute("error", e instanceof NumberFormatException
+                    ? "Notas devem ser números válidos."
+                    : e.getMessage());
+            getAllData(request, response, studentSubjectIdParam);
+            request.getRequestDispatcher("/WEB-INF/views/teacher/student/releaseGrade.jsp")
                     .forward(request, response);
-        } catch (NumberFormatException e){
-            request.setAttribute("error", "Notas devem ser números válidos.");
-            request.getRequestDispatcher("/teacher/students/grades/release?studentSubjectId=" + studentSubjectIdParam)
-                    .forward(request, response);
+        }
+    }
+
+    private void getAllData(HttpServletRequest request, HttpServletResponse response, String studentSubjectIdParam){
+        try {
+            StudentSubject studentSubject = new StudentSubjectDAO().findById(Integer.parseInt(studentSubjectIdParam));
+            request.setAttribute("studentSubject", studentSubject != null ? studentSubject : new StudentSubject());
+        } catch (NotFoundException | ValidationException | DataException e){
+            request.setAttribute("studentSubject", new StudentSubject());
         }
     }
 }
