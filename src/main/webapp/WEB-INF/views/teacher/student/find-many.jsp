@@ -32,7 +32,7 @@
 
 <div class="app-layout">
 
-  <!-- SIDEBAR IGUAL À BASE -->
+  <!-- SIDEBAR -->
   <aside class="sidebar">
 
     <div class="sidebar-logo">
@@ -231,10 +231,7 @@
       <div class="boletim-grid">
 
         <div class="header-grid">
-          <h1>
-            <%= teacher != null
-                    ? OutputFormatService.formatName(teacher.getName())
-                    : "Desempenho dos Alunos" %>
+          <h1>Desempenho dos Alunos
           </h1>
         </div>
 
@@ -244,10 +241,10 @@
         100px
         1fr
         1fr
-        60px
-        60px
-        60px
-        90px
+        70px
+        70px
+        70px
+        100px
         140px;">
 
           <thead>
