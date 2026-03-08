@@ -2,20 +2,29 @@
 @import url('./layout/tokens.css');
 @import url('./layout/navbar.css');
 
+*{
+    box-sizing: border-box;
+}
+
+.main-content{
+    padding: 32px;
+}
+
 .boletim-grid{
     background-color: var(--surface-color);
     border-radius: var(--medium-radius);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 24px 32px;
     width: 50vw;
-    margin: 70px auto;
-    padding-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin: auto;
 }
 .header-grid{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
     font-size: var(--text-md);
 }
 
@@ -154,10 +163,8 @@ select{
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-top: 30px;
-    margin-bottom: 0px;
-
 }
+
 .modal-actions button{
     font-size: var(--text-sm) ;
     background: #4c63ff;
@@ -245,12 +252,11 @@ select{
 }
 
 /* ===== FORM ACTIONS ===== */
-
 .form-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 12px;
+    width: 100%;
     justify-content: center;
+    gap: 64px;
 }
 
 .btn-submit {
@@ -465,14 +471,6 @@ a.blue_button:hover {
 
 a.blue_button:active {
     transform: scale(0.98);
-}
-
-.form-actions {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    gap: 64px;
-    margin-top: 10px;
 }
 
 .btn-save{
