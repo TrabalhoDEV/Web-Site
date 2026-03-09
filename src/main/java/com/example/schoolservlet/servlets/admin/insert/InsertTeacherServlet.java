@@ -70,6 +70,9 @@ public class InsertTeacherServlet extends HttpServlet {
             if(validSubjectIds != null && !validSubjectIds.isEmpty()) {
                 List<SubjectTeacher> subjectTeachersToInsert = new ArrayList<>();
                 for (Integer subjectId : validSubjectIds) {
+                    if (!subjectDAO.hasStudentsById(subjectId)) {
+                        throw new ValidationException("A matéria selecionada não possui alunos vinculados.");
+                    }
 
                     Subject subject = subjectDAO.findById(subjectId);
 
@@ -85,6 +88,10 @@ public class InsertTeacherServlet extends HttpServlet {
             if(validClassIds != null && !validClassIds.isEmpty()){
                 List<SchoolClassTeacher> classTeachersToInsert = new ArrayList<>();
                 for (Integer classId : validClassIds) {
+                    if (!schoolClassDAO.hasStudentsById(classId)) {
+                        throw new ValidationException("A turma selecionada não possui alunos vinculados.");
+                    }
+
                     SchoolClass schoolClass = schoolClassDAO.findById(classId);
                     SchoolClassTeacher schoolClassTeacher = new SchoolClassTeacher();
                     schoolClassTeacher.setTeacher(teacher);
