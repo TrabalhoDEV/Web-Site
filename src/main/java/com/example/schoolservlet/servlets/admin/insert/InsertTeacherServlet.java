@@ -29,8 +29,13 @@ public class InsertTeacherServlet extends HttpServlet {
 
     /**
      * Handles POST requests for teacher registration.
+     * <p>
+     * If any validation fails after the teacher is created (e.g., invalid subject or class associations),
+     * the method performs a rollback by deleting the created teacher record. Database CASCADE rules
+     * automatically clean up any related subject-teacher and class-teacher relationships.
+     * </p>
      *
-     * @param request  the HTTP request containing name, email, username, password parameters
+     * @param request  the HTTP request containing name, email, username, password, subjectIds, and schoolClassIds parameters
      * @param response the HTTP response object
      * @throws ServletException if servlet processing fails
      * @throws IOException      if I/O error occurs
@@ -71,6 +76,8 @@ public class InsertTeacherServlet extends HttpServlet {
                 List<SubjectTeacher> subjectTeachersToInsert = new ArrayList<>();
                 for (Integer subjectId : validSubjectIds) {
                     if (!subjectDAO.hasStudentsById(subjectId)) {
+                        // Rollback teacher creation
+                        teacherDAO.delete(teacherId);
                         throw new ValidationException("A matéria selecionada não possui alunos vinculados.");
                     }
 
@@ -89,6 +96,8 @@ public class InsertTeacherServlet extends HttpServlet {
                 List<SchoolClassTeacher> classTeachersToInsert = new ArrayList<>();
                 for (Integer classId : validClassIds) {
                     if (!schoolClassDAO.hasStudentsById(classId)) {
+                        // Rollback teacher creation (cascade deletes subject-teacher relationships)
+                        teacherDAO.delete(teacherId);
                         throw new ValidationException("A turma selecionada não possui alunos vinculados.");
                     }
 
@@ -151,6 +160,15 @@ public class InsertTeacherServlet extends HttpServlet {
 
     }
 
+    /**
+     * Handles GET requests to display the teacher registration form.
+     * Loads all available subjects and school classes for selection.
+     *
+     * @param request  the HTTP request object
+     * @param response the HTTP response object
+     * @throws ServletException if servlet processing fails
+     * @throws IOException      if I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -160,6 +178,12 @@ public class InsertTeacherServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
     }
 
+    /**
+     * Retrieves all subjects from the database and sets them as a request attribute.
+     * If an error occurs, sets the error message as a request attribute.
+     *
+     * @param request the HTTP request object to set attributes
+     */
     private void getAllSubjects(HttpServletRequest request){
         try {
             List<Subject> subjects = subjectDAO.findAll();
@@ -169,6 +193,12 @@ public class InsertTeacherServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Retrieves all school classes from the database and sets them as a request attribute.
+     * If an error occurs, sets the error message as a request attribute.
+     *
+     * @param request the HTTP request object to set attributes
+     */
     private void getAllSchoolClasses(HttpServletRequest request) {
         try {
             List<SchoolClass> classes = schoolClassDAO.findAll();
