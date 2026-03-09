@@ -223,4 +223,24 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
             throw new DataException("Erro ao contar turmas", sqle);
         }
     }
+
+    public boolean hasStudentsById(int schoolClassId) throws DataException, ValidationException {
+        InputValidation.validateId(schoolClassId, "id da turma");
+
+        String sql = "SELECT EXISTS (SELECT 1 FROM student WHERE id_school_class = ?) AS has_students";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, schoolClassId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) return rs.getBoolean("has_students");
+            }
+
+            return false;
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao validar alunos da turma", sqle);
+        }
+    }
 }

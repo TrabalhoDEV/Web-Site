@@ -315,4 +315,24 @@ public class SubjectDAO implements GenericDAO<Subject> {
             throw new DataException("Erro ao deletar matéria", sqle);
         }
     }
+
+    public boolean hasStudentsById(int subjectId) throws DataException, ValidationException {
+        InputValidation.validateId(subjectId, "id da matéria");
+
+        String sql = "SELECT EXISTS (SELECT 1 FROM student_subject WHERE id_subject = ?) AS has_students";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, subjectId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) return rs.getBoolean("has_students");
+            }
+
+            return false;
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao validar alunos da matéria", sqle);
+        }
+    }
 }
