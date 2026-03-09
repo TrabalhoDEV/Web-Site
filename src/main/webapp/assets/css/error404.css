@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    top: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background: linear-gradient(to bottom, white, #4362ee72);
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    height: 100dvh;
+    scroll-behavior: none;
+    overflow-x: hidden;
+}
+
+img{
+    max-height: 100dvh;
+}
+.title{
+    font-size: 100px;
+    font-weight: 600;
+    color: #4361EE;
+    margin-top: 200px;
+}
+.sub-title{
+    font-size: 30px;
+    font-weight: 600;
+    color: #1B2559;
+}
+.description{
+    color: #555;
+    font-weight: 500;
+    font-size: 16px;
+    width: 60%;
+}
+button{
+    background-color: #4361EE;
+    color: white;
+    padding: 15px 25px;
+    font-weight: 500;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    margin-top: 40px;
+}
+button:hover{
+    background-color: #3950BE;
+    cursor: pointer;
+}

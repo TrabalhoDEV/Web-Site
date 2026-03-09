@@ -1,0 +1,49 @@
+package com.example.schoolservlet.utils;
+
+/**
+ * Java class that contains constants that define business' rules, like length limits.
+ * Doing that based on each table of database.
+ */
+public class Constants {
+//    GLOBAL constraints:
+    public static final int MAX_EMAIL_LENGTH = 355;
+    public static final int MIN_EMAIL_LENGTH = 2;
+    public static final int MAX_PASSWORD_LENGTH = 28;
+    public static final int MIN_PASSWORD_LENGTH = 8;
+
+
+//    TEACHER constraints:
+    public static final int MAX_TEACHER_NAME_LENGTH = 150;
+    public static final int MIN_TEACHER_NAME_LENGTH = 3;
+    public static final int MAX_TEACHER_USERNAME_LENGTH = 50;
+    public static final int MIN_TEACHER_USERNAME_LENGTH = 3;
+
+
+//    STUDENT constraints:
+    public static final int MAX_STUDENT_NAME_LENGHT = 150;
+    public static final int MIN_STUDENT_NAME_LENGHT = 3;
+    public static final int MAX_STUDENT_CLASS = 12;
+    public static final int MIN_STUDENT_CLASS = 1;
+
+
+//  SUBJECT constraints:
+    public static final int MAX_SUBJECT_NAME_LENGTH = 100;
+    public static final int MIN_SUBJECT_NAME_LENGTH = 2;
+
+//  STUDENT_SUBJECT constraints:
+    public static final double MAX_GRADE = 10.0;
+    public static final double MIN_GRADE = 0.0;
+    public static final double MIN_GRADE_TO_BE_APPROVAL = 7.0;
+    public static final int MAX_GRADE_TO_HELP = 8;
+    public static final int STUDENTS_HELP_TAKE = 5;
+    public static final int PENDENCIES_TAKE = 3;
+    public static final int MAX_OBS_LENGTH = 2000;
+    public static final int MIN_OBS_LENGTH = 3;
+
+//    PAGES constraints:
+    public static final int MAX_TAKE = 6;
+    public static final int MIN_PAGE = 0;
+
+// STRINGS
+    public static final String UNEXPECTED_ERROR_MESSAGE = "Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.";
+}
