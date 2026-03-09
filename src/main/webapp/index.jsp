@@ -46,7 +46,6 @@
 
     <p>Esqueceu sua senha? <a href="${pageContext.request.contextPath}/auth/forgot-password/send-code">Clique aqui</a></p>
     <p>Não tem conta? <a href="${pageContext.request.contextPath}/student/validate/cpf">Crie aqui</a></p>
-    <p>Tem alguma dúvida sobre a escola? <a href="${pageContext.request.contextPath}/chatbot">Visite nosso chatbot</a></p>
     <a href="pages/landing/index.html"> Página principal </a>
 </main>
 
