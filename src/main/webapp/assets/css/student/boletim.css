@@ -4,12 +4,14 @@
 
 /* Notes */
 .card-note{
-    width: 90%;
-    width: 90%;
+    width: 100%;
     margin: 35px;
     display: flex;
     gap: 40px;
+    margin-left: 0;
     margin-bottom: 60px;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 .card-note h1{
     font-size: var(--text-42x1);
@@ -41,7 +43,8 @@
     flex-direction: column;
     justify-content: space-between;
     height: 130px;
-    width: 245px;
+    flex: 1;
+    min-width: 190px;
     background-color:#ffffff;
 }
 .approved-note h1{
@@ -62,7 +65,8 @@
     flex-direction: column;
     justify-content: space-between;
     height: 130px;
-    width: 245px;
+    flex: 1;
+    min-width: 190px;
     background-color:#ffffff;
 }
 .reproved-note h1{
@@ -84,7 +88,8 @@
     justify-content: space-between;
     background-color:#ffffff;
     height: 130px;
-    width: 245px;
+    flex: 1;
+    min-width: 190px;
 
 }
 .pending-note h1{
