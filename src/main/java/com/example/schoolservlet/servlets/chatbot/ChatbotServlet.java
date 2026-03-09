@@ -66,14 +66,11 @@ public class ChatbotServlet extends HttpServlet {
             dotenv = null;
         }
 
-        try {
-            this.apiKey = dotenv.get("AI_MODEL_API_KEY");
 
-            if (apiKey == null || apiKey.trim().isEmpty()) {
-                logger.warning("AI_MODEL_API_KEY environment variable is not set");
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to load environment variables", e);
+        this.apiKey = ConfigService.getEnv("AI_MODEL_API_KEY", dotenv);
+
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            logger.warning("AI_MODEL_API_KEY environment variable is not set");
         }
     }
 
