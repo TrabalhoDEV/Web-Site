@@ -261,7 +261,7 @@
                                     <span class="status overdue">•</span> <span
                                             class="status"> <%=pendency.status()%></span></p>
                             </div>
-                            <a href="student-profile.html">
+                            <a href="${pageContext.request.contextPath}/teacher/students/grades/release?studentSubjectId=<%=pendencies.get(0).studentId()%>">
                                 <button class="details">Detalhes</button>
                             </a>
                         </li>
