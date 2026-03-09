@@ -54,8 +54,20 @@ public class ChatbotServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
+
+        Dotenv dotenv = null;
+
         try {
-            this.apiKey = ConfigService.getEnv("AI_MODEL_API_KEY", Dotenv.load());
+            dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            dotenv = null;
+        }
+
+        try {
+            this.apiKey = dotenv.get("AI_MODEL_API_KEY");
 
             if (apiKey == null || apiKey.trim().isEmpty()) {
                 logger.warning("AI_MODEL_API_KEY environment variable is not set");
