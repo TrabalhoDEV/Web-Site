@@ -20,8 +20,7 @@
     String userPrompt = request.getAttribute("userPrompt") != null? request.getAttribute("userPrompt").toString() : "";
 %>
 <body>
-
-<header class="navbar" style="color: black">
+<header class="navbar">
   <div class="nav-container">
 
     <a href="#" class="logo">
@@ -132,15 +131,15 @@
     </a>
 
     <nav class="nav-links">
-      <a href="<%= request.getContextPath() %>/index.html#hero">Início</a>
-      <a href="">Detalhes</a>
-      <a href="<%= request.getContextPath() %>/index.html#recursos">Recursos</a>
-      <a href="<%= request.getContextPath() %>/index.html#beneficios">Benefícios</a>
+      <a href="<%=request.getContextPath()%>/index.html#hero">Início</a>
+      <a href="<%=request.getContextPath()%>//pages/chatbot/chatbot.jsp">Detalhes</a>
+      <a href="<%=request.getContextPath()%>/index.html#recursos">Recursos</a>
+      <a href="<%=request.getContextPath()%>/index.html#beneficios">Benefícios</a>
     </nav>
 
     <div class="nav-actions">
-      <a href="<%= request.getContextPath() %>/index.jsp" class="login-link">Login</a>
-      <a href="<%= request.getContextPath() %>/pages/students/signupCpf.jsp" class="btn btn-primary btn-nav">Cadastrar</a>
+      <a href="<%=request.getContextPath()%>/index.jsp" class="login-link">Login</a>
+      <a href="<%=request.getContextPath()%>/pages/students/signupCpf.jsp" class="btn btn-primary btn-nav">Cadastrar</a>
     </div>
 
   </div>
