@@ -71,7 +71,7 @@ public class HomeServlet extends HttpServlet {
             studentsPerformance = studentSubjectDAO.studentsPerformance(teacher.getId());
             pendencies = studentSubjectDAO.teacherPendency(teacher.getId());
         } catch (ValidationException | NotFoundException | DataException e) {
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/student.jsp");
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/teacher/index.jsp");
             return;
         }
 
