@@ -27,9 +27,9 @@ VALUES
 -- =========================
 -- TEACHER (1 professor)
 -- =========================
-INSERT INTO teacher (name, email, username, password)
+INSERT INTO teacher (name, email, username)
 VALUES
-    ('Carlos Eduardo Lima', 'carlos.lima@escolavertice.com.br', 'carlos.lima', '123456');
+    ('Carlos Eduardo Lima', 'carlos.lima@escolavertice.com.br', 'carlos.lima');
 
 -- =========================
 -- SUBJECTS
@@ -44,30 +44,30 @@ VALUES
 -- =========================
 -- ADMIN
 -- =========================
-INSERT INTO admin (document, email, password)
+INSERT INTO admin (document, email)
 VALUES
-    ('12345678901', 'secretaria@escolavertice.com.br', 'admin123');
+    ('12345678901', 'secretaria@escolavertice.com.br');
 
 -- =========================
 -- STUDENTS (14 alunos)
 -- Aluno principal: id = 1
 -- =========================
-INSERT INTO student (name, email, password, cpf, id_school_class)
+INSERT INTO student (name, email, cpf, id_school_class)
 VALUES
-    ('Miguel Fernandes', 'miguel.fernandes@aluno.vertice.com.br', '123456', '10000000001', 1), -- principal
-    ('Ana Clara Souza', 'ana.clara@aluno.vertice.com.br', '123456', '10000000002', 1),
-    ('Bruno Henrique Silva', 'bruno.henrique@aluno.vertice.com.br', '123456', '10000000003', 1),
-    ('Camila Rodrigues', 'camila.rodrigues@aluno.vertice.com.br', '123456', '10000000004', 1),
-    ('Daniel Martins', 'daniel.martins@aluno.vertice.com.br', '123456', '10000000005', 1),
-    ('Eduarda Nogueira', 'eduarda.nogueira@aluno.vertice.com.br', '123456', '10000000006', 1),
-    ('Felipe Araujo', 'felipe.araujo@aluno.vertice.com.br', '123456', '10000000007', 2),
-    ('Gabriela Moraes', 'gabriela.moraes@aluno.vertice.com.br', '123456', '10000000008', 2),
-    ('Henrique Almeida', 'henrique.almeida@aluno.vertice.com.br', '123456', '10000000009', 2),
-    ('Isabela Castro', 'isabela.castro@aluno.vertice.com.br', '123456', '10000000010', 2),
-    ('Joao Pedro Santos', 'joao.pedro@aluno.vertice.com.br', '123456', '10000000011', 2),
-    ('Larissa Teixeira', 'larissa.teixeira@aluno.vertice.com.br', '123456', '10000000012', 2),
-    ('Matheus Oliveira', 'matheus.oliveira@aluno.vertice.com.br', '123456', '10000000013', 2),
-    ('Nathalia Barros', 'nathalia.barros@aluno.vertice.com.br', '123456', '10000000014', 2);
+    ('Miguel Fernandes', 'miguel.fernandes@aluno.vertice.com.br', , '10000000001', 1), -- principal
+    ('Ana Clara Souza', 'ana.clara@aluno.vertice.com.br', , '10000000002', 1),
+    ('Bruno Henrique Silva', 'bruno.henrique@aluno.vertice.com.br', , '10000000003', 1),
+    ('Camila Rodrigues', 'camila.rodrigues@aluno.vertice.com.br', , '10000000004', 1),
+    ('Daniel Martins', 'daniel.martins@aluno.vertice.com.br', , '10000000005', 1),
+    ('Eduarda Nogueira', 'eduarda.nogueira@aluno.vertice.com.br', , '10000000006', 1),
+    ('Felipe Araujo', 'felipe.araujo@aluno.vertice.com.br', , '10000000007', 2),
+    ('Gabriela Moraes', 'gabriela.moraes@aluno.vertice.com.br', , '10000000008', 2),
+    ('Henrique Almeida', 'henrique.almeida@aluno.vertice.com.br', , '10000000009', 2),
+    ('Isabela Castro', 'isabela.castro@aluno.vertice.com.br', , '10000000010', 2),
+    ('Joao Pedro Santos', 'joao.pedro@aluno.vertice.com.br', , '10000000011', 2),
+    ('Larissa Teixeira', 'larissa.teixeira@aluno.vertice.com.br', , '10000000012', 2),
+    ('Matheus Oliveira', 'matheus.oliveira@aluno.vertice.com.br', , '10000000013', 2),
+    ('Nathalia Barros', 'nathalia.barros@aluno.vertice.com.br', , '10000000014', 2);
 
 -- =========================
 -- SCHOOL CLASS TEACHER
