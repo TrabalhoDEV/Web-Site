@@ -24,7 +24,7 @@
     <% } %>
     <button type="submit">Enviar</button>
     <p>Já tem conta? <a href="${pageContext.request.contextPath}/index.jsp">Clique aqui</a></p>
-        <p><a href="${pageContext.request.contextPath}/chatbot">Tem alguma dúvida  sobre a escola? Acesse nosso chatbot</a></p>
+        <p>Quer saber mais? <a href="${pageContext.request.contextPath}/index.html">Clique aqui</a></p>
 </form>
 </main>
 </body>
