@@ -505,8 +505,9 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                 ") " +
                 "AND (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL)" +
                 ") AS sub " +
-                "WHERE media < ? AND st.status = ? " +
-                "ORDER BY media ASC " +
+                "JOIN student st ON st.id = sub.id_student " +
+                "WHERE sub.media < ? AND st.status = ? " +
+                "ORDER BY sub.media ASC " +
                 "LIMIT ?";
 
         try (Connection conn = PostgreConnection.getConnection();
