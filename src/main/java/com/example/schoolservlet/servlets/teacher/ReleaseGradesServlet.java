@@ -3,14 +3,9 @@ package com.example.schoolservlet.servlets.teacher;
 import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
-import com.example.schoolservlet.exceptions.RequiredFieldException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.StudentSubject;
-import com.example.schoolservlet.utils.AccessValidation;
-import com.example.schoolservlet.utils.ErrorHandler;
-import com.example.schoolservlet.utils.InputNormalizer;
-import com.example.schoolservlet.utils.InputValidation;
-import com.example.schoolservlet.utils.records.AuthenticatedUser;
+import com.example.schoolservlet.utils.*;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -132,13 +127,8 @@ public class ReleaseGradesServlet extends HttpServlet {
         String grade1Param = request.getParameter("grade1");
         String grade2Param = request.getParameter("grade2");
         String observationsParam = request.getParameter("obs");
-        double grade1 = 0;
-        double grade2 = 0;
-
-        if (studentSubjectIdParam == null || studentSubjectIdParam.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/teacher/students");
-            return;
-        }
+        Double grade1 = null;
+        Double grade2 = null;
 
         int studentSubjectId;
         try {
@@ -149,17 +139,21 @@ public class ReleaseGradesServlet extends HttpServlet {
             return;
         }
 
+        // Validate grades:
+        try{
+            if (grade1Param != null && !grade1Param.isEmpty() && InputValidation.validateGrade(Double.parseDouble(grade1Param)) ){
+                grade1 = Double.parseDouble(grade1Param);
+            }
+            if (grade2Param != null && !grade2Param.isEmpty() && InputValidation.validateGrade(Double.parseDouble(grade2Param))){
+                grade2 = Double.parseDouble(grade2Param);
+            }
+
+        } catch (ClassCastException | NumberFormatException e){
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST, "Notas devem ser números entre " + Constants.MIN_GRADE + " e " + Constants.MAX_GRADE, request.getContextPath() + "/teacher/students");
+        }
+
         try {
             StudentSubject studentSubject = studentSubjectDAO.findById(studentSubjectId);
-
-            if (grade1Param != null || !grade1Param.isEmpty()) {
-                grade1 = Double.parseDouble(grade1Param);
-                InputValidation.validateGrade(grade1);
-            }
-            if (grade2Param != null || !grade2Param.isEmpty()) {
-                grade2 = Double.parseDouble(grade2Param);
-                InputValidation.validateGrade(grade2);
-            }
 
             studentSubject.setGrade1(grade1);
             studentSubject.setGrade2(grade2);
