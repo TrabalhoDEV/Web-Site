@@ -15,6 +15,8 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+import static com.example.schoolservlet.servlets.teacher.RenderStudentSubjectGradesDashboardServlet.getAllData;
+
 /**
  * Servlet responsible for releasing student grades by teachers.
  * This servlet handles both GET and POST requests for grade release operations:
@@ -33,44 +35,6 @@ import java.io.IOException;
 @WebServlet("/teacher/students/grades/release")
 public class ReleaseGradesServlet extends HttpServlet {
     private final StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
-    /**
-     * Handles GET requests to display the grade release form.
-     *
-     * <p>This method retrieves the student-subject record from the database and
-     * forwards it to the releaseGrade.jsp view for the teacher to fill in grades.</p>
-     *
-     * <p>Required Parameters:</p>
-     * <ul>
-     *     <li>{@code studentSubjectId} - The ID of the StudentSubject record to retrieve</li>
-     * </ul>
-     *
-     * <p>Request Attributes Set:</p>
-     * <ul>
-     *     <li>{@code studentSubject} - The StudentSubject object retrieved from the database</li>
-     *     <li>{@code error} - Error message if studentSubjectId is missing or invalid</li>
-     * </ul>
-     *
-     * @param request  the HttpServletRequest object
-     * @param response the HttpServletResponse object
-     * @throws IOException      if an I/O error occurs
-     * @throws ServletException if a servlet error occurs
-     * @throws RuntimeException if the StudentSubject is not found or a data error occurs
-     */
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        AccessValidation.isTeacher(request, response);
-        // Get studentSubject id:
-        String studentSubjectIdParam = request.getParameter("studentSubjectId");
-        if (studentSubjectIdParam == null || studentSubjectIdParam.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/teacher/students");
-            return;
-        }
-
-        // Load studentSubject from database:=
-        getAllData(request, response, studentSubjectIdParam);
-        request.getRequestDispatcher("/WEB-INF/views/teacher/student/releaseGrade.jsp")
-                    .forward(request, response);
-    }
-
     /**
      * Handles POST requests to save updated student grades.
      *
@@ -177,15 +141,6 @@ public class ReleaseGradesServlet extends HttpServlet {
         } catch (NumberFormatException e){
             session.setAttribute("error", "ID deve ser um número");
             response.sendRedirect(request.getContextPath() + "/teacher/students");
-        }
-    }
-
-    private void getAllData(HttpServletRequest request, HttpServletResponse response, String studentSubjectIdParam){
-        try {
-            StudentSubject studentSubject = new StudentSubjectDAO().findById(Integer.parseInt(studentSubjectIdParam));
-            request.setAttribute("studentSubject", studentSubject != null ? studentSubject : new StudentSubject());
-        } catch (NotFoundException | ValidationException | DataException e){
-            request.setAttribute("studentSubject", new StudentSubject());
         }
     }
 }
