@@ -261,8 +261,11 @@
                                     <span class="status overdue">•</span> <span
                                             class="status"> <%=pendency.status()%></span></p>
                             </div>
-                            <a href="${pageContext.request.contextPath}/teacher/students/grades/release?studentSubjectId=<%=pendencies.get(0).studentId()%>">
-                                <button class="details">Detalhes</button>
+                            <a href="">
+                                <form action="${pageContext.request.contextPath}/teacher/students/grades/render" method="post">
+                                    <input type="hidden" name="studentSubjectId" value="<%=pendencies.get(0).studentId()%>"/>
+                                    <button type="submit" class="details">Detalhes</button>
+                                </form>
                             </a>
                         </li>
                         <%}%>
