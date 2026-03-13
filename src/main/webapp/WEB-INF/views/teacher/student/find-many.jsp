@@ -282,7 +282,7 @@
             <td><span class="status <%= ss.getStatus() == "Aprovado" ? "approved" : (ss.getStatus() == "Reprovado" ? "reproved" : "pending")%>"><%= ss.getStatus()%>
             </span></td>
             <td>
-              <form action="${pageContext.request.contextPath}/teacher/students/grades/release">
+              <form action="${pageContext.request.contextPath}/teacher/students/grades/render" method="post">
                 <input type="hidden" name="studentSubjectId" value="<%= ss.getId() %>">
                 <button type="submit" class="release-button">Lançar Notas</button>
               </form>

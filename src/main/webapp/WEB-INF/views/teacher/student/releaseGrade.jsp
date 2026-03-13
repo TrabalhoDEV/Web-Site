@@ -186,9 +186,16 @@
 
                 <hr>
 
+                <% if (request.getAttribute("error") != null) { %>
+                    <div class="error-message">
+                        <p><%= request.getAttribute("error") %></p>
+                    </div>
+                <% } %>
+
                 <% if (ss == null) { %>
                     <div class="error-message">
-                        <p>Erro: Informações do aluno-matéria não disponíveis.</p>
+                        <p>Informações do aluno-matéria não estão disponíveis.</p>
+                        <p><a href="<%= request.getContextPath() %>/teacher/students">Voltar para a lista de alunos</a></p>
                     </div>
                 <% } else { %>
 
