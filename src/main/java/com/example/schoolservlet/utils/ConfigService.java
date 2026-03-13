@@ -14,7 +14,6 @@ public class ConfigService {
             if (value != null && !value.isBlank()) return value;
         }
 
-        System.out.println(variable+": "+value)
         // Return null if the variable is not founded
         return null;
     }
