@@ -141,15 +141,19 @@ public class ReleaseGradesServlet extends HttpServlet {
 
         // Validate grades:
         try{
-            if (grade1Param != null && !grade1Param.isEmpty() && InputValidation.validateGrade(Double.parseDouble(grade1Param)) ){
-                grade1 = Double.parseDouble(grade1Param);
+            if (grade1Param != null && !grade1Param.isEmpty()){
+                if (InputValidation.validateGrade(Double.parseDouble(grade1Param)) ){
+                    grade1 = Double.parseDouble(grade1Param);
+                } else throw new ValidationException("Nota 1 deve ser um número entre " + Constants.MIN_GRADE + " e " + Constants.MAX_GRADE);
             }
-            if (grade2Param != null && !grade2Param.isEmpty() && InputValidation.validateGrade(Double.parseDouble(grade2Param))){
-                grade2 = Double.parseDouble(grade2Param);
+            if (grade2Param != null && !grade2Param.isEmpty()){
+                if (InputValidation.validateGrade(Double.parseDouble(grade2Param))){
+                    grade2 = Double.parseDouble(grade2Param);
+                } else throw new ValidationException("Nota 2 deve ser um número entre " + Constants.MIN_GRADE + " e " + Constants.MAX_GRADE);
             }
-
-        } catch (ClassCastException | NumberFormatException e){
+        } catch (ClassCastException | NumberFormatException | ValidationException e){
             ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST, "Notas devem ser números entre " + Constants.MIN_GRADE + " e " + Constants.MAX_GRADE, request.getContextPath() + "/teacher/students");
+            return;
         }
 
         try {
