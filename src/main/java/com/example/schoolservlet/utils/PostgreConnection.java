@@ -8,9 +8,9 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class PostgreConnection {
 
-    private  static final HikariDataSource dataSource;
+    private  static HikariDataSource dataSource;
 
-    static{
+    public static void start(){
         Dotenv dotenv = null;
 
         // Firstly, it tries to load .env locally

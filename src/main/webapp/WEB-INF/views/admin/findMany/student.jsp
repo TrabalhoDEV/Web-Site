@@ -2,13 +2,20 @@
 <%@ page import="com.example.schoolservlet.models.Student" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 <%@ page import="java.util.TreeMap" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="com.example.schoolservlet.utils.enums.StudentStatusEnum" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    Map<Integer, Student> studentMap =
-            (Map<Integer, Student>) request.getAttribute("studentMap");
+    Map<Integer, Student> studentMap = new HashMap<>();
+    if (request.getAttribute("studentMap") != null)
+        studentMap = (Map<Integer, Student>) request.getAttribute("studentMap");
     studentMap = new TreeMap<>(studentMap);
-    int totalPages = (Integer) request.getAttribute("totalPages");
-    int currentPage = (Integer) request.getAttribute("page");
+    int totalPages = 1;
+    if (request.getAttribute("totalPages") != null) totalPages = (Integer) request.getAttribute("totalPages");
+    int currentPage = 1;
+    if (request.getAttribute("page") != null) currentPage = (Integer) request.getAttribute("page");
+    String filter = (String) request.getAttribute("filter");
+    Integer statusFilter = (Integer) request.getAttribute("statusFilter");
 %>
 
 <!DOCTYPE html>
@@ -222,9 +229,26 @@
             <div class="header-grid">
                 <h1>Lista de Alunos</h1>
 
-                <a href="${pageContext.request.contextPath}/admin/student/insert">
-                    <button class="btn-add">Adicionar Aluno</button>
-                </a>
+                <form method="get" action="${pageContext.request.contextPath}/admin/student/find-many"
+                      class="form-filter">
+                    <section>
+                        <input type="text" name="filter" value="<%= filter %>" placeholder="Nome, CPF ou matrícula"/>
+                        <select name="status">
+                            <option value="" <%= statusFilter == null ? "selected" : "" %>>Todos</option>
+                            <option value="1" <%= Integer.valueOf(1).equals(statusFilter) ? "selected" : "" %>>Inativo
+                            </option>
+                            <option value="2" <%= Integer.valueOf(2).equals(statusFilter) ? "selected" : "" %>>Ativo
+                            </option>
+                        </select>
+                        <input type="hidden" name="page" value="1"/>
+                        <button type="submit" class="primary-button">Buscar</button>
+                        <a href="${pageContext.request.contextPath}/admin/student/find-many" class="secondary-button">Limpar</a>
+                    </section>
+
+                    <a href="${pageContext.request.contextPath}/admin/student/insert" class="primary-button">
+                        Adicionar Aluno
+                    </a>
+                </form>
             </div>
 
             <hr>
@@ -234,13 +258,16 @@
             </p>
             <% }%>
 
+
+            <% if (!studentMap.isEmpty()) { %>
+
             <table class="grade-table" style="--cols: 6; grid-template-columns:
         90px
         1fr
         140px
         1fr
         90px
-        1fr;">
+        90px;">
 
                 <thead>
                 <tr>
@@ -254,8 +281,6 @@
                 </thead>
 
                 <tbody>
-
-                <% if (studentMap != null && !studentMap.isEmpty()) { %>
 
                 <% for (Student student : studentMap.values()) { %>
 
@@ -276,50 +301,63 @@
                                 : "Não informado" %>
                     </td>
 
-                    <td><%=OutputFormatService.formatStudentStatus(student.getStatus())%>
+                    <td class="<%= student.getStatus() == StudentStatusEnum.INACTIVE ? "inactive" : "active"%>-student"><%=OutputFormatService.formatStudentStatus(student.getStatus())%>
                     </td>
                     <td class="actions">
                         <div class="btn-action">
-                            <a href="${pageContext.request.contextPath}/admin/student/update?id=<%=student.getId()%>">
-                                <button class="btn-edit">Modificar</button>
+                            <%-- Modify --%>
+                            <a href="${pageContext.request.contextPath}/admin/student/update?id=<%= student.getId()%>">
+                                <button title="Modificar" class="btn-icon btn-edit">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                    </svg>
+                                </button>
                             </a>
+
+                            <%-- Delete --%>
                             <a href="#"
-                               onclick=openModalDelete("${pageContext.request.contextPath}/admin/student/delete?id=<%=student.getId()%>")>
-                                <button class="btn-delete">Deletar</button>
+                               onclick="openModalDelete('${pageContext.request.getContextPath()}/admin/student/delete?id=<%= student.getId() %>')">
+                                <button title="Deletar" class="btn-icon btn-delete">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"/>
+                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                        <path d="M10 11v6"/>
+                                        <path d="M14 11v6"/>
+                                        <path d="M9 6V4h6v2"/>
+                                    </svg>
+                                </button>
                             </a>
                         </div>
                     </td>
                 </tr>
 
                 <% } %>
-
-                <% } else { %>
-
-                <tr>
-                    <td colspan="6" style="text-align:center">
-                        Nenhum aluno foi encontrado
-                    </td>
-                </tr>
-
-                <% } %>
                 </tbody>
             </table>
+            <%} else if (statusFilter != null || filter != null) {%>
+            <p class="not-found">Nenhum aluno atende a esse(s) filtro(s)</p>
+            <% } else {%>
+            <p class="not-found">Nenhum aluno está cadastrado</p>
+            <%}%>
 
         </div>
-        <!-- PAGINAÇÃO -->
+
         <div class="pagination">
 
             <% if (currentPage > 1) { %>
-            <a href="?page=<%=currentPage-1%>">Anterior</a>
+            <a href="${pageContext.request.contextPath}/admin/student/find-many?page=<%= currentPage - 1 %>&filter=<%= filter %>&status=<%= statusFilter%>">Anterior</a>
             <% } %>
 
-
-            <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1%>
+            <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1 %>
             </strong>
 
             <% if (currentPage < totalPages) { %>
-            <a href="?page=<%=currentPage+1%>">Próxima</a>
+            <a href="${pageContext.request.contextPath}/admin/student/find-many?page=<%= currentPage + 1 %>&filter=<%= filter %>&status=<%= statusFilter%>">Próxima</a>
             <% } %>
+
         </div>
         </div>
     </section>
@@ -332,8 +370,8 @@
         <p id="deleteText">Essa é uma ação irreversível</p>
 
         <div class="modal-actions">
-            <button id="confirmDelete">Confirmar</button>
-            <button id="closeDelete">Cancelar</button>
+            <button class="primary-button" id="confirmDelete">Confirmar</button>
+            <a class="secondary-button" id="closeDelete">Cancelar</a>
         </div>
     </div>
 </dialog>

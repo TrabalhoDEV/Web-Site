@@ -219,6 +219,7 @@ public class InputValidation {
     }
     
     public static void validateName(String name) throws ValidationException{
+        validateIsNull("nome", name);
         if (!StandardCharsets.US_ASCII.newEncoder().canEncode(name)) throw new ValidationException("Nome contém caracteres inválidos");
         if (name.matches("^[\\p{L} ]*$")) throw new RegexException("nome");
     }
