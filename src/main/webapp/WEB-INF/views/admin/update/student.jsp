@@ -13,7 +13,6 @@
 
 </head>
 <body>
-<h1>Update Student</h1>
 
 <%
     // Load Student object from request attributes for form pre-population
