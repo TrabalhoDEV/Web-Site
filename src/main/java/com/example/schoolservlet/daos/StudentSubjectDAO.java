@@ -394,12 +394,14 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("SELECT " +
-                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
-                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND media < ? THEN 1 ELSE 0 END) AS failed, " +
-                     "SUM(CASE WHEN deadline > CURRENT_DATE OR media IS NULL THEN 1 ELSE 0 END) AS pending " +
+                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
+                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) AS failed, " +
+                     "SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) AS pending " +
                      "FROM (" +
                      "    SELECT " +
                      "        sb.deadline, " +
+                     "        ss.grade1, " +
+                     "        ss.grade2, " +
                      "        CASE " +
                      "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
                      "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
@@ -436,12 +438,14 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
                      "SELECT " +
-                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
-                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND media < ? THEN 1 ELSE 0 END) AS failed, " +
-                             "SUM(CASE WHEN deadline > CURRENT_DATE OR media IS NULL THEN 1 ELSE 0 END) AS pending " +
+                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
+                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) AS failed, " +
+                             "SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) AS pending " +
                              "FROM (" +
                              "    SELECT " +
                              "        sb.deadline, " +
+                             "        ss.grade1, " +
+                             "        ss.grade2, " +
                              "        CASE " +
                              "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
                              "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
@@ -563,23 +567,25 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
              PreparedStatement pstmt = conn.prepareStatement("SELECT\n" +
                      "COALESCE(\n" +
                      "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
+                     "        100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
                      "    ), 0) AS approved,\n" +
                      "\n" +
                      "COALESCE(\n" +
                      "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
+                     "        100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
                      "    ), 0) AS failed,\n" +
                      "\n" +
                      "COALESCE(\n" +
                      "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN deadline > CURRENT_DATE OR media IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
+                     "        100.0 * SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
                      "    ), 0) AS pending\n" +
                      "\n" +
                      "FROM (\n" +
                      "    SELECT\n" +
                      "        ss.id,\n" +
                      "        sb.deadline,\n" +
+                     "        ss.grade1,\n" +
+                     "        ss.grade2,\n" +
                      "        CASE\n" +
                      "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL\n" +
                      "                THEN (ss.grade1 + ss.grade2) / 2.0\n" +
