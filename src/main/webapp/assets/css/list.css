@@ -229,12 +229,6 @@ dialog::backdrop {
     background: rgba(0, 0, 0, 0.7);
 }
 
-.modal-cardU {
-    padding: 30px;
-    height: 480px;
-    width: 350px;
-}
-
 .modal-cardD {
     padding: 30px;
     height: 170px;
@@ -243,21 +237,6 @@ dialog::backdrop {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-}
-
-.modal-cardU input {
-    width: 90%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border-radius: var(--medium-radius);
-    border: 1px solid rgb(201, 201, 201);
-}
-.modal-cardD input {
-    width: 90%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border-radius: var(--medium-radius);
-    border: 1px solid rgb(201, 201, 201);
 }
 
 .modal-actions {

@@ -10,4 +10,10 @@
         <error-code>404</error-code>
         <location>/pages/errors/error404.jsp</location>
     </error-page>
+
+    <!-- Página de erro 500 -->
+    <error-page>
+        <error-code>500</error-code>
+        <location>/pages/errors/error500.jsp</location>
+    </error-page>
 </web-app>
