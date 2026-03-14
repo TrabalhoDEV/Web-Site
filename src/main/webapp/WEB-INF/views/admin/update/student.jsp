@@ -235,7 +235,7 @@
 
             <hr>
             <!-- Student update form: POST to update servlet -->
-            <form method="post" action="${pageContext.request.contextPath}/admin/student/update">
+            <form method="post" action="${pageContext.request.contextPath}/admin/student/update" class="generic-form">
                 <!-- Enrollment field (read-only identifier) -->
                 <div class="form-group">
                     <label for="enrollment">Enrollment</label>
