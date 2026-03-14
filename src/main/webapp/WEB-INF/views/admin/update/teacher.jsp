@@ -215,7 +215,7 @@
 
                 <hr>
 
-                <form action="${pageContext.request.contextPath}/admin/teacher/update" method="post">
+                <form action="${pageContext.request.contextPath}/admin/teacher/update" method="post" class="generic-form">
                     <input type="hidden" name="id" value="<%=teacher.getId()%>" />
                     <!-- Text Input Fields -->
                     <div class="form-group">
