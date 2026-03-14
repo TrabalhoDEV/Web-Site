@@ -312,3 +312,7 @@
     border-radius: 50%;
     margin-left: var(--space-4);
 }
+.no-result{
+    color: var(--muted-text-color);
+    font-weight: var(--text-medium);
+}
