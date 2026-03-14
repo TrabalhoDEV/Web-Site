@@ -9,8 +9,12 @@
     Map<Integer, Subject> subjectMap = new HashMap<>();
     if (request.getAttribute("subjectMap") != null) subjectMap = (Map<Integer, Subject>) request.getAttribute("subjectMap");
     subjectMap = new TreeMap<>(subjectMap);
-    int totalPages = (Integer) request.getAttribute("totalPages");
-    int currentPage = (Integer) request.getAttribute("page");
+    int totalPages = 1;
+    if (request.getAttribute("totalPages") != null) totalPages = (Integer) request.getAttribute("totalPages");
+    int currentPage = 1;
+    if (request.getAttribute("page") != null) currentPage = (Integer) request.getAttribute("page");
+    String nameFilter = "";
+    if (request.getAttribute("nameFilter") != null) nameFilter = (String) request.getAttribute("nameFilter");
 %>
 
 <!DOCTYPE html>
@@ -225,9 +229,24 @@
                 <div class="header-grid">
                     <h1>Lista de Matérias</h1>
 
-                    <a href="${pageContext.request.contextPath}/admin/subject/insert">
-                        <button class="primary-button">Adicionar Matéria</button>
-                    </a>
+                    <form method="get" action="${pageContext.request.contextPath}/admin/subject/find-many"
+                          class="form-filter">
+                        <section>
+                            <input
+                                    type="text"
+                                    name="name"
+                                    value="<%= nameFilter %>"
+                                    placeholder="Nome da matéria"
+                            />
+                            <input type="hidden" name="page" value="1"/>
+                            <button type="submit" class="primary-button">Buscar</button>
+                            <a href="${pageContext.request.contextPath}/admin/subject/find-many" class="secondary-button">Limpar</a>
+                        </section>
+
+                        <a href="${pageContext.request.contextPath}/admin/subject/insert">
+                            <button class="primary-button">Adicionar Turma</button>
+                        </a>
+                    </form>
                 </div>
 
                 <hr>
@@ -298,7 +317,11 @@
 
                     </tbody>
                 </table>
-                <% } else { %>
+                <% } else if (!nameFilter.isEmpty()) { %>
+
+                <p class="not-found">Nenhuma matéria foi encontrada pela filtragem</p>
+
+                <% } else if (request.getAttribute("error") == null) { %>
 
                 <p class="not-found">Nenhuma matéria está cadastrada</p>
 
@@ -309,7 +332,7 @@
             <div class="pagination">
 
                 <% if (currentPage > 1) { %>
-                <a href="${pageContext.request.contextPath}/admin/subject/find-many?page=<%=currentPage-1%>">Anterior</a>
+                <a href="${pageContext.request.contextPath}/admin/subject/find-many?page=<%=currentPage-1%>&name=<%= nameFilter %>">Anterior</a>
                 <% } %>
 
 
@@ -317,7 +340,7 @@
                 </strong>
 
                 <% if (currentPage < totalPages) { %>
-                <a href="${pageContext.request.contextPath}/admin/subject/find-many?page=<%=currentPage+1%>">Próxima</a>
+                <a href="${pageContext.request.contextPath}/admin/subject/find-many?page=<%=currentPage+1%>&name=<%= nameFilter %>">Próxima</a>
                 <% } %>
             </div>
         </section>
