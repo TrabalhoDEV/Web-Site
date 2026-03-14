@@ -11,7 +11,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Editar Turma | Vértice</title>
+  <title>Editar Turma</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
   <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/img/logo_pequena.svg" type="image/x-icon">
 </head>
