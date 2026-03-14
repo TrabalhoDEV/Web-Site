@@ -314,7 +314,7 @@
 
             <p class="not-found">Nenhuma turma foi encontrada pela filtragem</p>
 
-            <% } else { %>
+            <% } else if (request.getAttribute("error") == null) { %>
 
             <p class="not-found">Nenhuma turma está cadastrada</p>
 
