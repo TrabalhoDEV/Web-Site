@@ -49,12 +49,14 @@
     padding: 24px 32px;
     width: 65dvw;
     margin: 30px auto 0;
+    transition: background-color 0.3s ease;
 }
 .header-grid{
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: var(--text-md);
+    color: var(--text-color);
 }
 
 .btn-add{
@@ -117,10 +119,9 @@ tr {
     display: contents;
 }
 
-
 .grade-table th{
     text-align: left;
-    color: #8b97b3;
+    color: var(--muted-text-color);
     font-weight: 600;
     padding: 15px 5px;
 }
@@ -128,7 +129,8 @@ tr {
 .grade-table td{
     width: 100% / var(--cols);
     padding: 10px 5px;
-    border-top: 1px solid #eef1f6;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-color);
 }
 
 .grade-table td:not(.actions){
@@ -150,27 +152,30 @@ th{
     font-weight: 600;
 }
 
+
 .approved{
-    color:#10b981;
-    background:#e7f8f1;
-    border:1px solid #10b981;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid #10b981;
 }
 
 .reproved{
-    color:#ff0066;
-    background:#ffe6ef;
-    border:1px solid #ff0066;
+    color: #ff0066;
+    background: rgba(255, 0, 102, 0.15);
+    border: 1px solid #ff0066;
 }
 
 .pending{
-    color:#8b97b3;
-    background:#eef1f6;
-    border:1px solid #cfd6e6;
+    color: var(--muted-text-color);
+    background: var(--nav-active-color);
+    border: 1px solid var(--border-color);
 }
 
 dialog {
     margin: auto;
     padding: 0px;
+    background-color: var(--surface-color);
+    color: var(--text-color);
     border-radius: var(--medium-radius);
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -180,35 +185,28 @@ dialog::backdrop {
     background: rgba(0, 0, 0, 0.7);
 }
 
-.modal-cardU {
+.modal-cardU, .modal-cardD {
     padding: 30px;
-    height: 480px;
     width: 350px;
 }
 
+.modal-cardU { height: 480px; }
 .modal-cardD {
-    padding: 30px;
     height: 170px;
-    width: 350px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
 }
 
-.modal-cardU input {
+.modal-cardU input, .modal-cardD input {
     width: 90%;
     padding: 8px;
     margin-bottom: 15px;
+    background-color: var(--background-color1);
+    color: var(--text-color);
     border-radius: var(--medium-radius);
-    border: 1px solid rgb(201, 201, 201);
-}
-.modal-cardD input {
-    width: 90%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border-radius: var(--medium-radius);
-    border: 1px solid rgb(201, 201, 201);
+    border: 1px solid var(--border-color);
 }
 
 .modal-actions {
@@ -216,7 +214,6 @@ dialog::backdrop {
     justify-content: center;
     gap: 10px;
     margin-top: 30px;
-    margin-bottom: 0px;
 }
 
 .modal-actions button{

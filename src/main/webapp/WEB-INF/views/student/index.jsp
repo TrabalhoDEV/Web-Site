@@ -18,6 +18,8 @@
 
     <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg"
         type="image/x-icon">
+
+    <script src="${pageContext.request.contextPath}/assets/js/theme.js"></script>
 </head>
 <body>
 
