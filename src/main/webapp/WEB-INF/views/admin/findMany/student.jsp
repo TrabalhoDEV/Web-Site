@@ -337,9 +337,9 @@
                 <% } %>
                 </tbody>
             </table>
-            <%} else if (statusFilter != null || filter != null) {%>
+            <%} else if (statusFilter != null || (filter != null && !filter.trim().isEmpty())) {%>
             <p class="not-found">Nenhum aluno atende a esse(s) filtro(s)</p>
-            <% } else {%>
+            <% } else if (request.getAttribute("error") == null){%>
             <p class="not-found">Nenhum aluno está cadastrado</p>
             <%}%>
 
