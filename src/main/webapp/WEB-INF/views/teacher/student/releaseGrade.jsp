@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
+<%@ page import="com.example.schoolservlet.utils.Constants" %>
 <%
     Object studentSubjectObj = request.getAttribute("studentSubject");
     com.example.schoolservlet.models.StudentSubject ss = null;
@@ -185,9 +186,16 @@
 
                 <hr>
 
+                <% if (request.getAttribute("error") != null) { %>
+                    <div class="error-message">
+                        <p><%= request.getAttribute("error") %></p>
+                    </div>
+                <% } %>
+
                 <% if (ss == null) { %>
                     <div class="error-message">
-                        <p>Erro: Informações do aluno-matéria não disponíveis.</p>
+                        <p>Informações do aluno-matéria não estão disponíveis.</p>
+                        <p><a href="<%= request.getContextPath() %>/teacher/students">Voltar para a lista de alunos</a></p>
                     </div>
                 <% } else { %>
 
@@ -205,14 +213,16 @@
 
                         <div class="form-group">
                             <label for="grade1">Nota 1ª Avaliação:</label>
-                            <input type="number" id="grade1" name="grade1" step="0.1" min="0" max="10"
-                                   value="<%= ss.getGrade1() != null ? ss.getGrade1() : 0 %>">
+                            <input type="number" id="grade1" name="grade1" min="<%= Constants.MIN_GRADE %>" max="<%= Constants.MAX_GRADE %>" step="0.01"
+                                   value="<%= ss.getGrade1() != null ? ss.getGrade1() : "" %>"
+                                    placeholder="Nota não definida (Não é zero)">
                         </div>
 
                         <div class="form-group">
                             <label for="grade2">Nota 2ª Avaliação:</label>
-                            <input type="number" id="grade2" name="grade2" step="0.1" min="0" max="10"
-                                   value="<%= ss.getGrade2() != null ? ss.getGrade2() : 0 %>">
+                            <input type="number" id="grade2" name="grade2" min="<%= Constants.MIN_GRADE %>" max="<%= Constants.MAX_GRADE %>" step="0.01"
+                                   value="<%= ss.getGrade2() != null ? ss.getGrade2() : "" %>"
+                                   placeholder="Nota não definida (Não é zero)">
                         </div>
 
                         <div class="media-display">
@@ -244,17 +254,31 @@
 <script>
     const grade1Input = document.getElementById("grade1");
     const grade2Input = document.getElementById("grade2");
+    const mediaEl = document.getElementById("mediaValue");
 
-    if (grade1Input && grade2Input) {
+    if (grade1Input && grade2Input && mediaEl) {
+
         function calcularMedia() {
-            const grade1 = parseFloat(grade1Input.value) || 0;
-            const grade2 = parseFloat(grade2Input.value) || 0;
+            const g1 = grade1Input.value.trim();
+            const g2 = grade2Input.value.trim();
 
-            if (grade1 >= 0 && grade2 >= 0) {
-                const media = ((grade1 + grade2) / 2).toFixed(2);
-                document.getElementById("mediaValue").textContent = media;
+            const n1 = g1 === "" ? null : parseFloat(g1);
+            const n2 = g2 === "" ? null : parseFloat(g2);
+
+            let media = null;
+
+            if (n1 !== null && n2 !== null) {
+                media = (n1 + n2) / 2;
+            } else if (n1 !== null) {
+                media = n1;
+            } else if (n2 !== null) {
+                media = n2;
+            }
+
+            if (media !== null && !isNaN(media)) {
+                mediaEl.textContent = media.toFixed(2);
             } else {
-                document.getElementById("mediaValue").textContent = "-";
+                mediaEl.textContent = "-";
             }
         }
 
