@@ -263,7 +263,7 @@
                             </div>
                             <a href="">
                                 <form action="${pageContext.request.contextPath}/teacher/students/grades/render" method="post">
-                                    <input type="hidden" name="studentSubjectId" value="<%=pendencies.get(0).studentId()%>"/>
+                                    <input type="hidden" name="studentSubjectId" value="<%=pendencies.getFirst().studentSubjectId()%>"/>
                                     <button type="submit" class="details">Detalhes</button>
                                 </form>
                             </a>

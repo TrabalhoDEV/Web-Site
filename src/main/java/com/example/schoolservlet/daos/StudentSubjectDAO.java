@@ -620,6 +620,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("SELECT \n" +
                      "st.id AS id_student,\n" +
+                     "ss.id AS id,\n" +
                      "ss.grade1,\n" +
                      "ss.grade2,\n" +
                      "st.name AS student_name,\n" +
@@ -658,6 +659,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
             while (rs.next()) {
                 pendencies.add(new TeacherPendency(
                         rs.getInt("id_student"),
+                        rs.getInt("id"),
                         rs.getString("student_name"),
                         rs.getString("subject_name"),
                         rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
