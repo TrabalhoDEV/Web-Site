@@ -9,12 +9,6 @@
 
 <%
     Teacher teacher = (Teacher) request.getAttribute("teacher");
-    if (teacher == null) {
-%>
-<p>Professor não encontrado.</p>
-<%
-        return;
-    }
 %>
 <%
     List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
