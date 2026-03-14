@@ -2,6 +2,14 @@
 @import url('./layout/tokens.css');
 @import url('./layout/navbar.css');
 
+*{
+    box-sizing: border-box;
+}
+
+.main-content{
+    padding: 0 32px 0 32px;
+}
+
 .hero{
     position: relative;
     background: linear-gradient(to left, #9094ff 0%, #5750de 50%, #4361EE 100%);
@@ -52,52 +60,84 @@
 }
 .header-grid{
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 8px;
+    align-items: start;
     font-size: var(--text-md);
+    padding: 8px 0;
 }
 
-.btn-add{
-    font-size: var(--text-sm) ;
+.form-filter{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.form-filter > section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.form-filter > section > input{
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #dfe3ea;
+    font-size:13px;
+    min-width: 250px;
+}
+
+.form-filter > section > select{
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #dfe3ea;
+    font-size:13px;
+}
+
+.primary-button{
+    font-size: var(--text-sm);
     background: var(--primary-color);
-    color: white;
     border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
     padding: 8px 12px;
     border-radius: 8px;
+    width: fit-content;
+    min-width: 120px;
     cursor: pointer;
 }
 
-td button, #confirmDelete{
+.primary-button:hover{
+    background-color: var(--button-hover-color);
+}
+
+.secondary-button{
     font-size: var(--text-sm);
-    background: var(--primary-color);
-    color: white;
-    border: none;
+    background: transparent;
+    text-align: center;
+    text-decoration: none;
+    border: solid 3px var(--primary-color);
+    color: var(--primary-color);
     padding: 8px 12px;
     border-radius: 8px;
     width: 120px;
     cursor: pointer;
 }
 
-button:hover, #confirmDelete:hover{
-    background-color: var(--button-hover-color);
+.secondary-button:hover{
+    color: var(--button-hover-color);
+    background-color: #e7e9ff;
+    border: var(--button-hover-color) solid 3px;
 }
 
 .btn-action {
     display: flex;
     justify-content: space-between;
     gap: 8px;
-}
-
-.btn-delete, #closeDelete{
-    background: transparent;
-    border: solid 3px var(--primary-color);
-    color: var(--primary-color);
-}
-
-.btn-delete:hover, #closeDelete:hover{
-    background: transparent;
-    border: solid 3px var(--button-hover-color);
-    color: var(--button-hover-color);
 }
 
 .grade-table{
@@ -115,6 +155,7 @@ tbody {
 
 tr {
     display: contents;
+    height: fit-content;
 }
 
 
@@ -144,10 +185,18 @@ th{
 }
 
 .status{
-    padding: 6px 14px;
+    padding: 6px 12px;
     border-radius: 20px;
     font-size: 15px;
     font-weight: 600;
+}
+
+.active-student{
+    color:#10b981;
+}
+
+.inactive-student{
+    color:#8b97b3;
 }
 
 .approved{
@@ -170,7 +219,7 @@ th{
 
 dialog {
     margin: auto;
-    padding: 0px;
+    padding: 0;
     border-radius: var(--medium-radius);
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -216,7 +265,7 @@ dialog::backdrop {
     justify-content: center;
     gap: 10px;
     margin-top: 30px;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .modal-actions button{
@@ -249,4 +298,45 @@ dialog::backdrop {
     padding: 8px 12px;
     border-radius: 8px;
     cursor: pointer;
+}
+
+.pagination > a:hover{
+    background-color: var(--button-hover-color);
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-edit {
+    border: 0.5px solid #96a0e2;
+    color: #24379f;
+}
+
+.btn-edit:hover  { background: #dbe8fc; }
+
+.btn-delete {
+    border: 0.5px solid #F09595;
+    color: #A32D2D;
+}
+
+.btn-delete:hover { background: #FCEBEB; }
+
+.btn-details {
+    border: 0.5px solid #96a0e2;
+    color: #24379f;
+}
+
+.btn-details:hover { background: #dbe8fc; }
+
+.not-found{
+    margin-top: 16px;
 }
