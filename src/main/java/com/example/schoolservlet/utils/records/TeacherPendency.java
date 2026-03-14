@@ -4,6 +4,7 @@ import java.util.Date;
 
 public record TeacherPendency(
         int studentId,
+        int studentSubjectId,
         String studentName,
         String subjectName,
         Double grade1,

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
+<%@ page import="com.example.schoolservlet.utils.Constants" %>
 <%
     Object studentSubjectObj = request.getAttribute("studentSubject");
     com.example.schoolservlet.models.StudentSubject ss = null;
@@ -185,9 +186,16 @@
 
                 <hr>
 
+                <% if (request.getAttribute("error") != null) { %>
+                    <div class="error-message">
+                        <p><%= request.getAttribute("error") %></p>
+                    </div>
+                <% } %>
+
                 <% if (ss == null) { %>
                     <div class="error-message">
-                        <p>Erro: Informações do aluno-matéria não disponíveis.</p>
+                        <p>Informações do aluno-matéria não estão disponíveis.</p>
+                        <p><a href="<%= request.getContextPath() %>/teacher/students">Voltar para a lista de alunos</a></p>
                     </div>
                 <% } else { %>
 
@@ -205,14 +213,14 @@
 
                         <div class="form-group">
                             <label for="grade1">Nota 1ª Avaliação:</label>
-                            <input type="text" id="grade1" name="grade1"
+                            <input type="number" id="grade1" name="grade1" min="<%= Constants.MIN_GRADE %>" max="<%= Constants.MAX_GRADE %>" step="0.01"
                                    value="<%= ss.getGrade1() != null ? ss.getGrade1() : "" %>"
                                     placeholder="Nota não definida (Não é zero)">
                         </div>
 
                         <div class="form-group">
                             <label for="grade2">Nota 2ª Avaliação:</label>
-                            <input type="text" id="grade2" name="grade2"
+                            <input type="number" id="grade2" name="grade2" min="<%= Constants.MIN_GRADE %>" max="<%= Constants.MAX_GRADE %>" step="0.01"
                                    value="<%= ss.getGrade2() != null ? ss.getGrade2() : "" %>"
                                    placeholder="Nota não definida (Não é zero)">
                         </div>
