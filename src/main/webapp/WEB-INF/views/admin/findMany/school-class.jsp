@@ -310,7 +310,7 @@
 
                 </tbody>
             </table>
-            <% } else if (nameFilter != null) { %>
+            <% } else if (!nameFilter.isEmpty()) { %>
 
             <p class="not-found">Nenhuma turma foi encontrada pela filtragem</p>
 

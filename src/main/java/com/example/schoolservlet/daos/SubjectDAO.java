@@ -185,6 +185,61 @@ public class SubjectDAO implements GenericDAO<Subject> {
         return ids;
     }
 
+    public Map<Integer, Subject> findMany(int skip, int take, String nameFilter) throws DataException, ValidationException {
+        InputValidation.validateSubjectName(nameFilter);
+        Map<Integer, Subject> subjects = new HashMap<>();
+
+        String sql = "SELECT * FROM subject " +
+                "WHERE name ILIKE ? " +
+                "ORDER BY id LIMIT ? OFFSET ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int paramIndex = 1;
+
+            pstmt.setString(paramIndex++, "%" + nameFilter.trim() + "%");
+            pstmt.setInt(paramIndex++, take < 0 ? 0 : Math.min(take, Constants.MAX_TAKE));
+            pstmt.setInt(paramIndex,   skip < 0 ? 0 : skip);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                subjects.put(rs.getInt("id"), new Subject(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getDate("deadline")
+                ));
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar matérias", sqle);
+        }
+
+        return subjects;
+    }
+
+    public int count(String nameFilter) throws DataException, ValidationException {
+        InputValidation.validateSubjectName(nameFilter);
+
+        String sql = "SELECT COUNT(*) FROM subject " +
+                "WHERE name ILIKE ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, "%" + nameFilter.trim() + "%");
+
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar matérias", sqle);
+        }
+    }
+
     @Override
     public int totalCount() throws DataException {
         try(Connection conn = PostgreConnection.getConnection();

@@ -121,7 +121,7 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
             pstmt.setString(1, "%" + nameFilter.trim() + "%");
 
             ResultSet rs = pstmt.executeQuery();
-            return rs.next() ? rs.getInt(1) : 0;
+            return rs.next() ? rs.getInt(1) : -1;
 
         } catch (SQLException sqle) {
             throw new DataException("Erro ao contar turmas", sqle);
