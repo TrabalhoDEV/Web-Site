@@ -394,11 +394,12 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("SELECT " +
-                     "SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) AS approved, " +
-                     "SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) AS failed, " +
-                     "SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) AS pending " +
+                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
+                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND media < ? THEN 1 ELSE 0 END) AS failed, " +
+                     "SUM(CASE WHEN deadline > CURRENT_DATE OR media IS NULL THEN 1 ELSE 0 END) AS pending " +
                      "FROM (" +
                      "    SELECT " +
+                     "        sb.deadline, " +
                      "        CASE " +
                      "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
                      "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
@@ -435,11 +436,12 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
                      "SELECT " +
-                             "SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) AS approved, " +
-                             "SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) AS failed, " +
-                             "SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) AS pending " +
+                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
+                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND media < ? THEN 1 ELSE 0 END) AS failed, " +
+                             "SUM(CASE WHEN deadline > CURRENT_DATE OR media IS NULL THEN 1 ELSE 0 END) AS pending " +
                              "FROM (" +
                              "    SELECT " +
+                             "        sb.deadline, " +
                              "        CASE " +
                              "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
                              "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
@@ -448,6 +450,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                              "        END AS media " +
                              "    FROM student_subject ss " +
                              "    JOIN student st ON st.id = ss.id_student " +
+                             "    JOIN subject sb ON sb.id = ss.id_subject " +
                              "    WHERE ss.id_student = ? AND st.status = ? " +
                              ") AS sub"
              )) {
