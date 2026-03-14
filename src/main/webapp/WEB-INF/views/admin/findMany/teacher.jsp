@@ -8,8 +8,12 @@
     Map<Integer, Teacher> teacherMap = new HashMap<>();
     if (request.getAttribute("teacherMap") != null) teacherMap = (Map<Integer, Teacher>) request.getAttribute("teacherMap");
     teacherMap = new TreeMap<>(teacherMap);
-    int totalPages = (Integer) request.getAttribute("totalPages");
-    int currentPage = (Integer) request.getAttribute("page");
+    int totalPages = 1;
+    if (request.getAttribute("totalPages") != null) totalPages = (Integer) request.getAttribute("totalPages");
+    int currentPage = 1;
+    if (request.getAttribute("page") != null) currentPage = (Integer) request.getAttribute("page");
+    String filter = "";
+    if (request.getAttribute("filter") != null) filter = (String) request.getAttribute("filter");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -180,7 +184,20 @@
             <div class="boletim-grid">
                 <div class="header-grid">
                     <h1>Lista de Professores</h1>
-                    <a href="${pageContext.request.contextPath}/admin/teacher/insert"><button class="primary-button">Adicionar Professor</button></a>
+
+                    <form method="get" action="${pageContext.request.contextPath}/admin/teacher/find-many"
+                          class="form-filter">
+                        <section>
+                            <input type="text" name="filter" value="<%= filter %>" placeholder="Nome ou usuário"/>
+                            <input type="hidden" name="page" value="1"/>
+                            <button type="submit" class="primary-button">Buscar</button>
+                            <a href="${pageContext.request.contextPath}/admin/teacher/find-many" class="secondary-button">Limpar</a>
+                        </section>
+
+                        <a href="${pageContext.request.contextPath}/admin/teacher/insert" class="primary-button">
+                            Adicionar Professor
+                        </a>
+                    </form>
                 </div>
 
                 <hr>
@@ -256,11 +273,11 @@
                     </tr>
                     </tbody>
                 </table>
-                <% } else { %>
-
-                <p class="not-found">Nenhum professor foi cadastrado</p>
-
-                <% } %>
+                <% } else if (filter != null && !filter.trim().isEmpty()) {%>
+                <p class="not-found">Nenhum professor(a) atende a esse(s) filtro(s)</p>
+                <% } else if (request.getAttribute("error") == null){%>
+                <p class="not-found">Não há professor(a) cadastrados</p>
+                <%}%>
             </div>
             <!-- PAGINAÇÃO -->
             <div class="pagination">

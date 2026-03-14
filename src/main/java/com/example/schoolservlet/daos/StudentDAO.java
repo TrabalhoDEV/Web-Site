@@ -154,7 +154,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
                     default         -> " ";
                 })
                 + (status != null ? "AND s.status = ? " : "")
-                + "ORDER BY s.status DESC "
+                + "ORDER BY s.status DESC, s.id ASC "
                 + "LIMIT ? OFFSET ?";
 
         Map<Integer, Student> students = new HashMap<>();

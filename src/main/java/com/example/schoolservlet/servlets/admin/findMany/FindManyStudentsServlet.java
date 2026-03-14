@@ -2,15 +2,12 @@ package com.example.schoolservlet.servlets.admin.findMany;
 
 import com.example.schoolservlet.daos.StudentDAO;
 import com.example.schoolservlet.exceptions.DataException;
-import com.example.schoolservlet.exceptions.RequiredFieldException;
-import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.*;
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-
 import java.io.IOException;
 import java.util.Map;
 
