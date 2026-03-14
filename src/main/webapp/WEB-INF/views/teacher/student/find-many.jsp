@@ -279,7 +279,7 @@
             </td>
             <td><%= ss.getAverage() != null ? ss.getAverage() : "-" %>
             </td>
-            <td><span class="status <%= ss.getStatus() == "Aprovado" ? "approved" : (ss.getStatus() == "Reprovado" ? "reproved" : "pending")%>"><%= ss.getStatus()%>
+            <td><span class="status <%= ss.getStatus().equals("Aprovado") ? "approved" : (ss.getStatus().equals("Reprovado") ? "reproved" : "pending")%>"><%= ss.getStatus()%>
             </span></td>
             <td>
               <form action="${pageContext.request.contextPath}/teacher/students/grades/render" method="post">
