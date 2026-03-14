@@ -4,6 +4,7 @@ import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.utils.Constants;
+import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 
@@ -57,6 +58,74 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
         }
 
         return schoolClassMap;
+    }
+
+    @Override
+    public int totalCount() throws DataException {
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) AS totalCount FROM school_class");
+            ResultSet rs = pstmt.executeQuery()){
+
+            if (rs.next()){
+                return rs.getInt("totalCount");
+            }
+            return -1;
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar turmas", sqle);
+        }
+    }
+
+    public Map<Integer, SchoolClass> findMany(int skip, int take, String nameFilter) throws DataException, ValidationException {
+        InputValidation.validateSchoolClassName(nameFilter);
+        Map<Integer, SchoolClass> schoolClassMap = new HashMap<>();
+
+        String sql = "SELECT id, school_year FROM school_class " +
+                "WHERE school_year ILIKE ? " +
+                "ORDER BY id LIMIT ? OFFSET ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int paramIndex = 1;
+
+            pstmt.setString(paramIndex++, "%" + nameFilter.trim() + "%");
+
+            pstmt.setInt(paramIndex++, take < 0 ? 0 : Math.min(take, Constants.MAX_TAKE));
+            pstmt.setInt(paramIndex,   skip < 0 ? 0 : skip);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                schoolClassMap.put(rs.getInt("id"), new SchoolClass(
+                        rs.getInt("id"),
+                        rs.getString("school_year")
+                ));
+            }
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar turmas", sqle);
+        }
+
+        return schoolClassMap;
+    }
+
+    public int count(String nameFilter) throws DataException, ValidationException {
+        InputValidation.validateSchoolClassName(nameFilter);
+        String sql = "SELECT COUNT(*) FROM school_class " +
+                "WHERE school_year ILIKE ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, "%" + nameFilter.trim() + "%");
+
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch (SQLException sqle) {
+            throw new DataException("Erro ao contar turmas", sqle);
+        }
     }
 
     public List<SchoolClass> findAll() throws DataException {
@@ -205,22 +274,6 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao deletar turma", sqle);
-        }
-    }
-
-    @Override
-    public int totalCount() throws DataException {
-        try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) AS totalCount FROM school_class");
-            ResultSet rs = pstmt.executeQuery()){
-
-            if (rs.next()){
-                return rs.getInt("totalCount");
-            }
-            return -1;
-        } catch (SQLException sqle){
-            sqle.printStackTrace();
-            throw new DataException("Erro ao contar turmas", sqle);
         }
     }
 

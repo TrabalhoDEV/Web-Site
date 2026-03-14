@@ -2,21 +2,14 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 <%@ page import="java.util.TreeMap" %>
+<%@ page import="java.util.HashMap" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    Map<Integer, Teacher> teacherMap = (Map<Integer, Teacher>) request.getAttribute("teacherMap");
+    Map<Integer, Teacher> teacherMap = new HashMap<>();
+    if (request.getAttribute("teacherMap") != null) teacherMap = (Map<Integer, Teacher>) request.getAttribute("teacherMap");
     teacherMap = new TreeMap<>(teacherMap);
     int totalPages = (Integer) request.getAttribute("totalPages");
     int currentPage = (Integer) request.getAttribute("page");
-%>
-<%
-    String error = (String) session.getAttribute("error");
-    if (error != null) {
-%>
-<p style="color:red;"><%= error %></p>
-<%
-        session.removeAttribute("error");
-    }
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -187,7 +180,7 @@
             <div class="boletim-grid">
                 <div class="header-grid">
                     <h1>Lista de Professores</h1>
-                    <a href="${pageContext.request.contextPath}/admin/teacher/insert"><button class="btn-add">Adicionar Professor</button></a>
+                    <a href="${pageContext.request.contextPath}/admin/teacher/insert"><button class="primary-button">Adicionar Professor</button></a>
                 </div>
 
                 <hr>
@@ -198,7 +191,8 @@
                 </p>
                 <% }%>
 
-                <table class="grade-table" style="--cols: 4">
+                <% if (!teacherMap.isEmpty()) { %>
+                <table class="grade-table" style="--cols: 4; grid-template-columns: 2fr 1fr 2fr 120px">
                     <thead>
                     <tr>
                         <th>Nome</th>
@@ -209,7 +203,6 @@
                     </thead>
 
                     <tbody>
-                    <% if (teacherMap != null && !teacherMap.isEmpty()) { %>
                     <% for (Teacher teacher : teacherMap.values()) { %>
                     <tr>
                         <td><%= OutputFormatService.formatName(teacher.getName()) %></td>
@@ -217,23 +210,57 @@
                         <td><%= teacher.getEmail() %></td>
                         <td class="actions">
                             <div class="btn-action">
-                                <a href="${pageContext.request.contextPath}/admin/teacher/details?id=<%=teacher.getId()%>"><button class="btn-details">Ver detalhes</button></a>
-                                <a href="${pageContext.request.contextPath}/admin/teacher/update?id=<%=teacher.getId()%>"><button class="btn-edit">Modificar</button></a>
-                                <a onclick=openModalDelete("${pageContext.request.contextPath}/admin/teacher/delete?id=<%=teacher.getId()%>")><button class="btn-delete">Deletar</button></a>
+                                <%-- Details --%>
+                                <a href="${pageContext.request.contextPath}/admin/teacher/details?id=<%=teacher.getId()%>">
+                                    <button title="Ver detalhes" class="btn-icon btn-details">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                            <polyline points="14 2 14 8 20 8"/>
+                                            <line x1="16" y1="13" x2="8" y2="13"/>
+                                            <line x1="16" y1="17" x2="8" y2="17"/>
+                                            <line x1="10" y1="9" x2="8" y2="9"/>
+                                        </svg>
+                                    </button>
+                                </a>
+
+                                <%-- Modify --%>
+                                <a href="${pageContext.request.contextPath}/admin/teacher/update?id=<%= teacher.getId()%>">
+                                    <button title="Modificar" class="btn-icon btn-edit">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
+                                    </button>
+                                </a>
+
+                                <%-- Delete --%>
+                                <a href="#"
+                                   onclick="openModalDelete('${pageContext.request.contextPath}/admin/teacher/delete?id=<%= teacher.getId()%>')">
+                                    <button title="Deletar" class="btn-icon btn-delete">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"/>
+                                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                            <path d="M10 11v6"/>
+                                            <path d="M14 11v6"/>
+                                            <path d="M9 6V4h6v2"/>
+                                        </svg>
+                                    </button>
+                                </a>
                             </div>
                         </td>
                     </tr>
-                    <% } } else { %>
-
-                    <tr>
-                    <td colspan="4" style="text-align: center">Nenhum professor foi encontrado</td>
-                    </tr>
-
                     <% } %>
 
                     </tr>
                     </tbody>
                 </table>
+                <% } else { %>
+
+                <p class="not-found">Nenhum professor foi cadastrado</p>
+
+                <% } %>
             </div>
             <!-- PAGINAÇÃO -->
             <div class="pagination">

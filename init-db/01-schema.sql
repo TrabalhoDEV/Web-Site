@@ -10,7 +10,7 @@ CREATE TABLE teacher
     name     VARCHAR(150) NOT NULL,
     email    VARCHAR(355) NOT NULL UNIQUE,
     username VARCHAR(50)  NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
+    password TEXT NOT NULL
 );
 
 CREATE TABLE student
@@ -18,10 +18,9 @@ CREATE TABLE student
     id       SERIAL PRIMARY KEY,
     name     VARCHAR(150) DEFAULT 'não informado',
     email    VARCHAR(345) UNIQUE,
-    password VARCHAR(255) DEFAULT 'não informado',
+    password TEXT DEFAULT 'não informado',
     status   INT          DEFAULT 1,
-    cpf      VARCHAR(11) NOT NULL UNIQUE CHECK (cpf ~ '^[0-9]{11}$'
-) ,
+    cpf      VARCHAR(11) NOT NULL UNIQUE CHECK (cpf ~ '^[0-9]{11}$') ,
 	id_school_class INT NOT NULL REFERENCES school_class(id)
 );
 
@@ -37,7 +36,7 @@ CREATE TABLE admin
     id       SERIAL PRIMARY KEY,
     document VARCHAR(11),
     email    VARCHAR(355) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
+    password TEXT NOT NULL
 );
 
 CREATE TABLE school_class_teacher
