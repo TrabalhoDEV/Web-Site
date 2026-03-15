@@ -1,21 +1,38 @@
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 32px;
+    width: 100%;
     height: 72px;
+    padding: 0 32px;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+}
+
 .topbar-right {
     display: flex;
     align-items: center;
     gap: 24px;
 }
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
 .topbar-profile {
     display: flex;
     align-items: center;
     gap: var(--space-2);
     height: 100%;
 }
+
 .topbar-profile img {
     width: 40px;
     height: 40px;
@@ -23,6 +40,7 @@
     object-fit: cover;
     display: block;
 }
+
 .topbar-profile-info {
     display: flex;
     flex-direction: column;
@@ -32,13 +50,10 @@
     color: var(--text-color);
     font-weight: var(--text-semi-bold);
 }
+
 .subject {
     color: var(--muted-text-color);
     font-weight: var(--text-medium);
-}
-.topbar-actions {
-    display: flex;
-    gap: var(--space-4);
 }
 
 .icon-button {
@@ -47,9 +62,14 @@
     cursor: pointer;
     color: var(--muted-text-color);
     position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 .notification-button::after {
-    content: " ";
+    content: "";
     position: absolute;
     top: -3px;
     right: 6px;
@@ -58,9 +78,11 @@
     background: var(--red-secondary-color);
     border-radius: 50%;
 }
-#theme-button{
+
+#theme-button {
     color: var(--theme-icon-color);
 }
+
 .icon-button:hover {
-    stroke: var(--primary-color);
+    color: var(--primary-color);
 }
