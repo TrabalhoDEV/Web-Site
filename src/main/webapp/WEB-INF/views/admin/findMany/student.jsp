@@ -314,7 +314,7 @@
                                 : "Não informado" %>
                     </td>
 
-                    <td class="<%= student.getStatus() == StudentStatusEnum.INACTIVE ? "inactive" : "active"%>-student"><%=OutputFormatService.formatStudentStatus(student.getStatus())%>
+                    <td><p class="<%= student.getStatus() == StudentStatusEnum.INACTIVE ? "inactive" : "active"%>-student"><%=OutputFormatService.formatStudentStatus(student.getStatus())%></p>
                     </td>
                     <td class="actions">
                         <div class="btn-action">
