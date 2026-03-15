@@ -13,6 +13,13 @@
     flex-direction: row;
     flex-wrap: wrap;
 }
+.main-content {
+    margin-left: 16rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 32px 32px 32px;
+}
 .card-note h1{
     font-size: var(--text-42x1);
     color: #ffffff;

@@ -18,6 +18,14 @@
     color: white;
 }
 
+.main-content {
+    margin-left: 16rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 32px 32px 32px;
+}
+
 .hero h1 {
     font-weight: var(--text-semi-bold);
     font-size: var(--text-2xl);
@@ -27,7 +35,6 @@
 .hero p {
     margin: 0;
 }
-
 .hero::after {
     content: "";
     position: absolute;
@@ -194,7 +201,9 @@
 .pill.pending {
     background: var(--purple-secondary-color);
 }
-
+.performance-wrapper{
+    margin-top: 16px;
+}
 .performance-legend {
     display: flex;
     gap: var(--space-4);
@@ -202,12 +211,16 @@
     color: var(--text-color);
 }
 
+.performance-legend span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .dot {
     width: 10px;
     height: 10px;
     border-radius: 2px;
-    display: inline-block;
-    margin-right: 6px;
 }
 
 .dot.approved {

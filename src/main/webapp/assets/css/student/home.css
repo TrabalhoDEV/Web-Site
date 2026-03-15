@@ -21,7 +21,22 @@
     margin: 0 auto;
     color: white;
 }
-
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("../../img/fundo-hero.svg") no-repeat center;
+    background-size: cover;
+    pointer-events: none;
+    z-index: 0;
+}
+.main-content {
+    margin-left: 16rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 32px 32px 32px;
+}
 .hero h1{
     font-weight: var(--text-semi-bold);
     font-size: var(--text-2xl);
