@@ -27,6 +27,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet"
         href="${pageContext.request.contextPath}/assets/css/list.css"/>
+  <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
+
 </head>
 <body>
 

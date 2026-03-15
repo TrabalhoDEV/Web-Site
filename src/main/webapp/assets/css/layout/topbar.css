@@ -1,9 +1,11 @@
 .topbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    padding: 0 32px;
     height: 72px;
+    width: 80%;
+    margin: 0 auto;
+    padding: 0;
 }
 .topbar-right {
     display: flex;

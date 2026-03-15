@@ -503,10 +503,10 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                 "   WHERE stt.id_subject = sb.id " +
                 "   AND stt.id_teacher = ? " +
                 ") " +
-                "AND (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL)" +
+                "AND (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL) " +
+                "AND st.status = ? " +
                 ") AS sub " +
-                "JOIN student st ON st.id = sub.id_student " +
-                "WHERE sub.media < ? AND st.status = ? " +
+                "WHERE sub.media < ? " +
                 "ORDER BY sub.media ASC " +
                 "LIMIT ?";
 
@@ -515,8 +515,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
             pstmt.setInt(1, teacherId);
             pstmt.setInt(2, teacherId);
-            pstmt.setInt(3, Constants.MAX_GRADE_TO_HELP);
-            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal());
+            pstmt.setInt(3, StudentStatusEnum.ACTIVE.ordinal() + 1);
+            pstmt.setInt(4, Constants.MAX_GRADE_TO_HELP);
             pstmt.setInt(5, Constants.STUDENTS_HELP_TAKE);
             ResultSet rs = pstmt.executeQuery();
 
