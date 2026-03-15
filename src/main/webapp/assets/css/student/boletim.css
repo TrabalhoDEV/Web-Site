@@ -13,30 +13,25 @@
     flex-direction: row;
     flex-wrap: wrap;
 }
-.main-content {
-    margin-left: 16rem;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 0 32px 32px 32px;
-}
 .card-note h1{
     font-size: var(--text-42x1);
-    color: #ffffff;
+    color:#ffffff;
     font-weight: 500;
 }
 
 .card-note p{
     padding-left: 20px;
     font-size: var(--text-42x1);
-    color: var(--muted-text-color);
+    color:var(--muted-text-color);
     font-weight: 500;
+
+
 }
 
 .card-note span{
     font-weight: 600;
     font-size: xx-large;
-    color: var(--text-color);
+    color: var( --text-color);
     padding-right: 5px;
 }
 
@@ -50,8 +45,7 @@
     height: 130px;
     flex: 1;
     min-width: 190px;
-    background-color: var(--surface-color);
-    transition: background-color 0.3s ease;
+    background-color:#ffffff;
 }
 .approved-note h1{
     background-color: var(--green-secondary-color);
@@ -73,8 +67,7 @@
     height: 130px;
     flex: 1;
     min-width: 190px;
-    background-color: var(--surface-color);
-    transition: background-color 0.3s ease;
+    background-color:#ffffff;
 }
 .reproved-note h1{
     background-color: var( --red-secondary-color);
@@ -93,14 +86,14 @@
     display:flex;
     flex-direction: column;
     justify-content: space-between;
-    background-color: var(--surface-color);
+    background-color:#ffffff;
     height: 130px;
     flex: 1;
     min-width: 190px;
-    transition: background-color 0.3s ease;
+
 }
 .pending-note h1{
-    background-color: var(--muted-text-color);
+    background-color: #c0c8db;
     margin-top:0 ;
     padding-left: 20px;
     padding-top:7px;
@@ -134,7 +127,6 @@
 .boletim-header > h3{
     display: flex;
     align-items: center;
-    color: var(--text-color);
 }
 
 /* Boletim table */
@@ -148,7 +140,6 @@
     flex-direction: column;
     gap: 12px;
     padding-top: 30px;
-    transition: background-color 0.3s ease;
 }
 
 .grade-table{
@@ -170,7 +161,7 @@ tr {
 
 .grade-table th{
     text-align: left;
-    color: var(--muted-text-color);
+    color: #8b97b3;
     font-weight: 600;
     padding-bottom: 15px;
 }
@@ -178,8 +169,7 @@ tr {
 .grade-table td{
     width: 100% / var(--cols);
     padding: 12px 8px 12px 0;
-    border-top: 1px solid var(--border-color);
-    color: var(--text-color);
+    border-top: 1px solid #eef1f6;
 }
 
 .grade-table td:not(.actions){
@@ -197,21 +187,26 @@ tr {
 
 .approved{
     color:#10b981;
-    background: rgba(16, 185, 129, 0.1);
+    background:#e7f8f1;
     border:1px solid #10b981;
 }
 
 .reproved{
     color:#ff0066;
-    background: rgba(255, 0, 102, 0.1);
+    background:#ffe6ef;
     border:1px solid #ff0066;
 }
 
 .pending{
-    color: var(--muted-text-color);
-    background: var(--nav-active-color);
-    border:1px solid var(--border-color);
+    color:#8b97b3;
+    background:#eef1f6;
+    border:1px solid #cfd6e6;
 }
+
+
+.blue{ color:#3b82f6; }
+.red{ color:#ef4444; }
+.purple{ color:#8b5cf6; }
 
 .bold{ font-weight: 700; }
 

@@ -19,24 +19,9 @@
     display: flex;
     align-items: center;
     margin: 0 auto;
-    color: white;
+    color: var(--surface-color);
 }
-.hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: url("../../img/fundo-hero.svg") no-repeat center;
-    background-size: cover;
-    pointer-events: none;
-    z-index: 0;
-}
-.main-content {
-    margin-left: 16rem;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 0 32px 32px 32px;
-}
+
 .hero h1{
     font-weight: var(--text-semi-bold);
     font-size: var(--text-2xl);
@@ -62,7 +47,7 @@
     z-index: 1;
 }
 .primary-button{
-    background-color: white;
+    background-color: var(--surface-color);
     color: var(--primary-color);
     margin-top: var(--space-6);
     padding: var(--space-2) var(--space-5);
@@ -75,7 +60,7 @@
 }
 .primary-button:hover{
     background-color: rgba(255, 255, 255, 0.4);
-    color: white;
+    color: var(--surface-color);
 }
 
 /* Observações */
@@ -109,7 +94,6 @@
     justify-content: space-between;
     height: 185px;
     width: 250px;
-    background-color: var(--surface-color);
 }
 .card-tasks h3{
     color: var(--text-color);
@@ -148,7 +132,7 @@
 }
 
 button {
-    background: var(--primary-color);
+    background: #4c63ff;
     color: white;
     border: none;
     padding: 6px 12px;
@@ -157,13 +141,13 @@ button {
 }
 /* Modal -------------------------------------*/
 .card-modal{
+
     padding: var(--space-5);
     display:flex;
     flex-direction: column;
     justify-content: space-between;
     height: 285px;
     width: 450px;
-    background-color: var(--surface-color);
 }
 .card-modal h3{
     color: var(--text-color);
@@ -183,9 +167,23 @@ button {
     max-width: 100%;
 }
 
+.card-footer {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+button {
+    background: #4c63ff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
 dialog{
-    background-color: var(--surface-color);
-    color: var(--text-color);
     border-radius: var(--medium-radius);
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);

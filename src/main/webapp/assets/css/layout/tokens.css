@@ -56,10 +56,6 @@
     --space-7: 2.5rem;   /* 40px */
     --space-8: 3rem;     /* 48px */
 
-    /* Transition */
-
-    --transition-fast: 0.3s ease;
-
 }
 
 body.dark-mode {
