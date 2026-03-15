@@ -45,7 +45,6 @@ public class FindManyTeacherByClassServlet extends HttpServlet {
             session.removeAttribute("error");
         }
 
-        // Valida o id da turma
         if (classIdParam == null || classIdParam.isBlank()) {
             response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
             return;
