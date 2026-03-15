@@ -1,13 +1,9 @@
-/* Font - Poppins*/
+/* hero.css — landing page pública */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-:root{
-
-    /* Colors */
-
+:root {
     --primary-color: #4361EE;
-    --button-hover-color: #3950BE;
+    --button-hover-color: #394ebc;
     --nav-active-color: #E7EBFD;
     --background-color1: #F5F5FD;
     --background-color2: #EBEFFF;
@@ -16,52 +12,27 @@
     --border-color: #EBEDF8;
     --text-color: #1B2559;
     --muted-text-color: #8F9BBA;
-    --orange-secondary-color: #FF5B5B;
+    --orange-secondary-color: #d04c4c;
     --red-secondary-color: #FF0080;
     --green-secondary-color: #10B981;
     --purple-secondary-color: #7C3AED;
-    --theme-icon-color:#8F9BBA;
-
-    /* Font Sizes */
-
-    --text-xs: 0.75rem;   /* 12px */
-    --text-sm: 0.875rem;  /* 14px */
-    --text-md: 1rem;      /* 16px */
-    --text-lg: 1.125rem;  /* 18px */
-    --text-xl: 1.25rem;   /* 20px */
-    --text-2xl: 1.5rem;   /* 24px */
-    --text-3xl: 2rem;     /* 32px */
-    --text-4xl: 2.5rem;   /* 40px */
-
-    /* Font Weight*/
-
+    --theme-icon-color: #8F9BBA;
+    --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.03);
+    --shadow-md: 0 10px 40px rgba(64, 82, 246, 0.08);
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-md: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
     --text-bold: 700;
     --text-semi-bold: 600;
     --text-medium: 500;
-    --text-regular: 400;
-
-    /* Radius */
-
-    --small-radius:4px;
-    --medium-radius:8px;
-    --large-radius:16px;
-
-    /* Spacing */
-
-    --space-1: 0.25rem;  /* 4px  */
-    --space-2: 0.5rem;   /* 8px  */
-    --space-3: 0.75rem;  /* 12px */
-    --space-4: 1rem;     /* 16px */
-    --space-5: 1.5rem;   /* 24px */
-    --space-6: 2rem;     /* 32px */
-    --space-7: 2.5rem;   /* 40px */
-    --space-8: 3rem;     /* 48px */
-
-    /* Shadows*/
-
-    --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.03);
-    --shadow-md: 0 10px 40px rgba(64, 82, 246, 0.08);
+    --medium-radius: 8px;
+    --large-radius: 16px;
+    --transition-fast: 0.2s ease;
 }
+
 * {
     margin: 0;
     padding: 0;
@@ -71,7 +42,7 @@
 body {
     background-color: var(--background-color1);
     font-family: 'Poppins', sans-serif;
-    color: var(--text-description);
+    color: var(--description-color);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -81,29 +52,30 @@ body {
 a {
     text-decoration: none;
     color: var(--text-color);
-    font-weight: 500;
-    font-size: 16px;
-    transition: color 0.2s;
+    font-weight: var(--text-medium);
+    font-size: var(--text-md);
+    transition: color var(--transition-fast);
 }
 
 a:hover {
     color: var(--primary-color);
 }
 
+/* ===== BOTÕES ===== */
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border: none;
     cursor: pointer;
-    font-family: var(--font-family);
+    font-family: 'Poppins', sans-serif;
     font-weight: var(--text-medium);
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
 }
 
 .btn-primary {
     background-color: var(--primary-color);
-    color: white;
+    color: #ffffff;
     font-size: var(--text-md);
     border-radius: 50px;
 }
@@ -112,6 +84,31 @@ a:hover {
     background-color: var(--button-hover-color);
 }
 
+.btn-large {
+    padding: 16px 40px;
+    font-size: var(--text-lg);
+}
+
+.btn-send {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: var(--text-sm);
+    font-weight: var(--text-medium);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.btn-send:hover {
+    background-color: var(--button-hover-color);
+}
+
+/* ===== NAVBAR ===== */
 .navbar {
     width: 100%;
     display: flex;
@@ -135,7 +132,7 @@ a:hover {
     display: flex;
     align-items: center;
     gap: 2px;
-    margin-left: 20PX;
+    margin-left: 20px;
 }
 
 .nav-links {
@@ -159,6 +156,7 @@ a:hover {
     font-size: var(--text-md);
 }
 
+/* ===== HERO SECTION ===== */
 .hero-section {
     flex: 1;
     display: flex;
@@ -175,7 +173,6 @@ a:hover {
     gap: 80px;
 }
 
-
 .hero-text {
     flex: 1;
     max-width: 550px;
@@ -184,7 +181,7 @@ a:hover {
 .title {
     color: var(--primary-color);
     font-size: 2.7rem;
-    font-weight: 500;
+    font-weight: var(--text-medium);
     line-height: 1.2;
     letter-spacing: -1px;
     margin-bottom: 30px;
@@ -197,7 +194,6 @@ a:hover {
     left: 0;
     width: 80%;
     height: auto;
-
 }
 
 .description {
@@ -208,11 +204,7 @@ a:hover {
     color: var(--muted-text-color);
 }
 
-.btn-large {
-    padding: 16px 40px;
-    font-size: var(--text-lg);
-}
-
+/* ===== CHAT DEMO ===== */
 .hero-chat {
     flex: 1;
     max-width: 500px;
@@ -251,7 +243,6 @@ a:hover {
 
 .message p {
     margin: 0;
-
 }
 
 .message .time {
@@ -262,11 +253,8 @@ a:hover {
     gap: 4px;
     align-self: flex-end;
 }
-.sent p{
-    color: white;
-}
 
-.received{
+.received {
     align-self: flex-start;
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
@@ -277,9 +265,11 @@ a:hover {
 .sent {
     align-self: flex-end;
     background-color: var(--primary-color);
-    color: var(--white);
+    color: #ffffff;
     border-radius: 12px 12px 0 12px;
 }
+
+.sent p { color: #ffffff; }
 
 .sent .time {
     color: rgba(255, 255, 255, 0.8);
@@ -290,7 +280,7 @@ a:hover {
 }
 
 .chat-input-box {
-    background-color: white;
+    background-color: var(--surface-color);
     border-radius: 50px;
     padding: 10px 10px 10px 20px;
     display: flex;
@@ -311,7 +301,7 @@ a:hover {
     flex: 1;
     border: none;
     outline: none;
-    font-family: var(--font-family);
+    font-family: 'Poppins', sans-serif;
     font-size: var(--text-sm);
     color: var(--description-color);
 }
@@ -320,39 +310,21 @@ a:hover {
     color: var(--theme-icon-color);
 }
 
-.btn-send {
-    background-color: var(--primary-color);
-    color:white;
-    border: none;
-    border-radius: 50px;
-    padding: 10px 20px;
-    font-size: var(--text-sm);
-    font-weight: var(--text-medium);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-send:hover {
-    background-color: var(--button-hover-color);
-}
-
+/* ===== FAB DE PERFIL ===== */
 .fab-profile {
     position: fixed;
     bottom: 40px;
     right: 40px;
     width: 60px;
     height: 60px;
-    background-color: white;
+    background-color: var(--surface-color);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform var(--transition-fast);
 }
 
 .fab-profile:hover {
@@ -373,15 +345,18 @@ a:hover {
     border: 2px solid var(--surface-color);
 }
 
+/* ===== RESPONSIVO ===== */
 @media (max-width: 968px) {
     .hero-container {
         flex-direction: column;
         text-align: center;
         gap: 50px;
     }
-    .wave{
+
+    .wave {
         left: 10%;
     }
+
     .hero-text {
         max-width: 100%;
     }

@@ -1,32 +1,40 @@
+/* =============================================
+   DETAILS — Detalhes de entidade
+   ============================================= */
+
+/* ── Grid de detalhe ── */
 .detail-grid {
     background-color: var(--surface-color);
     border-radius: var(--medium-radius);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    box-shadow: var(--shadow-card);
     padding: 30px 40px;
     width: 90%;
 }
 
+/* ── Cabeçalho ── */
 .dialog-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #3a4edc;
+    color: var(--primary-color);
     margin-bottom: 30px;
 }
 
+/* ── Botão fechar ── */
 .close-btn {
     font-size: 50px;
-    background-color: #ffffff;
-    color: #282828;
+    background-color: var(--surface-color);
+    color: var(--text-color);
     border: none;
     cursor: pointer;
-    transition: 0.2s;
+    transition: color var(--transition-fast);
 }
 
 .close-btn:hover {
-    color: #4c63ff;
+    color: var(--primary-color);
 }
 
+/* ── Seção de informações ── */
 .info-section {
     margin-bottom: 30px;
 }
@@ -38,16 +46,17 @@
 }
 
 .label {
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: #181d42;
+    font-weight: var(--text-semi-bold);
+    font-size: var(--text-lg);
+    color: var(--text-color);
 }
 
 .value {
-    font-size: 1.1rem;
-    color: gray;
+    font-size: var(--text-lg);
+    color: var(--muted-text-color);
 }
 
+/* ── Listas ── */
 .lists-container {
     display: flex;
     gap: 30px;
@@ -60,27 +69,28 @@
 }
 
 .list-box h3 {
-    color: #3a4edc;
-    font-size: 1.4rem;
+    color: var(--primary-color);
+    font-size: var(--text-2xl);
     margin-bottom: 12px;
 }
 
 .scroll-list {
     max-height: 210px;
     overflow-y: auto;
-    border: 1px solid #ddd;
-    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--medium-radius);
     padding: 10px;
-    background: #ffffff;
+    background: var(--surface-color);
 }
 
 .scroll-list li {
-    font-size: 1rem;
+    font-size: var(--text-md);
     padding: 6px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
     list-style: none;
 }
 
+/* ── Ações do modal ── */
 .modal-actions {
     display: flex;
     justify-content: space-around;
@@ -89,22 +99,36 @@
 
 .modal-actions button {
     font-size: var(--text-sm);
-    background: #4c63ff;
-    color: white;
+    background: var(--primary-color);
+    color: #fff;
     border: none;
     width: 120px;
     height: 40px;
-    border-radius: 8px;
+    border-radius: var(--medium-radius);
     cursor: pointer;
-    transition: 0.2s;
+    transition: background-color var(--transition-fast);
 }
 
 .modal-actions button:hover {
-    background-color: #3f52e6;
+    background-color: var(--button-hover-color);
 }
 
+/* ── Botão de exclusão — outline ── */
+#btn-delete {
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+#btn-delete:hover {
+    background: transparent;
+    border-color: var(--button-hover-color);
+    color: var(--button-hover-color);
+}
+
+/* ── Responsivo ── */
 @media (max-width: 768px) {
-    .boletim-grid {
+    .detail-grid {
         width: 95%;
         padding: 24px 20px;
     }
@@ -116,26 +140,14 @@
 }
 
 @media (max-width: 480px) {
-    .boletim-grid {
+    .detail-grid {
         width: 100%;
         padding: 16px 12px;
-        border-radius: 12px;
+        border-radius: var(--medium-radius);
     }
 
     .info-row {
         flex-direction: column;
         gap: 4px;
     }
-}
-
-#btn-delete{
-    background: transparent;
-    border: solid 3px var(--primary-color);
-    color: var(--primary-color);
-}
-
-#btn-delete:hover{
-    background: transparent;
-    border: solid 3px var(--button-hover-color);
-    color: var(--button-hover-color);
 }

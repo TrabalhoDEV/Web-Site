@@ -1,12 +1,17 @@
+/* =============================================
+   LIST — Listagem de entidades (alunos, turmas…)
+   ============================================= */
+
 @import url('./layout/topbar.css');
 @import url('./layout/tokens.css');
 @import url('./layout/navbar.css');
 
-.hero{
+/* ── Hero banner ── */
+.hero {
     position: relative;
     background: linear-gradient(to left, #9094ff 0%, #5750de 50%, #4361EE 100%);
-    border-radius: 1rem;
-    padding: 24px 32px;
+    border-radius: var(--large-radius);
+    padding: var(--space-5) var(--space-6);
     overflow: hidden;
     width: 80%;
     height: 14vh;
@@ -14,17 +19,17 @@
     display: flex;
     align-items: center;
     margin: 0 auto;
-    color: white;
+    color: var(--surface-color);
 }
 
-.hero h1{
+.hero h1 {
     font-weight: var(--text-semi-bold);
     font-size: var(--text-2xl);
-    margin-bottom:var(--space-2);
+    margin-bottom: var(--space-2);
 }
-.hero p{
-    margin: 0;
-}
+
+.hero p { margin: 0; }
+
 .hero::after {
     content: "";
     position: absolute;
@@ -34,6 +39,7 @@
     pointer-events: none;
     z-index: 0;
 }
+
 .hero-illustration {
     position: absolute;
     right: 3%;
@@ -42,43 +48,66 @@
     z-index: 1;
 }
 
-.boletim-grid{
+/* ── Card/grade de listagem ── */
+.boletim-grid {
     background-color: var(--surface-color);
     border-radius: var(--medium-radius);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    padding: 24px 32px;
+    box-shadow: var(--shadow-card);
+    padding: var(--space-5) var(--space-6);
     width: 65dvw;
     margin: 30px auto 0;
 }
-.header-grid{
+
+.header-grid {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: var(--text-md);
 }
 
-.btn-add{
-    font-size: var(--text-sm) ;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-td button, #confirmDelete{
+/* ── Botões de ação ── */
+.btn-add {
     font-size: var(--text-sm);
     background: var(--primary-color);
-    color: white;
+    color: #fff;
     border: none;
     padding: 8px 12px;
-    border-radius: 8px;
-    width: 120px;
+    border-radius: var(--medium-radius);
     cursor: pointer;
+    transition: background-color var(--transition-fast);
 }
 
-button:hover, #confirmDelete:hover{
+.btn-add:hover {
+    background-color: var(--button-hover-color);
+}
+
+td button,
+#confirmDelete {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: var(--medium-radius);
+    width: 120px;
+    height: 40px;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+td button.btn-delete:hover,
+td button#closeDelete:hover {
+    background: var(--orange-secondary-color);
+    color: var(--surface-color);
+}
+
+td svg {
+    width: 2em;
+    height: 2em;
+}
+
+
+button:hover,
+#confirmDelete:hover {
     background-color: var(--button-hover-color);
 }
 
@@ -88,92 +117,86 @@ button:hover, #confirmDelete:hover{
     gap: 8px;
 }
 
-.btn-delete, #closeDelete{
-    background: transparent;
-    border: solid 3px var(--primary-color);
-    color: var(--primary-color);
+/* Botão de exclusão — outline */
+.btn-delete,
+#closeDelete {
+    background: var(--orange-secondary-color);
+    color: var(--surface-color);
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+    width: 5em;
 }
 
-.btn-delete:hover, #closeDelete:hover{
-    background: transparent;
-    border: solid 3px var(--button-hover-color);
-    color: var(--button-hover-color);
-}
 
-.grade-table{
+
+
+/* ── Tabela ── */
+.grade-table {
     width: 100%;
-    font-size: 16px;
+    font-size: var(--text-md);
     border-collapse: collapse;
     display: grid;
     grid-template-columns: repeat(var(--cols, 6), 1fr);
 }
 
 thead,
-tbody {
-    display: contents;
-}
+tbody { display: contents; }
 
-tr {
-    display: contents;
-}
+tr { display: contents; }
 
-
-.grade-table th{
+.grade-table th {
     text-align: left;
-    color: #8b97b3;
-    font-weight: 600;
+    color: var(--muted-text-color);
+    font-weight: var(--text-semi-bold);
     padding: 15px 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.grade-table td{
-    width: 100% / var(--cols);
+.grade-table td {
     padding: 10px 5px;
-    border-top: 1px solid #eef1f6;
+    border-top: 1px solid var(--border-color);
 }
 
-.grade-table td:not(.actions){
+.grade-table td:not(.actions) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-th{
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.status{
+/* ── Badges de status ── */
+.status {
     padding: 6px 14px;
     border-radius: 20px;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: var(--text-sm);
+    font-weight: var(--text-semi-bold);
 }
 
-.approved{
-    color:#10b981;
-    background:#e7f8f1;
-    border:1px solid #10b981;
+.approved {
+    color: var(--green-secondary-color);
+    background: #e7f8f1;
+    border: 1px solid var(--green-secondary-color);
 }
 
-.reproved{
-    color:#ff0066;
-    background:#ffe6ef;
-    border:1px solid #ff0066;
+.reproved {
+    color: #ff0066;
+    background: #ffe6ef;
+    border: 1px solid #ff0066;
 }
 
-.pending{
-    color:#8b97b3;
-    background:#eef1f6;
-    border:1px solid #cfd6e6;
+.pending {
+    color: var(--muted-text-color);
+    background: #eef1f6;
+    border: 1px solid #cfd6e6;
 }
 
+/* ── Modais ── */
 dialog {
     margin: auto;
-    padding: 0px;
+    padding: 0;
     border-radius: var(--medium-radius);
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-card);
 }
 
 dialog::backdrop {
@@ -196,19 +219,15 @@ dialog::backdrop {
     align-items: center;
 }
 
-.modal-cardU input {
-    width: 90%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border-radius: var(--medium-radius);
-    border: 1px solid rgb(201, 201, 201);
-}
+.modal-cardU input,
 .modal-cardD input {
     width: 90%;
     padding: 8px;
     margin-bottom: 15px;
     border-radius: var(--medium-radius);
-    border: 1px solid rgb(201, 201, 201);
+    border: 1px solid var(--border-color);
+    font-family: 'Poppins', sans-serif;
+    font-size: var(--text-sm);
 }
 
 .modal-actions {
@@ -216,37 +235,46 @@ dialog::backdrop {
     justify-content: center;
     gap: 10px;
     margin-top: 30px;
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
-.modal-actions button{
-    font-size: var(--text-sm) ;
+.modal-actions button {
+    font-size: var(--text-sm);
     background: var(--primary-color);
-    color: white;
+    color: #fff;
     border: none;
     width: 110px;
     height: 40px;
-    border-radius: 8px;
+    border-radius: var(--medium-radius);
     cursor: pointer;
+    transition: background-color var(--transition-fast);
 }
 
-.pagination{
-    margin-top: 20px;
-    margin-left: 40px;
-    margin-bottom: 20px;
+.modal-actions button:hover {
+    background-color: var(--button-hover-color);
+}
+
+/* ── Paginação ── */
+.pagination {
+    margin: 20px 0 20px 40px;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 12px;
 }
 
-.pagination > a{
+.pagination > a {
     text-decoration: none;
-    font-size: var(--text-sm) ;
+    font-size: var(--text-sm);
     background: var(--primary-color);
-    color: white;
+    color: #fff;
     border: none;
     padding: 8px 12px;
-    border-radius: 8px;
+    border-radius: var(--medium-radius);
     cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.pagination > a:hover {
+    background-color: var(--button-hover-color);
 }
