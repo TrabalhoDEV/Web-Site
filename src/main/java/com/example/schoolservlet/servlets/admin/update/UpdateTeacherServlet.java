@@ -12,8 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,11 +24,11 @@ import java.util.Set;
  */
 @WebServlet(name = "admin-update-teacher",value = "/admin/teacher/update")
 public class UpdateTeacherServlet extends HttpServlet {
-    private SubjectDAO subjectDAO = new SubjectDAO();
-    private SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
-    private SubjectTeacherDAO subjectTeacherDAO = new SubjectTeacherDAO();
-    private SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
-    private TeacherDAO teacherDAO = new TeacherDAO();
+    private final SubjectDAO subjectDAO = new SubjectDAO();
+    private final SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+    private final SubjectTeacherDAO subjectTeacherDAO = new SubjectTeacherDAO();
+    private final SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
+    private final TeacherDAO teacherDAO = new TeacherDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -102,17 +104,25 @@ public class UpdateTeacherServlet extends HttpServlet {
             teacher.setEmail(email);
             teacher.setUsername(username);
 
-            teacherDAO.update(teacher);
+            List<Integer> validClassIds = InputValidation.validateIdsExist(schoolClassIdsParam, schoolClassDAO.findAllIds());
+            Set<Integer> newSchoolClassIds = new HashSet<>(validClassIds);
 
             List<Integer> validSubjectIds = InputValidation.validateIdsExist(subjectIdsParam, subjectDAO.findAllIds());
+            Set<Integer> newSubjectIds = new HashSet<>(validSubjectIds);
 
-            Set<Integer> newSubjectIds = new HashSet<>();
-            if (validSubjectIds != null) {
-                newSubjectIds.addAll(validSubjectIds);
+            Set<Integer> allowedSubjectIds = findAllowedSubjectIdsBySchoolClasses(newSchoolClassIds);
+
+            if (!newSubjectIds.isEmpty() && newSchoolClassIds.isEmpty()) {
+                throw new ValidationException("Selecione ao menos uma turma antes de escolher as matérias.");
             }
 
-            List<Subject> currentSubjects = subjectDAO.findByTeacherId(teacher.getId());
+            if (!allowedSubjectIds.containsAll(newSubjectIds)) {
+                throw new ValidationException("As matérias selecionadas não pertencem às turmas escolhidas.");
+            }
 
+            teacherDAO.update(teacher);
+
+            List<Subject> currentSubjects = subjectDAO.findByTeacherId(teacher.getId());
             Set<Integer> currentSubjectIds = new HashSet<>();
             for (Subject s : currentSubjects) {
                 currentSubjectIds.add(s.getId());
@@ -141,15 +151,7 @@ public class UpdateTeacherServlet extends HttpServlet {
 
             subjectTeacherDAO.deleteManyByTeacherAndSubjects(teacher.getId(), toRemoveSubjects);
 
-            List<Integer> validClassIds = InputValidation.validateIdsExist(schoolClassIdsParam, schoolClassDAO.findAllIds());
-
-            Set<Integer> newSchoolClassIds = new HashSet<>();
-            if (validClassIds != null) {
-                newSchoolClassIds.addAll(validClassIds);
-            }
-
             List<SchoolClass> currentSchoolClasses = schoolClassDAO.findByTeacherId(teacher.getId());
-
             Set<Integer> currentSchoolClassIds = new HashSet<>();
             for (SchoolClass sc : currentSchoolClasses) {
                 currentSchoolClassIds.add(sc.getId());
@@ -176,7 +178,6 @@ public class UpdateTeacherServlet extends HttpServlet {
                 schoolClassTeacherDAO.createMany(classTeachersToInsert);
             }
 
-
             schoolClassTeacherDAO.deleteManyByTeacherAndClasses(teacher.getId(), toRemoveClasses);
 
             try {
@@ -197,21 +198,14 @@ public class UpdateTeacherServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("error", "ID inválido.");
             response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
-            return;
         } catch (DataException | NotFoundException e) {
             request.getSession().setAttribute("error", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
-            return;
-        } catch (ValueAlreadyExistsException vaee){
+        } catch (ValidationException e){
             loadSafely(request, id);
-            request.setAttribute("error", vaee.getMessage());
+            preserveFormSelections(request);
+            request.setAttribute("error", e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
-            return;
-        } catch (ValidationException ve){
-            loadSafely(request, id);
-            request.setAttribute("error", ve.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
-            return;
         }
     }
 
@@ -219,21 +213,61 @@ public class UpdateTeacherServlet extends HttpServlet {
             throws DataException, NotFoundException, ValidationException {
 
         Teacher teacher = teacherDAO.findById(teacherId);
-        List<Subject> allSubjects = subjectDAO.findAll();
-        List<Subject> teacherSubjects =
-                subjectDAO.findByTeacherId(teacherId);
-
-        List<SchoolClass> allSchoolClasses =
-                schoolClassDAO.findAll();
-        List<SchoolClass> teacherSchoolClasses =
-                schoolClassDAO.findByTeacherId(teacherId);
+        List<Subject> teacherSubjects = subjectDAO.findByTeacherId(teacherId);
+        List<SchoolClass> allSchoolClasses = schoolClassDAO.findAll();
+        List<SchoolClass> teacherSchoolClasses = schoolClassDAO.findByTeacherId(teacherId);
+        Map<Integer, List<Subject>> subjectsBySchoolClass = buildSubjectsBySchoolClass(allSchoolClasses);
 
         request.setAttribute("teacher", teacher);
-        request.setAttribute("subjects", allSubjects);
         request.setAttribute("teacherSubjects", teacherSubjects);
         request.setAttribute("schoolClasses", allSchoolClasses);
-        request.setAttribute("teacherSchoolClasses",
-                teacherSchoolClasses);
+        request.setAttribute("teacherSchoolClasses", teacherSchoolClasses);
+        request.setAttribute("subjectsBySchoolClass", subjectsBySchoolClass);
+    }
+
+    private Map<Integer, List<Subject>> buildSubjectsBySchoolClass(List<SchoolClass> schoolClasses)
+            throws DataException {
+        Map<Integer, List<Subject>> subjectsBySchoolClass = new HashMap<>();
+
+        for (SchoolClass schoolClass : schoolClasses) {
+            subjectsBySchoolClass.put(schoolClass.getId(), subjectDAO.findBySchoolClassId(schoolClass.getId()));
+        }
+
+        return subjectsBySchoolClass;
+    }
+
+    private Set<Integer> findAllowedSubjectIdsBySchoolClasses(Set<Integer> schoolClassIds)
+            throws DataException {
+        Set<Integer> allowedSubjectIds = new HashSet<>();
+
+        for (Integer schoolClassId : schoolClassIds) {
+            for (Subject subject : subjectDAO.findBySchoolClassId(schoolClassId)) {
+                allowedSubjectIds.add(subject.getId());
+            }
+        }
+
+        return allowedSubjectIds;
+    }
+
+    private void preserveFormSelections(HttpServletRequest request) {
+        request.setAttribute("submittedSchoolClassIds", parseSelectedIds(request.getParameterValues("schoolClassIds")));
+        request.setAttribute("submittedSubjectIds", parseSelectedIds(request.getParameterValues("subjectIds")));
+    }
+
+    private Set<Integer> parseSelectedIds(String[] idsParam) {
+        Set<Integer> ids = new HashSet<>();
+        if (idsParam == null) {
+            return ids;
+        }
+
+        for (String idParam : idsParam) {
+            try {
+                ids.add(Integer.parseInt(idParam));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        return ids;
     }
 
     private void loadSafely(HttpServletRequest request, int id) {

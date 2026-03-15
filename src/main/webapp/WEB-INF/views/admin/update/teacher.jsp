@@ -5,29 +5,54 @@
 <%@ page import="com.example.schoolservlet.models.SchoolClass" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.HashSet" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
     Teacher teacher = (Teacher) request.getAttribute("teacher");
 %>
 <%
-    List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
     List<Subject> teacherSubjects = (List<Subject>) request.getAttribute("teacherSubjects");
+    List<SchoolClass> schoolClasses = (List<SchoolClass>) request.getAttribute("schoolClasses");
+    List<SchoolClass> teacherSchoolClasses = (List<SchoolClass>) request.getAttribute("teacherSchoolClasses");
+    Map<Integer, List<Subject>> subjectsBySchoolClass = (Map<Integer, List<Subject>>) request.getAttribute("subjectsBySchoolClass");
 
-    Set<Integer> teacherSubjectIds = new HashSet<>();
-    if (teacherSubjects != null) {
-        for (Subject ts : teacherSubjects) {
-            teacherSubjectIds.add(ts.getId());
+    Set<Integer> selectedSubjectIds = (Set<Integer>) request.getAttribute("submittedSubjectIds");
+    if (selectedSubjectIds == null) {
+        selectedSubjectIds = new HashSet<>();
+        if (teacherSubjects != null) {
+            for (Subject ts : teacherSubjects) {
+                selectedSubjectIds.add(ts.getId());
+            }
         }
     }
 
-    List<SchoolClass> schoolClasses = (List<SchoolClass>) request.getAttribute("schoolClasses");
-    List<SchoolClass> teacherSchoolClasses = (List<SchoolClass>) request.getAttribute("teacherSchoolClasses");
+    Set<Integer> selectedSchoolClassIds = (Set<Integer>) request.getAttribute("submittedSchoolClassIds");
+    if (selectedSchoolClassIds == null) {
+        selectedSchoolClassIds = new HashSet<>();
+        if (teacherSchoolClasses != null) {
+            for (SchoolClass sc : teacherSchoolClasses) {
+                selectedSchoolClassIds.add(sc.getId());
+            }
+        }
+    }
 
-    Set<Integer> teacherSchoolClassesId = new HashSet<>();
-    if (teacherSchoolClasses != null) {
-        for (SchoolClass sc : teacherSchoolClasses) {
-            teacherSchoolClassesId.add(sc.getId());
+    if (subjectsBySchoolClass == null) {
+        subjectsBySchoolClass = new HashMap<>();
+    }
+
+    List<Subject> availableSubjectsForSelectedClasses = new ArrayList<>();
+    Set<Integer> availableSubjectIdsForSelectedClasses = new HashSet<>();
+    for (Integer selectedClassId : selectedSchoolClassIds) {
+        List<Subject> classSubjects = subjectsBySchoolClass.get(selectedClassId);
+        if (classSubjects != null) {
+            for (Subject subject : classSubjects) {
+                if (availableSubjectIdsForSelectedClasses.add(subject.getId())) {
+                    availableSubjectsForSelectedClasses.add(subject);
+                }
+            }
         }
     }
 %>
@@ -227,18 +252,24 @@
                         <input type="text" id="username" name="username" value="<%=teacher.getUsername()%>" placeholder="Digite o username do professor" required>
                     </div>
 
-                    <!-- Subjects Fieldset -->
+                    <!-- Classes Fieldset -->
                     <div class="fieldset-group">
                         <fieldset class="checkbox-fieldset">
-                            <legend>Selecione as Matérias:</legend>
+                            <legend>1. Selecione as Turmas:</legend>
                             <div class="checkbox-grid">
                                 <%
-                                    if (subjects != null) {
-                                        for (Subject subject : subjects) {
+                                    if (schoolClasses != null) {
+                                        for (SchoolClass sc : schoolClasses) {
                                 %>
                                 <div class="checkbox-item">
-                                    <input type="checkbox" id="subject_<%= subject.getId() %>" name="subjectIds" value="<%= subject.getId() %>" <%= teacherSubjectIds.contains(subject.getId()) ? "checked" : "" %>>
-                                    <label for="subject_<%= subject.getId() %>"><%= OutputFormatService.formatName(subject.getName()) %></label>
+                                    <input
+                                            type="checkbox"
+                                            id="class_<%= sc.getId() %>"
+                                            name="schoolClassIds"
+                                            value="<%= sc.getId() %>"
+                                            class="school-class-checkbox"
+                                            <%= selectedSchoolClassIds.contains(sc.getId()) ? "checked" : "" %>>
+                                    <label for="class_<%= sc.getId() %>"><%= OutputFormatService.formatName(sc.getSchoolYear()) %></label>
                                 </div>
                                 <%
                                         }
@@ -248,25 +279,36 @@
                         </fieldset>
                     </div>
 
-                    <!-- Classes Fieldset -->
+                    <!-- Subjects Fieldset -->
                     <div class="fieldset-group">
                         <fieldset class="checkbox-fieldset">
-                            <legend>Selecione as Turmas:</legend>
-                            <div class="checkbox-grid">
+                            <legend>2. Selecione as Matérias da(s) Turma(s) marcada(s):</legend>
+                            <p id="subjects-help-text" style="margin: 0 0 12px 0; color: #666;">
+                                Marque uma ou mais turmas para carregar apenas as matérias disponíveis nelas.
+                            </p>
+                            <div class="checkbox-grid" id="subject-checkbox-grid">
                                 <%
-                                    if (schoolClasses != null) {
-                                        for (SchoolClass sc : schoolClasses) {
+                                    for (Subject subject : availableSubjectsForSelectedClasses) {
                                 %>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="class_<%= sc.getId() %>" name="schoolClassIds" value="<%= sc.getId() %>"  <%= teacherSchoolClassesId.contains(sc.getId()) ? "checked" : "" %>>
-                                    <label for="class_<%= sc.getId() %>"><%= OutputFormatService.formatName(sc.getSchoolYear()) %></label>
+                                <div class="checkbox-item" data-subject-item>
+                                    <input
+                                            type="checkbox"
+                                            id="subject_<%= subject.getId() %>"
+                                            name="subjectIds"
+                                            value="<%= subject.getId() %>"
+                                            <%= selectedSubjectIds.contains(subject.getId()) ? "checked" : "" %>>
+                                    <label for="subject_<%= subject.getId() %>"><%= OutputFormatService.formatName(subject.getName()) %></label>
                                 </div>
                                 <%
-                                        }
                                     }
                                 %>
                             </div>
+                            <p id="subject-empty-state" style="display: <%= availableSubjectsForSelectedClasses.isEmpty() ? "block" : "none" %>; color: #666; margin-top: 12px;">
+                                Nenhuma matéria disponível para as turmas selecionadas.
+                            </p>
                         </fieldset>
+
+                        <p style="color: #666; margin-top: 12px;">Se uma matéria existir apenas em parte das turmas selecionadas, ela será atribuída somente às turmas onde estiver disponível.</p>
                     </div>
 
                     <%
@@ -291,6 +333,146 @@
     </main>
 
 </div>
+
+<script>
+    const subjectsBySchoolClass = {
+        <%
+            boolean firstClass = true;
+            for (SchoolClass schoolClass : schoolClasses) {
+                if (!firstClass) {
+                    out.print(",");
+                }
+                firstClass = false;
+                out.print("\n        \"");
+                out.print(schoolClass.getId());
+                out.print("\": [");
+
+                List<Subject> classSubjects = subjectsBySchoolClass.get(schoolClass.getId());
+                boolean firstSubject = true;
+                if (classSubjects != null) {
+                    for (Subject subject : classSubjects) {
+                        if (!firstSubject) {
+                            out.print(",");
+                        }
+                        firstSubject = false;
+                        String safeName = subject.getName() == null ? "" : subject.getName()
+                                .replace("\\", "\\\\")
+                                .replace("\"", "\\\"")
+                                .replace("\r", "")
+                                .replace("\n", "\\n");
+                        out.print("{ id: ");
+                        out.print(subject.getId());
+                        out.print(", name: \"");
+                        out.print(safeName);
+                        out.print("\" }");
+                    }
+                }
+
+                out.print("]");
+            }
+        %>
+    };
+
+    const selectedSubjectIds = new Set([
+        <%
+            boolean firstSelectedSubject = true;
+            for (Integer subjectId : selectedSubjectIds) {
+                if (!firstSelectedSubject) {
+                    out.print(", ");
+                }
+                firstSelectedSubject = false;
+                out.print(subjectId);
+            }
+        %>
+    ]);
+
+    const classCheckboxes = document.querySelectorAll('.school-class-checkbox');
+    const subjectsGrid = document.getElementById('subject-checkbox-grid');
+    const subjectEmptyState = document.getElementById('subject-empty-state');
+
+    function formatSubjectName(name) {
+        return name
+            .toLowerCase()
+            .replace(/(^|\s)\S/g, function(letter) {
+                return letter.toUpperCase();
+            });
+    }
+
+    function getSelectedClassIds() {
+        return Array.from(classCheckboxes)
+            .filter(function(checkbox) { return checkbox.checked; })
+            .map(function(checkbox) { return checkbox.value; });
+    }
+
+    function getAvailableSubjects() {
+        const selectedClassIds = getSelectedClassIds();
+        const availableSubjectsMap = new Map();
+
+        selectedClassIds.forEach(function(classId) {
+            const classSubjects = subjectsBySchoolClass[classId] || [];
+            classSubjects.forEach(function(subject) {
+                if (!availableSubjectsMap.has(subject.id)) {
+                    availableSubjectsMap.set(subject.id, subject);
+                }
+            });
+        });
+
+        return Array.from(availableSubjectsMap.values());
+    }
+
+    function renderSubjects() {
+        const availableSubjects = getAvailableSubjects();
+        subjectsGrid.innerHTML = '';
+
+        if (availableSubjects.length === 0) {
+            subjectEmptyState.style.display = 'block';
+            return;
+        }
+
+        subjectEmptyState.style.display = 'none';
+
+        availableSubjects.forEach(function(subject) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'checkbox-item';
+            wrapper.setAttribute('data-subject-item', '');
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = 'subject_' + subject.id;
+            checkbox.name = 'subjectIds';
+            checkbox.value = subject.id;
+            checkbox.checked = selectedSubjectIds.has(subject.id);
+            checkbox.addEventListener('change', function() {
+                if (checkbox.checked) {
+                    selectedSubjectIds.add(subject.id);
+                } else {
+                    selectedSubjectIds.delete(subject.id);
+                }
+            });
+
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = formatSubjectName(subject.name || '');
+
+            wrapper.appendChild(checkbox);
+            wrapper.appendChild(label);
+            subjectsGrid.appendChild(wrapper);
+        });
+
+        const availableSubjectIds = new Set(availableSubjects.map(function(subject) { return subject.id; }));
+        Array.from(selectedSubjectIds).forEach(function(subjectId) {
+            if (!availableSubjectIds.has(subjectId)) {
+                selectedSubjectIds.delete(subjectId);
+            }
+        });
+    }
+
+    classCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', renderSubjects);
+    });
+
+    renderSubjects();
+</script>
 
 </body>
 </html>
