@@ -59,7 +59,7 @@ public class StudentSubject {
         if (grade2 != null){
             return grade2;
         }
-        return 0.0;
+        return null;
     }
 
     public String getObs() {

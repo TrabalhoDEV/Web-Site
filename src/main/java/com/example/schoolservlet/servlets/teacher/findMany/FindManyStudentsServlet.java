@@ -137,7 +137,7 @@ public class FindManyStudentsServlet extends HttpServlet {
 
         request.setAttribute("studentSubjectMap", studentSubjectMap);
         request.setAttribute("page", page);
-        request.setAttribute("totalPages", totalPages -1);
+        request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher(responsePath).forward(request, response);
     }

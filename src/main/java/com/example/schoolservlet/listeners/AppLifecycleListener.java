@@ -8,7 +8,7 @@ import jakarta.servlet.annotation.WebListener;
 @WebListener
 public class AppLifecycleListener implements ServletContextListener {
     @Override
-    public void contextInitialized(ServletContextEvent sce) {}
+    public void contextInitialized(ServletContextEvent sce) { PostgreConnection.start(); }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {

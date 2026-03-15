@@ -3,6 +3,7 @@ package com.example.schoolservlet.daos;
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentDAO;
 import com.example.schoolservlet.exceptions.*;
+import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.*;
@@ -137,6 +138,105 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
         }
     }
 
+    public Map<Integer, Student> findMany(int skip, int take, String filter, StudentStatusEnum status) throws DataException {
+        FilterType type = detectFilterType(filter);
+
+        if (type == FilterType.NONE && status == null) return findMany(skip, take);
+
+        String sql = "SELECT s.id, s.name, s.cpf, s.email, s.status, s.id_school_class, sc.school_year "
+                + "FROM student s "
+                + "JOIN school_class sc ON sc.id = s.id_school_class "
+                + "WHERE 1=1 "
+                + (switch (type) {
+                    case NAME       -> "AND s.name ILIKE ? ";
+                    case CPF        -> "AND s.cpf = ? ";
+                    case ENROLLMENT -> "AND s.id = ? ";
+                    default         -> " ";
+                })
+                + (status != null ? "AND s.status = ? " : "")
+                + "ORDER BY s.status DESC, s.id ASC "
+                + "LIMIT ? OFFSET ?";
+
+        Map<Integer, Student> students = new HashMap<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int paramIndex = 1;
+
+            if (type != FilterType.NONE) {
+                String trim = filter.trim();
+                switch (type) {
+                    case NAME       -> pstmt.setString(paramIndex++, "%" + trim + "%");
+                    case CPF        -> pstmt.setString(paramIndex++, InputNormalizer.normalizeCpf(trim));
+                    case ENROLLMENT -> pstmt.setInt(paramIndex++, InputNormalizer.normalizeEnrollment(trim));
+                }
+            }
+
+            if (status != null) pstmt.setInt(paramIndex++, status.ordinal() + 1);
+
+            pstmt.setInt(paramIndex++, Math.min(Math.max(take, 0), Constants.MAX_TAKE));
+            pstmt.setInt(paramIndex,   Math.max(skip, 0));
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Student student = new Student();
+                student.setId(rs.getInt("id"));
+                student.setName(rs.getString("name"));
+                student.setCpf(rs.getString("cpf"));
+                student.setEmail(rs.getString("email"));
+                student.setIdSchoolClass(rs.getInt("id_school_class"));
+                student.setStatus(StudentStatusEnum.values()[rs.getInt("status") - 1]);
+                students.put(student.getId(), student);
+            }
+
+            return students;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar alunos", sqle);
+        }
+    }
+
+    public int count(String filter, StudentStatusEnum status) throws DataException {
+        FilterType type = detectFilterType(filter);
+
+        if (type == FilterType.NONE && status == null) return totalCount();
+
+        String sql = "SELECT COUNT(*) FROM student s WHERE 1=1 "
+                + (switch (type) {
+                    case NAME -> "AND s.name ILIKE ? ";
+                    case CPF -> "AND s.cpf = ? ";
+                    case ENROLLMENT -> "AND s.id = ? ";
+                    default -> "";
+                })
+                + (status != null ? "AND s.status = ? " : "");
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int paramIndex = 1;
+
+            if (type != FilterType.NONE) {
+                String trim = filter.trim();
+                switch (type) {
+                    case NAME       -> pstmt.setString(paramIndex++, "%" + trim + "%");
+                    case CPF        -> pstmt.setString(paramIndex++, InputNormalizer.normalizeCpf(trim));
+                    case ENROLLMENT -> pstmt.setInt(paramIndex++, InputNormalizer.normalizeEnrollment(trim));
+                }
+            }
+
+            if (status != null) pstmt.setInt(paramIndex, status.ordinal() + 1);
+
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar alunos", sqle);
+        }
+    }
+
     public int countBySchoolClass(int schoolClassId) throws ValidationException, DataException{
         InputValidation.validateId(schoolClassId, "id da turma");
 
@@ -146,7 +246,7 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()){
-                return rs.getInt("count_by_id_teacher");
+                return rs.getInt(1);
             }
             return -1;
         } catch (SQLException sqle){
@@ -338,5 +438,20 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
             sqle.printStackTrace();
             throw new DataException("Erro ao logar aluno", sqle);
         }
+    }
+
+    private enum FilterType { NAME, CPF, ENROLLMENT, NONE }
+
+    private FilterType detectFilterType(String filter) {
+        if (filter == null || filter.isBlank()) return FilterType.NONE;
+
+        String trim = filter.trim();
+
+        if (trim.matches("\\d{6}")) return FilterType.ENROLLMENT;
+
+        if (trim.matches("\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}"))
+            return FilterType.CPF;
+
+        return FilterType.NAME;
     }
 }
