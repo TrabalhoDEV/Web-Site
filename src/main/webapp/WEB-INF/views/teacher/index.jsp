@@ -13,9 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Professor | Vértice</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/home.css"/>
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/css/img/Logo - Vértice.svg"
-          type="image/x-icon">
-
+    <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
     <script src="${pageContext.request.contextPath}/assets/js/theme.js"></script>
 </head>
 <%
@@ -222,7 +220,7 @@
                 <h1>Olá, <%=teacher != null ? OutputFormatService.formatName(teacher.getName()) : "professor"%>!</h1>
                 <p>Acompanhe atentamente o desenvolvimento dos seus alunos</p>
 
-                <a href="${pageContext.request.contextPath}/teacher/students">
+                <a href="${pageContext.request.contextPath}/teacher/student/find-many">
                     <button class="primary-button">Ver alunos</button>
                 </a>
 
