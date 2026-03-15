@@ -351,8 +351,8 @@
         <p id="deleteText">Essa é uma ação irreversível</p>
 
         <div class="modal-actions">
-            <button id="confirmDelete">Confirmar</button>
-            <button id="closeDelete">Cancelar</button>
+            <button class="primary-button" id="confirmDelete">Confirmar</button>
+            <a class="secondary-button" id="closeDelete">Cancelar</a>
         </div>
     </div>
 </dialog>

@@ -202,24 +202,6 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
         }
     }
 
-    public void updateTeacher(int oldTeacherId, int newTeacherId) throws DataException, NotFoundException, ValidationException {
-        InputValidation.validateId(oldTeacherId, "id");
-        InputValidation.validateId(newTeacherId, "id");
-
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(
-                     "UPDATE subject_teacher SET id_teacher = ? WHERE id_teacher = ?"
-             )) {
-            pstmt.setInt(1, newTeacherId);
-            pstmt.setInt(2, oldTeacherId);
-
-            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("subject_teacher", "id", String.valueOf(oldTeacherId));
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-            throw new DataException("Erro ao atualizar relações entre matéria e professor", sqle);
-        }
-    }
-
     @Override
     public void delete(int id) throws DataException, NotFoundException, ValidationException {
         InputValidation.validateId(id, "id");

@@ -672,6 +672,17 @@ a {
 .footer-socials {
     display: flex;
     gap: 16px;
+    align-items: center;
+    justify-content: start;
+}
+
+.footer-socials > .email{
+    color: var(--muted-text-color);
+}
+
+.footer-socials > .email:hover{
+    color: var(--primary-color);
+    transform: translateY(-3px);
 }
 
 .social-icon {
