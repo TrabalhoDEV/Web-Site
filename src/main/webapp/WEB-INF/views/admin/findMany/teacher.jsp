@@ -297,7 +297,7 @@
     </main>
 
     <dialog id="deleteDialog">
-        <div class="modal-cardD">
+        <div class="modal-card">
             <h3>Deseja deletar este professor?</h3>
             <p id="deleteText">Essa é uma ação irreversível</p>
 

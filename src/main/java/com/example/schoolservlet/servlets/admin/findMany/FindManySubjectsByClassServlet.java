@@ -11,6 +11,7 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,6 +72,9 @@ public class FindManySubjectsByClassServlet extends HttpServlet {
             int skip = take * (page - 1);
 
             Map<Integer, Subject> subjectMap = schoolClassSubjectDAO.findManyByClass(skip, take, schoolClassId, filter);
+
+            List<Subject> availableSubjects = schoolClassSubjectDAO.findAvailable(schoolClassId);
+            request.setAttribute("availableSubjects", availableSubjects);
 
             request.setAttribute("subjectMap",    subjectMap);
             request.setAttribute("page",          page);

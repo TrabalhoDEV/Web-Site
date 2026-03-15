@@ -234,13 +234,12 @@ dialog::backdrop {
     background: rgba(0, 0, 0, 0.7);
 }
 
-.modal-cardD {
+.modal-card {
     padding: 30px;
-    height: 170px;
     width: 350px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 32px;
     align-items: center;
 }
 
@@ -250,17 +249,6 @@ dialog::backdrop {
     gap: 10px;
     margin-top: 30px;
     margin-bottom: 0;
-}
-
-.modal-actions button{
-    font-size: var(--text-sm) ;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    width: 110px;
-    height: 40px;
-    border-radius: 8px;
-    cursor: pointer;
 }
 
 .pagination{
@@ -323,4 +311,28 @@ dialog::backdrop {
 
 .not-found{
     margin-top: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.form-group select[multiple] {
+    height: auto;
 }
