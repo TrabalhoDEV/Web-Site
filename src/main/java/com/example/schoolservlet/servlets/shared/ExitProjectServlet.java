@@ -16,6 +16,6 @@ public class ExitProjectServlet extends HttpServlet {
             session.invalidate();
         }
 
-        response.sendRedirect("index.jsp");
+        response.sendRedirect("index.html");
     }
 }
