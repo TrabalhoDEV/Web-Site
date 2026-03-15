@@ -240,8 +240,8 @@
                         <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="secondary-button">Limpar</a>
                     </section>
 
-                    <a href="${pageContext.request.contextPath}/admin/school-class/insert">
-                        <button class="primary-button">Adicionar Turma</button>
+                    <a href="${pageContext.request.contextPath}/admin/school-class/insert" class="primary-button">
+                        Adicionar Turma
                     </a>
                 </form>
             </div>
@@ -257,7 +257,7 @@
             <% if (!schoolClassMap.isEmpty()) { %>
 
             <table class="grade-table"
-                   style="--cols: 2; grid-template-columns: 1fr 90px">
+                   style="--cols: 2; grid-template-columns: 1fr 160px">
 
                 <thead>
                 <tr>
@@ -277,6 +277,30 @@
 
                     <td class="actions">
                         <div class="btn-action">
+                            <%-- Subjects --%>
+                            <a href="${pageContext.request.contextPath}/admin/school-class/subject/find-many?classId=<%=schoolClass.getId()%>">
+                                <button title="Ver matérias" class="btn-icon btn-details">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                        <line x1="9" y1="7" x2="15" y2="7"/>
+                                        <line x1="9" y1="11" x2="15" y2="11"/>
+                                    </svg>
+                                </button>
+                            </a>
+
+                            <%-- Teachers --%>
+                            <a href="${pageContext.request.contextPath}/admin/school-class/teacher/find-many?classId=<%=schoolClass.getId()%>">
+                                <button title="Ver professores" class="btn-icon btn-details">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                </button>
+                            </a>
+
                             <%-- Modify --%>
                             <a href="${pageContext.request.contextPath}/admin/school-class/update?id=<%= schoolClass.getId()%>">
                                 <button title="Modificar" class="btn-icon btn-edit">
@@ -341,7 +365,7 @@
 </main>
 
 <dialog id="deleteDialog">
-    <div class="modal-cardD">
+    <div class="modal-card">
         <h3>Deseja deletar esta turma?</h3>
         <p id="deleteText">Essa é uma ação irreversível</p>
 

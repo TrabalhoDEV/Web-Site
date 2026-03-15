@@ -7,6 +7,7 @@ import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.SchoolClassTeacher;
 import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 import java.sql.*;
@@ -46,6 +47,86 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao deletar school_class_teacher", sqle);
+        }
+    }
+
+    public Map<Integer, Teacher> findManyByClass(int skip, int take, int schoolClassId, String filter) throws DataException {
+        boolean hasFilter = filter != null && !filter.isBlank();
+
+        String sql = "SELECT t.id, t.name, t.email, t.username, "
+                + "COUNT(st.id_subject) AS subject_count "
+                + "FROM teacher t "
+                + "INNER JOIN school_class_teacher sct ON sct.id_teacher = t.id "
+                + "LEFT JOIN subject_teacher st ON st.id_teacher = t.id "
+                + "WHERE sct.id_school_class = ? "
+                + (hasFilter ? "AND (t.name ILIKE ? OR t.username ILIKE ?) " : "")
+                + "GROUP BY t.id, t.name, t.email, t.username "
+                + "ORDER BY t.id "
+                + "LIMIT ? OFFSET ?";
+
+        Map<Integer, Teacher> teachers = new HashMap<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int i = 1;
+            pstmt.setInt(i++, schoolClassId);
+
+            if (hasFilter) {
+                String like = "%" + filter.trim() + "%";
+                pstmt.setString(i++, like);
+                pstmt.setString(i++, like);
+            }
+
+            pstmt.setInt(i++, Math.min(Math.max(take, 0), Constants.MAX_TAKE));
+            pstmt.setInt(i,   Math.max(skip, 0));
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Teacher teacher = new Teacher(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("username")
+                );
+                teacher.setSubjectCount(rs.getInt("subject_count"));
+                teachers.put(teacher.getId(), teacher);
+            }
+
+            return teachers;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar professores da turma", sqle);
+        }
+    }
+
+    public int countByClass(int schoolClassId, String filter) throws DataException {
+        boolean hasFilter = filter != null && !filter.isBlank();
+
+        String sql = "SELECT COUNT(DISTINCT t.id) FROM teacher t "
+                + "INNER JOIN school_class_teacher sct ON sct.id_teacher = t.id "
+                + "WHERE sct.id_school_class = ? "
+                + (hasFilter ? "AND (t.name ILIKE ? OR t.username ILIKE ?)" : "");
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int i = 1;
+            pstmt.setInt(i++, schoolClassId);
+
+            if (hasFilter) {
+                String like = "%" + filter.trim() + "%";
+                pstmt.setString(i++, like);
+                pstmt.setString(i,   like);
+            }
+
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar professores da turma", sqle);
         }
     }
 
@@ -193,30 +274,6 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao deletar school_class_teacher", sqle);
-        }
-    }
-
-    public void deleteManyByTeacherAndClasses(int teacherId, Set<Integer> classIds)
-            throws DataException {
-
-        if (classIds == null || classIds.isEmpty()) return;
-
-        String sql = "DELETE FROM school_class_teacher WHERE id_teacher = ? AND id_school_class = ?";
-
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            for (Integer classId : classIds) {
-                ps.setInt(1, teacherId);
-                ps.setInt(2, classId);
-                ps.addBatch();
-            }
-
-            ps.executeBatch();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DataException("Erro ao remover múltiplos vínculos entre turmas e professores");
         }
     }
 }
