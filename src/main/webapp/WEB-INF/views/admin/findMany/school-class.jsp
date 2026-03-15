@@ -240,8 +240,8 @@
                         <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="secondary-button">Limpar</a>
                     </section>
 
-                    <a href="${pageContext.request.contextPath}/admin/school-class/insert">
-                        <button class="primary-button">Adicionar Turma</button>
+                    <a href="${pageContext.request.contextPath}/admin/school-class/insert" class="primary-button">
+                        Adicionar Turma
                     </a>
                 </form>
             </div>

@@ -31,8 +31,6 @@ public class InsertSchoolClassServlet extends HttpServlet {
 
         if (!AccessValidation.isAdmin(request, response)) return;
 
-        getAllSubjects(request);
-
         request.getRequestDispatcher("/WEB-INF/views/admin/insert/school-class.jsp").forward(request, response);
     }
 
@@ -58,46 +56,15 @@ public class InsertSchoolClassServlet extends HttpServlet {
 
             FieldAlreadyUsedValidation.exists("school_class", "school_year", "nome da turma", name);
 
-            List<Integer> validSubjectIds = InputValidation.validateIdsExist(
-                    subjectIdsParam,
-                    subjectDAO.findAllIds()
-            );
-
             SchoolClass schoolClass = new SchoolClass();
 
             schoolClass.setSchoolYear(name);
 
             this.schoolClassDAO.create(schoolClass);
 
-            SchoolClass createdSchoolClass = this.schoolClassDAO.findByName(name);
-
-            List<SchoolClassSubject> schoolClassSubjectsToInsert = new ArrayList<>();
-
-            for (Integer subjectId : validSubjectIds) {
-                Subject subject = subjectDAO.findById(subjectId);
-
-                SchoolClassSubject schoolClassSubject = new SchoolClassSubject();
-                schoolClassSubject.setSchoolClass(createdSchoolClass);
-                schoolClassSubject.setSubject(subject);
-
-                schoolClassSubjectsToInsert.add(schoolClassSubject);
-            }
-
-            schoolClassSubjectDAO.createMany(schoolClassSubjectsToInsert);
-
             response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
-        } catch (DataException | NotFoundException | ValidationException e){
-            getAllSubjects(request);
+        } catch (DataException | ValidationException e){
             ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/insert/school-class.jsp");
-        }
-    }
-
-    private void getAllSubjects(HttpServletRequest request){
-        try {
-            List<Subject> subjects = subjectDAO.findAll();
-            request.setAttribute("subjects", subjects);
-        } catch (DataException de){
-            request.setAttribute("error", de.getMessage());
         }
     }
 }

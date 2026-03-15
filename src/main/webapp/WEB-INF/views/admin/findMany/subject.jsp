@@ -243,8 +243,8 @@
                             <a href="${pageContext.request.contextPath}/admin/subject/find-many" class="secondary-button">Limpar</a>
                         </section>
 
-                        <a href="${pageContext.request.contextPath}/admin/subject/insert">
-                            <button class="primary-button">Adicionar Turma</button>
+                        <a href="${pageContext.request.contextPath}/admin/subject/insert" class="primary-button">
+                            Adicionar Matéria
                         </a>
                     </form>
                 </div>
