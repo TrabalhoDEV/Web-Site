@@ -176,13 +176,15 @@
 
         <hr>
 
-        <p>Esse professor possui pendências, informe um professor para substituí-lo</p>
+        <p style="font-size: 14px; color: gray">Esse(a) professor(a) ainda possui pendências, informe um professor(a) para substituí-lo(a) e completá-las.</p>
 
-        <form action="${pageContext.request.contextPath}/admin/teacher/delete" method="post">
+        <form action="${pageContext.request.contextPath}/admin/teacher/delete" method="post" class="teacher-form">
           <input type="hidden" name="id" value="<%= request.getAttribute("id")%>">
 
-          <label for="username">Usuário:</label>
-          <input name="username" id="username" type="text" placeholder="Digite o usuário aqui">
+          <div class="input-group">
+            <label for="username">Usuário do outro professor:</label>
+            <input name="username" id="username" type="text" placeholder="Digite o usuário aqui">
+          </div>
 
           <%if (request.getAttribute("error") != null){%>
           <p style="color: #9b0404; text-align: start"><%=request.getAttribute("error")%></p>

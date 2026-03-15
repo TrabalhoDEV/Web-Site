@@ -9,6 +9,7 @@ import com.example.schoolservlet.models.Subject;
 import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
+import com.example.schoolservlet.utils.ErrorHandler;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -24,60 +25,50 @@ import java.util.Map;
  */
 @WebServlet(name = "admin-find-many-teachers", value = "/admin/teacher/find-many")
 public class FindManyTeacherServlet extends HttpServlet {
+    private final TeacherDAO teacherDAO = new TeacherDAO();
+    private final String responsePath = "/WEB-INF/views/admin/findMany/teacher.jsp";
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
 
         if (!AccessValidation.isAdmin(request, response)) return;
 
-        String sessionError = (String) request.getSession().getAttribute("error");
-
-        if (sessionError != null) {
-            request.setAttribute("error", sessionError);
-            request.getSession().removeAttribute("error");
-        }
-
+        HttpSession session = request.getSession(false);
         String pageParam = request.getParameter("page");
+        String filter    = request.getParameter("filter");
 
         int take = Constants.MAX_TAKE;
-        int skip = 0;
-        int page;
-        int totalCount = 0;
-        int totalPages;
-        request.setAttribute("page", 1);
-        request.setAttribute("totalPages", 1);
+        int page = 1;
+
+        request.setAttribute("filter", filter != null ? filter : "");
+
+        if (session.getAttribute("error") != null) {
+            request.setAttribute("error", session.getAttribute("error"));
+            session.removeAttribute("error");
+        }
 
         try {
             page = Integer.parseInt(pageParam);
-        } catch (NumberFormatException nfe) {
-            page = 1;
-        }
+        } catch (NumberFormatException ignored) {}
 
-        TeacherDAO teacherDAO = new TeacherDAO();
-        Map<Integer, Teacher> teacherMap;
         try {
-            totalCount = teacherDAO.totalCount();
-            totalPages = Math.max(1, (int)Math.ceil((double) totalCount / Constants.MAX_TAKE));
+            int totalCount = teacherDAO.count(filter);
+            int totalPages = Math.max(1, (int) Math.ceil((double) totalCount / take));
+
             page = Math.max(1, Math.min(page, totalPages));
-            skip = take * (page - 1);
-            teacherMap = teacherDAO.findMany(skip, take);
+            int skip = take * (page - 1);
+
+            Map<Integer, Teacher> teacherMap = teacherDAO.findMany(skip, take, filter);
+
+            request.setAttribute("teacherMap", teacherMap);
+            request.setAttribute("page", page);
+            request.setAttribute("totalPages", totalPages);
         } catch (DataException de) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp")
-                    .forward(request, response);
+            ErrorHandler.forward(request, response, de.getStatus(), de.getMessage(), responsePath);
             return;
         }
 
-        request.setAttribute("teacherMap", teacherMap);
-        request.setAttribute("page", page);
-        request.setAttribute("totalPages", totalPages);
-
-        request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        request.getRequestDispatcher(responsePath).forward(request, response);
     }
 }

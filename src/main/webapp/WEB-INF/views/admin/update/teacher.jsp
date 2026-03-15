@@ -9,12 +9,6 @@
 
 <%
     Teacher teacher = (Teacher) request.getAttribute("teacher");
-    if (teacher == null) {
-%>
-<p>Professor não encontrado.</p>
-<%
-        return;
-    }
 %>
 <%
     List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
@@ -43,7 +37,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Atualizar | Vértice</title>
+    <title>Atualizar professor</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
     <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
@@ -215,7 +209,7 @@
 
                 <hr>
 
-                <form action="${pageContext.request.contextPath}/admin/teacher/update" method="post">
+                <form action="${pageContext.request.contextPath}/admin/teacher/update" method="post" class="generic-form">
                     <input type="hidden" name="id" value="<%=teacher.getId()%>" />
                     <!-- Text Input Fields -->
                     <div class="form-group">

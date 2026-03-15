@@ -13,25 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TeacherDAO implements GenericDAO<Teacher> {
-    // Implement interface methods
-    @Override
-    public int totalCount() throws DataException {
-        try(Connection conn = PostgreConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(
-                        "SELECT COUNT(*) AS total_count FROM teacher");){
-
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()){
-                return rs.getInt("total_count");
-            }
-
-        } catch (SQLException sqle){
-            sqle.printStackTrace();
-            throw new DataException("Erro ao contar professores", sqle);
-        }
-        return  -1;
-    }
-
     @Override
     public Map<Integer, Teacher> findMany(int skip, int take) throws DataException {
         Map<Integer, Teacher> teacherMap = new HashMap<>();
@@ -57,6 +38,24 @@ public class TeacherDAO implements GenericDAO<Teacher> {
             throw new DataException("Erro ao listar professores", sqle);
         }
         return teacherMap;
+    }
+
+    @Override
+    public int totalCount() throws DataException {
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "SELECT COUNT(*) AS total_count FROM teacher");){
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()){
+                return rs.getInt("total_count");
+            }
+
+        } catch (SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar professores", sqle);
+        }
+        return  -1;
     }
 
     @Override
@@ -119,6 +118,70 @@ public class TeacherDAO implements GenericDAO<Teacher> {
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao deletar professor", sqle);
+        }
+    }
+
+    public Map<Integer, Teacher> findMany(int skip, int take, String filter) throws DataException {
+        boolean hasFilter = filter != null && !filter.isBlank();
+
+        if (!hasFilter) return findMany(skip, take);
+
+        String sql = "SELECT id, name, email, username "
+                + "FROM teacher "
+                + "WHERE name ILIKE ? OR username ILIKE ? "
+                + "ORDER BY id "
+                + "LIMIT ? OFFSET ?";
+
+        Map<Integer, Teacher> teachers = new HashMap<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            String like = "%" + filter.trim() + "%";
+            pstmt.setString(1, like);
+            pstmt.setString(2, like);
+            pstmt.setInt(3, Math.min(Math.max(take, 0), Constants.MAX_TAKE));
+            pstmt.setInt(4, Math.max(skip, 0));
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                teachers.put(rs.getInt("id"), new Teacher(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("username")
+                ));
+            }
+
+            return teachers;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar professores", sqle);
+        }
+    }
+
+    public int count(String filter) throws DataException {
+        boolean hasFilter = filter != null && !filter.isBlank();
+
+        if (!hasFilter) return totalCount();
+
+        String sql = "SELECT COUNT(*) FROM teacher "
+                + "WHERE name ILIKE ? OR username ILIKE ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            String like = "%" + filter.trim() + "%";
+            pstmt.setString(1, like);
+            pstmt.setString(2, like);
+
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar professores", sqle);
         }
     }
 

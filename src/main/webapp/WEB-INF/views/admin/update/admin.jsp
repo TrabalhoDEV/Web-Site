@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <title>Perfil do Administrador</title>
+  <title>Atualizar meu perfil</title>
   <link rel="stylesheet"
         href="${pageContext.request.contextPath}/assets/css/editAdmin.css"/>
   <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
