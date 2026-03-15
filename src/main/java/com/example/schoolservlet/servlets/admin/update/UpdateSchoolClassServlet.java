@@ -168,12 +168,8 @@ public class UpdateSchoolClassServlet extends HttpServlet {
             throws DataException, NotFoundException, ValidationException {
 
         SchoolClass schoolClass = schoolClassDAO.findById(schoolClassId);
-        List<Subject> allSubjects = subjectDAO.findAll();
-        List<Subject> schoolClassSubjects = subjectDAO.findBySchoolClassId(schoolClassId);
 
         request.setAttribute("schoolClass", schoolClass);
-        request.setAttribute("subjects", allSubjects);
-        request.setAttribute("schoolClassSubjects", schoolClassSubjects);
     }
 
     private void loadSafely(HttpServletRequest request, int schoolClassId) {
