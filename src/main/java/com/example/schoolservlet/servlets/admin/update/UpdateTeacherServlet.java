@@ -231,9 +231,6 @@ public class UpdateTeacherServlet extends HttpServlet {
         request.setAttribute("teacher", teacher);
         request.setAttribute("subjects", allSubjects);
         request.setAttribute("teacherSubjects", teacherSubjects);
-        request.setAttribute("schoolClasses", allSchoolClasses);
-        request.setAttribute("teacherSchoolClasses",
-                teacherSchoolClasses);
     }
 
     private void loadSafely(HttpServletRequest request, int id) {

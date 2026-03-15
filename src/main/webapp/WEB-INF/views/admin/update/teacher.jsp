@@ -21,7 +21,6 @@
         }
     }
 
-    List<SchoolClass> schoolClasses = (List<SchoolClass>) request.getAttribute("schoolClasses");
     List<SchoolClass> teacherSchoolClasses = (List<SchoolClass>) request.getAttribute("teacherSchoolClasses");
 
     Set<Integer> teacherSchoolClassesId = new HashSet<>();
@@ -239,27 +238,6 @@
                                 <div class="checkbox-item">
                                     <input type="checkbox" id="subject_<%= subject.getId() %>" name="subjectIds" value="<%= subject.getId() %>" <%= teacherSubjectIds.contains(subject.getId()) ? "checked" : "" %>>
                                     <label for="subject_<%= subject.getId() %>"><%= OutputFormatService.formatName(subject.getName()) %></label>
-                                </div>
-                                <%
-                                        }
-                                    }
-                                %>
-                            </div>
-                        </fieldset>
-                    </div>
-
-                    <!-- Classes Fieldset -->
-                    <div class="fieldset-group">
-                        <fieldset class="checkbox-fieldset">
-                            <legend>Selecione as Turmas:</legend>
-                            <div class="checkbox-grid">
-                                <%
-                                    if (schoolClasses != null) {
-                                        for (SchoolClass sc : schoolClasses) {
-                                %>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="class_<%= sc.getId() %>" name="schoolClassIds" value="<%= sc.getId() %>"  <%= teacherSchoolClassesId.contains(sc.getId()) ? "checked" : "" %>>
-                                    <label for="class_<%= sc.getId() %>"><%= OutputFormatService.formatName(sc.getSchoolYear()) %></label>
                                 </div>
                                 <%
                                         }
