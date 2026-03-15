@@ -99,7 +99,7 @@ public class ReleaseGradesServlet extends HttpServlet {
             studentSubjectId = Integer.parseInt(studentSubjectIdParam);
         } catch (NumberFormatException e) {
             session.setAttribute("error", "ID deve ser um número inteiro");
-            response.sendRedirect(request.getContextPath() + "/teacher/students");
+            response.sendRedirect(request.getContextPath() + "/teacher/student/find-many");
             return;
         }
 
@@ -128,11 +128,11 @@ public class ReleaseGradesServlet extends HttpServlet {
             studentSubject.setObs(observationsParam.isEmpty() ? null : InputNormalizer.normalizeObs(observationsParam));
 
             studentSubjectDAO.update(studentSubject);
-            response.sendRedirect(request.getContextPath() + "/teacher/students");
+            response.sendRedirect(request.getContextPath() + "/teacher/student/find-many");
 
         } catch (NotFoundException e) {
             session.setAttribute("error", e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/teacher/students");
+            response.sendRedirect(request.getContextPath() + "/teacher/student/find-many");
         } catch (DataException | ValidationException e) {
             request.setAttribute("error", e.getMessage());
             getAllData(request, response, studentSubjectIdParam);
@@ -140,7 +140,7 @@ public class ReleaseGradesServlet extends HttpServlet {
                     .forward(request, response);
         } catch (NumberFormatException e){
             session.setAttribute("error", "ID deve ser um número");
-            response.sendRedirect(request.getContextPath() + "/teacher/students");
+            response.sendRedirect(request.getContextPath() + "/teacher/student/find-many");
         }
     }
 }

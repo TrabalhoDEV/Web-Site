@@ -245,23 +245,6 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         }
     }
 
-    public void updateTeacher(int oldTeacherId, int newTeacherId) throws DataException, ValidationException, NotFoundException{
-        InputValidation.validateId(oldTeacherId, "id");
-        InputValidation.validateId(newTeacherId, "id");
-
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("UPDATE SET id_teacher = ? WHERE id_teacher = ?")){
-            pstmt.setInt(1, newTeacherId);
-            pstmt.setInt(2, oldTeacherId);
-
-            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("school_class_teacher", "id", String.valueOf(oldTeacherId));
-        } catch (SQLException sqle){
-            sqle.printStackTrace();
-            throw new DataException("Erro ao atualizar relação entre professor e turma", sqle);
-        }
-    }
-
-
     @Override
     public void delete(int id) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId( id, "id");
@@ -274,6 +257,56 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         } catch (SQLException sqle){
             sqle.printStackTrace();
             throw new DataException("Erro ao deletar school_class_teacher", sqle);
+        }
+    }
+
+    public void removeSubjectsFromList(int teacherId, Set<Integer> subjectIds) throws DataException {
+        String sql = """
+            UPDATE school_class_teacher
+            SET subject_list = array_remove(subject_list, ?)
+            WHERE id_teacher = ?
+            """;
+
+        String sqlDeleteEmpty = """
+            DELETE FROM school_class_teacher
+            WHERE id_teacher = ?
+            AND subject_list = '{}'
+            """;
+
+        Connection conn = null;
+        try {
+            conn = PostgreConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                for (int subjectId : subjectIds) {
+                    pstmt.setInt(1, subjectId);
+                    pstmt.setInt(2, teacherId);
+                    pstmt.addBatch();
+                }
+                pstmt.executeBatch();
+            }
+
+            // Deleta registros que ficaram sem nenhuma matéria
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteEmpty)) {
+                pstmt.setInt(1, teacherId);
+                pstmt.executeUpdate();
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ignored) {}
+            throw new DataException("Erro ao remover matérias do professor.", e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException ignored) {}
         }
     }
 }

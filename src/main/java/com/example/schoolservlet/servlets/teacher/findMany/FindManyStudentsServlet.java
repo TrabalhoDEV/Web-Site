@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "teacher-find-many-students", value = "/teacher/students")
+@WebServlet(name = "teacher-find-many-students", value = "/teacher/student/find-many")
 public class FindManyStudentsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -44,6 +44,8 @@ public class FindManyStudentsServlet extends HttpServlet {
         Teacher teacher = null;
         StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
         String responsePath = "/WEB-INF/views/teacher/student/find-many.jsp";
+
+        request.setAttribute("enrollment", enrollmentFilter);
 
         try {
             user = (AuthenticatedUser) session.getAttribute("user");
