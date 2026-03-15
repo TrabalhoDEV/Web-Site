@@ -2,6 +2,7 @@ package com.example.schoolservlet.servlets.admin.insert;
 
 import com.example.schoolservlet.daos.SchoolClassSubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.utils.AccessValidation;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -22,9 +23,8 @@ public class InsertSchoolClassSubjectServlet extends HttpServlet {
         String[] teacherIds   = request.getParameterValues("teacherIds");
         HttpSession session = request.getSession(false);
 
-        if (classIdParam == null || classIdParam.isBlank() ||
-                subjectIdParam == null || subjectIdParam.isBlank()) {
-            session.setAttribute("error", "ID da matéria e da turma não podem ser nulos");
+        if (subjectIdParam == null || subjectIdParam.isBlank()) {
+            session.setAttribute("error", "ID da matéria é obrigatório");
             response.sendRedirect(request.getContextPath() + "/admin/school-class/subject/find-many?classId=" + classIdParam);
             return;
         }
@@ -47,8 +47,8 @@ public class InsertSchoolClassSubjectServlet extends HttpServlet {
 
         try {
             schoolClassSubjectDAO.createWithRelations(classId, subjectId, teacherIds);
-        } catch (DataException de) {
-            session.setAttribute("error", de.getMessage());
+        } catch (DataException | ValidationException e) {
+            session.setAttribute("error", e.getMessage());
         }
 
         response.sendRedirect(request.getContextPath() + "/admin/school-class/subject/find-many?classId=" + classId);
