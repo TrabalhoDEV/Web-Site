@@ -153,14 +153,14 @@ public class SendCodeServlet extends HttpServlet {
             session.setAttribute("code", code);
 
             try {
-                EmailService.sendEmail(email, "Recuperação de senha", "<h1>Recuperação da sua senha na Vértice</h1>" +
-                        "<p>Esse código expirará em 15 minutos, caso não tenha sido você, ignore.</p>" +
+                EmailService.sendEmail(email, "Recuperação de senha", "<h1 style=\"text-align:center;\">Recuperação da sua senha no Colégio Vértice</h1>" +
+                        "<p style=\"text-align:center;\">Esse código expirará em 15 minutos, caso não tenha sido você, ignore.</p>" +
                         "<br>" +
                         "<div><h3 style=\"text-align:center;\">Código:</h3>" +
                         "<h2 style=\"text-align:center;\">" + code + "</h2></div>"
                         + "<br>"
-                        + "Atenciosamente,<br>"
-                        + "Secretaria Vértice"
+                        + "<p style=\"text-align:center;\">Atenciosamente,<br>"
+                        + "Secretaria Vértice</p>"
                 );
             } catch (Exception e) {
                 e.printStackTrace();

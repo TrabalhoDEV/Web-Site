@@ -4,6 +4,7 @@ import com.example.schoolservlet.daos.*;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.*;
 import com.example.schoolservlet.utils.*;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -27,6 +28,24 @@ public class UpdateTeacherServlet extends HttpServlet {
     private SubjectTeacherDAO subjectTeacherDAO = new SubjectTeacherDAO();
     private SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
     private TeacherDAO teacherDAO = new TeacherDAO();
+
+    private static String enrollInURL;
+
+    static{
+        Dotenv dotenv = null;
+
+        // Firstly, it tries to load .env locally
+        try {
+            dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            dotenv = null;
+        }
+
+        enrollInURL = ConfigService.getEnv("BASE_URL", dotenv);
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -141,11 +160,8 @@ public class UpdateTeacherServlet extends HttpServlet {
 
             subjectTeacherDAO.deleteManyByTeacherAndSubjects(teacher.getId(), toRemoveSubjects);
 
-            List<Integer> validClassIds = InputValidation.validateIdsExist(schoolClassIdsParam, schoolClassDAO.findAllIds());
-
-            Set<Integer> newSchoolClassIds = new HashSet<>();
-            if (validClassIds != null) {
-                newSchoolClassIds.addAll(validClassIds);
+            if (!toRemoveSubjects.isEmpty()) {
+                schoolClassTeacherDAO.removeSubjectsFromList(teacher.getId(), toRemoveSubjects);
             }
 
             List<SchoolClass> currentSchoolClasses = schoolClassDAO.findByTeacherId(teacher.getId());
@@ -156,14 +172,16 @@ public class UpdateTeacherServlet extends HttpServlet {
             }
 
             try {
-                String assunto = "Edição dos dados do Sistema Escolar";
-                String mensagem = "Olá " + OutputFormatService.formatName(teacher.getName()) + ",<br><br>"
-                        + "Seus dados foram atualizados!.<br>"
-                        + String.format("<a href=\"%s/index.jsp\">Clique aqui para logar</a><br><br>", request.getContextPath())
-                        + "Atenciosamente,<br>"
-                        + "Secretaria Vértice";
+                String topic = "Acesso ao Sistema Escolar";
+                String message = "<h3 style=\"text-align:center;\">Olá " + OutputFormatService.formatName(teacher.getName()) + ",</h3>"
+                        + "<p style=\"text-align:center;\">Sua conta foi alterada pelo seu administrador.</p>"
+                        + "<p style=\"text-align:center;\">Caso tenha sido um engano fale com ele,</p>"
+                        + "<p style=\"text-align:center;\">Para logar, acesse o link abaixo:</p><br>"
+                        + "<p style=\"text-align:center;\">" + enrollInURL+"/auth" + "</p><br>"
+                        + "<p style=\"text-align:center;\">Atenciosamente,<br>"
+                        + "Secretaria Vértice</p>";
 
-                EmailService.sendEmail(teacher.getEmail(), assunto, mensagem);
+                EmailService.sendEmail(teacher.getEmail(), topic, message);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -173,21 +191,17 @@ public class UpdateTeacherServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("error", "ID inválido.");
             response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
-            return;
         } catch (DataException | NotFoundException e) {
             request.getSession().setAttribute("error", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
-            return;
         } catch (ValueAlreadyExistsException vaee){
             loadSafely(request, id);
             request.setAttribute("error", vaee.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
-            return;
         } catch (ValidationException ve){
             loadSafely(request, id);
             request.setAttribute("error", ve.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
-            return;
         }
     }
 

@@ -313,7 +313,7 @@
 
 <dialog id="deleteDialog">
   <div class="modal-card">
-    <h3>Deseja deletar esta turma?</h3>
+    <h3>Deseja deletar esta matéria desta turma?</h3>
     <p id="deleteText">Essa é uma ação irreversível</p>
 
     <div class="modal-actions">

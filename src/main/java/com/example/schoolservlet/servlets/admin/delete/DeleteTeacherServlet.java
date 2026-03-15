@@ -41,18 +41,7 @@ public class DeleteTeacherServlet extends HttpServlet {
             int id = Integer.parseInt(idParam);
             InputValidation.validateId(id, "id");
 
-            teacherDAO.findById(id);
-
-            StudentsPerformance studentsPerformance = studentSubjectDAO.studentsPerformance(id);
-
-            if (studentsPerformance.pending() == 0){
-                teacherDAO.delete(id);
-            } else {
-                request.setAttribute("id", id);
-                request.getRequestDispatcher(actualPath).forward(request, response);
-                return;
-            }
-
+            teacherDAO.delete(id);
         } catch (NumberFormatException nfe){
             session.setAttribute("error", "ID deve ser um número");
         } catch (DataException | NotFoundException | ValidationException e){
@@ -60,41 +49,5 @@ public class DeleteTeacherServlet extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + responsePath);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html");
-
-        if (!AccessValidation.isAdmin(request, response)) return;
-
-        String idParam = request.getParameter("id");
-        String username = request.getParameter("username");
-        HttpSession session = request.getSession(false);
-
-        try{
-            InputValidation.validateIsNull("id", idParam);
-            InputValidation.validateIsNull("usuário", username);
-
-            int id = Integer.parseInt(idParam);
-            InputValidation.validateId(id, "id");
-            InputValidation.validateUserName(username);
-
-            Teacher oldTeacher = teacherDAO.findById(id);
-            Teacher newTeacher = teacherDAO.findByUserName(username);
-
-            if (oldTeacher.getUsername().equals(newTeacher.getUsername())) throw new ValidationException("Usuário não pode ser o professor que está sendo removido");
-
-            schoolClassTeacherDAO.updateTeacher(id, newTeacher.getId());
-            subjectTeacherDAO.updateTeacher(id, newTeacher.getId());
-            teacherDAO.delete(id);
-
-            response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
-        } catch (NumberFormatException nfe) {
-            ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST, "ID deve ser um número", actualPath);
-        } catch (DataException | NotFoundException | ValidationException e){
-            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), actualPath);
-        }
-
     }
 }

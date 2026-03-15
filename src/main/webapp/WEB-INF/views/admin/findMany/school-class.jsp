@@ -371,7 +371,7 @@
 
         <div class="modal-actions">
             <button class="primary-button" id="confirmDelete">Confirmar</button>
-            <button class="secondary-button" id="closeDelete">Cancelar</button>
+            <a class="secondary-button" id="closeDelete">Cancelar</a>
         </div>
     </div>
 </dialog>

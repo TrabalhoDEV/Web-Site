@@ -4,6 +4,7 @@ import com.example.schoolservlet.daos.*;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.*;
 import com.example.schoolservlet.utils.*;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -26,6 +27,24 @@ public class InsertTeacherServlet extends HttpServlet {
     private TeacherDAO teacherDAO = new TeacherDAO();
     private SubjectTeacherDAO subjectTeacherDAO = new SubjectTeacherDAO();
     private SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
+
+    private static String enrollInURL;
+
+    static{
+        Dotenv dotenv = null;
+
+        // Firstly, it tries to load .env locally
+        try {
+            dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            dotenv = null;
+        }
+
+        enrollInURL = ConfigService.getEnv("BASE_URL", dotenv);
+    }
 
     /**
      * Handles POST requests for teacher registration.
@@ -91,15 +110,16 @@ public class InsertTeacherServlet extends HttpServlet {
             }
 
             try {
-                String assunto = "Acesso ao Sistema Escolar";
-                String mensagem = "Olá " + OutputFormatService.formatName(teacher.getName()) + ",<br><br>"
-                        + "Você já pode acessar o sistema escolar.<br>"
-                        + "A senha será enviada pelo administrador da escola.<br>"
-                        + String.format("<a href=\"%s/index.jsp\">Clique aqui para logar</a><br><br>", request.getContextPath())
-                        + "Atenciosamente,<br>"
-                        + "Secretaria Vértice";
+                String topic = "Acesso ao Sistema Escolar";
+                String message = "<h3 style=\"text-align:center;\">Olá " + OutputFormatService.formatName(teacher.getName()) + ",</h3>"
+                        + "<p style=\"text-align:center;\">Você já pode acessar o sistema escolar.</p>"
+                        + "<p style=\"text-align:center;\">A senha será enviada pelo administrador da escola.</p>"
+                        + "<p style=\"text-align:center;\">Conheça o sistema pelo link abaixo: </p><br>"
+                        + "<p style=\"text-align:center;\">" + enrollInURL + "</p><br>"
+                        + "<p style=\"text-align:center;\">Atenciosamente,<br>"
+                        + "Secretaria Vértice</p>";
 
-                EmailService.sendEmail(teacher.getEmail(), assunto, mensagem);
+                EmailService.sendEmail(teacher.getEmail(), topic, message);
             } catch (Exception e) {
                 e.printStackTrace();
             }
