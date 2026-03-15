@@ -102,7 +102,9 @@
     background: var(--primary-color);
     border: none;
     color: white;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-decoration: none;
     padding: 8px 12px;
     border-radius: 8px;
@@ -118,13 +120,16 @@
 .secondary-button{
     font-size: var(--text-sm);
     background: transparent;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-decoration: none;
     border: solid 3px var(--primary-color);
     color: var(--primary-color);
     padding: 8px 12px;
     border-radius: 8px;
-    width: 120px;
+    width: fit-content;
+    min-width: 120px;
     cursor: pointer;
 }
 

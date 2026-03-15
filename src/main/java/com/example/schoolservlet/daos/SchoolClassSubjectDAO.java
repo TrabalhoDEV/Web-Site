@@ -107,6 +107,72 @@ public class SchoolClassSubjectDAO implements GenericDAO<SchoolClassSubject> {
         }
     }
 
+    public Map<Integer, Subject> findManyByClass(int skip, int take, int schoolClassId, String filter) throws DataException {
+        String sql = """
+            SELECT s.id, s.name, s.deadline
+            FROM subject s
+            INNER JOIN school_class_subject scs ON scs.id_subject = s.id
+            WHERE scs.id_school_class = ?
+        """;
+
+        boolean hasFilter = filter != null && !filter.isBlank();
+        if (hasFilter) sql += " AND LOWER(s.name) LIKE LOWER(?) ";
+
+        sql += " ORDER BY s.name LIMIT ? OFFSET ?";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            int idx = 1;
+            stmt.setInt(idx++, schoolClassId);
+            if (hasFilter) stmt.setString(idx++, "%" + filter + "%");
+            stmt.setInt(idx++, take);
+            stmt.setInt(idx,   skip);
+
+            ResultSet rs = stmt.executeQuery();
+            Map<Integer, Subject> map = new LinkedHashMap<>();
+
+            while (rs.next()) {
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id"));
+                subject.setName(rs.getString("name"));
+                subject.setDeadline(rs.getDate("deadline"));
+                map.put(subject.getId(), subject);
+            }
+
+            return map;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao buscar matérias da turma.", e);
+        }
+    }
+
+    public int countByClass(int schoolClassId, String filter) throws DataException {
+        String sql = """
+            SELECT COUNT(*) FROM subject s
+            INNER JOIN school_class_subject scs ON scs.id_subject = s.id
+            WHERE scs.id_school_class = ?
+        """;
+
+        boolean hasFilter = filter != null && !filter.isBlank();
+        if (hasFilter) sql += " AND LOWER(s.name) LIKE LOWER(?)";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, schoolClassId);
+            if (hasFilter) stmt.setString(2, "%" + filter + "%");
+
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao contar matérias da turma.", e);
+        }
+    }
+
     @Override
     public void create(SchoolClassSubject scs) throws DataException, ValidationException {
         InputValidation.validateId(scs.getSchoolClass().getId(), "id da turma");
