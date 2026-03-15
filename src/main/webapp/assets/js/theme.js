@@ -20,3 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("The 'theme-button' was not found in HTML");
     }
 });
+(function applyTheme() {
+    const currentTheme = localStorage.getItem('dark-mode');
+    if (currentTheme === 'enabled') {
+        document.body.classList.add('dark-mode');
+    }
+})();

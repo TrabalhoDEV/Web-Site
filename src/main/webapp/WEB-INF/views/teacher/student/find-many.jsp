@@ -286,7 +286,7 @@
             <td>
               <form action="${pageContext.request.contextPath}/teacher/students/grades/render" method="post">
                 <input type="hidden" name="studentSubjectId" value="<%= ss.getId() %>">
-                <button type="submit" class="release-button">Lançar Notas</button>
+                <button type="submit" class="primary-button">Lançar Notas</button>
               </form>
             </td>
           </tr>
