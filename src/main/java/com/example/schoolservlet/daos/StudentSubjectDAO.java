@@ -448,6 +448,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                              "        END AS media " +
                              "    FROM student_subject ss " +
                              "    JOIN student st ON st.id = ss.id_student " +
+                             "    JOIN subject sb ON sb.id = ss.id_subject " +
                              "    WHERE ss.id_student = ? AND st.status = ? " +
                              ") AS sub"
              )) {

@@ -267,7 +267,7 @@
                         </li>
                         <%}%>
                         <%} else {%>
-                        <p>Nenhuma pendência foi encontrada</p>
+                        <p class="no-result no-pendences">Nenhuma pendência foi encontrada</p>
                         <%}%>
                         <%if (request.getAttribute("error") != null) {%>
                         <p><%=request.getAttribute("error")%>
@@ -317,7 +317,7 @@
                             </li>
                             <%}%>
                             <%} else {%>
-                            <p>Nenhum aluno foi encontrado nessa situação</p>
+                            <p class="no-result no-students">Nenhum aluno foi encontrado nessa situação</p>
                             <%}%>
 
                             <%if (request.getAttribute("error") != null) {%>

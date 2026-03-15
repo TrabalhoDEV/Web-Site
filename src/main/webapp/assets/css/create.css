@@ -20,7 +20,9 @@
     flex-direction: column;
     gap: 24px;
     margin: auto;
+    transition: background-color 0.3s ease;
 }
+
 .header-grid{
     display: flex;
     justify-content: space-between;
@@ -118,6 +120,7 @@ dialog {
     padding: 30px;
     height: 170px;
     width: 350px;
+    background-color: var(--surface-color);
 }
 
 .modal-cardAdd {

@@ -21,7 +21,13 @@
     margin: 0 auto;
     color: var(--surface-color);
 }
-
+.main-content {
+    margin-left: 16rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0 32px 32px 32px;
+}
 .hero h1{
     font-weight: var(--text-semi-bold);
     font-size: var(--text-2xl);
@@ -148,6 +154,7 @@ button {
     justify-content: space-between;
     height: 285px;
     width: 450px;
+    background-color: var(--surface-color);
 }
 .card-modal h3{
     color: var(--text-color);
@@ -184,6 +191,8 @@ button {
 }
 
 dialog{
+    background-color: var(--surface-color);
+    color: var(--text-color);
     border-radius: var(--medium-radius);
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
