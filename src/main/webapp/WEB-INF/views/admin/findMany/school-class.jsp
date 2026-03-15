@@ -257,7 +257,7 @@
             <% if (!schoolClassMap.isEmpty()) { %>
 
             <table class="grade-table"
-                   style="--cols: 2; grid-template-columns: 1fr 120px">
+                   style="--cols: 2; grid-template-columns: 1fr 160px">
 
                 <thead>
                 <tr>
@@ -277,6 +277,18 @@
 
                     <td class="actions">
                         <div class="btn-action">
+                            <%-- Subjects --%>
+                            <a href="${pageContext.request.contextPath}/admin/school-class/subject/find-many?classId=<%=schoolClass.getId()%>">
+                                <button title="Ver matérias" class="btn-icon btn-details">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                        <line x1="9" y1="7" x2="15" y2="7"/>
+                                        <line x1="9" y1="11" x2="15" y2="11"/>
+                                    </svg>
+                                </button>
+                            </a>
+
                             <%-- Teachers --%>
                             <a href="${pageContext.request.contextPath}/admin/school-class/teacher/find-many?classId=<%=schoolClass.getId()%>">
                                 <button title="Ver professores" class="btn-icon btn-details">

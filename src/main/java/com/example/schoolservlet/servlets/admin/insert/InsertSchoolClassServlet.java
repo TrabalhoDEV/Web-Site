@@ -24,7 +24,6 @@ import java.util.List;
 public class InsertSchoolClassServlet extends HttpServlet {
     private SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
     private SubjectDAO subjectDAO = new SubjectDAO();
-    private SchoolClassSubjectDAO schoolClassSubjectDAO = new SchoolClassSubjectDAO();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -41,7 +40,6 @@ public class InsertSchoolClassServlet extends HttpServlet {
         if (!AccessValidation.isAdmin(request, response)) return;
 
         String name = request.getParameter("name");
-        String[] subjectIdsParam = request.getParameterValues("subjectIds");
 
         try{
             InputValidation.validateIsNull("turma", name);
@@ -49,10 +47,6 @@ public class InsertSchoolClassServlet extends HttpServlet {
             name = name.trim().toLowerCase();
 
             InputValidation.validateSchoolClassName(name);
-
-            if (subjectIdsParam == null || subjectIdsParam.length == 0) {
-                throw new ValidationException("Selecione pelo menos uma matéria");
-            }
 
             FieldAlreadyUsedValidation.exists("school_class", "school_year", "nome da turma", name);
 

@@ -90,7 +90,6 @@ public class UpdateSchoolClassServlet extends HttpServlet {
 
             SchoolClass schoolClass = schoolClassDAO.findById(schoolClassId);
 
-            String[] subjectIdsParam = request.getParameterValues("subjectIds");
             String name = request.getParameter("schoolYear");
 
             InputValidation.validateSchoolClassName(name);
@@ -101,48 +100,6 @@ public class UpdateSchoolClassServlet extends HttpServlet {
                 schoolClass.setSchoolYear(name);
                 schoolClassDAO.update(schoolClass);
             }
-
-            List<Integer> validSubjectIds = InputValidation.validateIdsExist(
-                    subjectIdsParam,
-                    subjectDAO.findAllIds()
-            );
-
-            Set<Integer> newSubjectIds = new HashSet<>();
-            if (validSubjectIds != null) {
-                newSubjectIds.addAll(validSubjectIds);
-            }
-
-            List<Subject> currentSubjects = subjectDAO.findBySchoolClassId(schoolClassId);
-
-            Set<Integer> currentSubjectIds = new HashSet<>();
-            for (Subject s : currentSubjects) {
-                currentSubjectIds.add(s.getId());
-            }
-
-            Set<Integer> toAddSubjects = new HashSet<>(newSubjectIds);
-            toAddSubjects.removeAll(currentSubjectIds);
-
-            Set<Integer> toRemoveSubjects = new HashSet<>(currentSubjectIds);
-            toRemoveSubjects.removeAll(newSubjectIds);
-
-            if (!toAddSubjects.isEmpty()) {
-                List<SchoolClassSubject> schoolClassSubjectsToInsert = new ArrayList<>();
-
-                for (Integer subjectId : toAddSubjects) {
-                    Subject subject = subjectDAO.findById(subjectId);
-
-                    SchoolClassSubject scs = new SchoolClassSubject();
-                    scs.setSchoolClass(schoolClass);
-                    scs.setSubject(subject);
-                    schoolClassSubjectsToInsert.add(scs);
-                }
-
-                schoolClassSubjectDAO.createMany(schoolClassSubjectsToInsert);
-                studentSubjectDAO.createManyBySchoolClass(schoolClassId, new ArrayList<>(toAddSubjects));
-            }
-
-            schoolClassSubjectDAO.deleteManyBySchoolClassAndSubjects(schoolClassId, toRemoveSubjects);
-            studentSubjectDAO.deleteManyBySchoolClass(schoolClassId, new ArrayList<>(toRemoveSubjects));
 
             response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
 

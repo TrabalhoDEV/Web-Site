@@ -244,8 +244,8 @@
             <a href="${pageContext.request.contextPath}/admin/school-class/teacher/find-many?classId=<%= classId %>" class="secondary-button">Limpar</a>
           </section>
 
-          <a href="${pageContext.request.contextPath}/admin/school-class/teachers/insert" class="primary-button">
-            Adicionar Professor
+          <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="primary-button">
+            Ver turmas
           </a>
         </form>
       </div>
@@ -259,13 +259,13 @@
       <% }%>
 
       <% if (!teacherMap.isEmpty()) { %>
-      <table class="grade-table" style="--cols: 4; grid-template-columns: 2fr 1fr 1fr 60px">
+      <table class="grade-table" style="--cols: 4; grid-template-columns: 2fr 1fr 2fr 1fr">
         <thead>
         <tr>
           <th>Nome</th>
           <th>Usuário</th>
+          <th>Email</th>
           <th>Qtd. Matérias</th>
-          <th>Ações</th>
         </tr>
         </thead>
 
@@ -274,29 +274,13 @@
         <tr>
           <td><%= OutputFormatService.formatName(teacher.getName()) %></td>
           <td><%= teacher.getUsername() %></td>
+          <td><%= teacher.getEmail()%></td>
           <td>
             <% if (teacher.getSubjectCount() > 0) { %>
             <%= teacher.getSubjectCount() %> matéria(s)
             <% } else { %>
             <span class="not-found-inline">Nenhuma matéria</span>
             <% } %>
-          </td>
-          <td class="actions">
-            <div class="btn-action">
-              <a href="#"
-                 onclick="openModalDelete('${pageContext.request.contextPath}/admin/school-class/teacher/delete?teacherId=<%= teacher.getId()%>&classId=<%= request.getAttribute("schoolClassId") %>')">
-                <button title="Remover professor da turma" class="btn-icon btn-delete">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                    <path d="M10 11v6"/>
-                    <path d="M14 11v6"/>
-                    <path d="M9 6V4h6v2"/>
-                  </svg>
-                </button>
-              </a>
-            </div>
           </td>
         </tr>
         <% } %>
