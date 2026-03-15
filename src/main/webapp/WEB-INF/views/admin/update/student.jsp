@@ -7,13 +7,11 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Update Student</title>
+    <title>Atualizar aluno</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css"/>
     <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
-
 </head>
 <body>
-<h1>Update Student</h1>
 
 <%
     // Load Student object from request attributes for form pre-population
@@ -235,7 +233,7 @@
 
             <hr>
             <!-- Student update form: POST to update servlet -->
-            <form method="post" action="${pageContext.request.contextPath}/admin/student/update">
+            <form method="post" action="${pageContext.request.contextPath}/admin/student/update" class="generic-form">
                 <!-- Enrollment field (read-only identifier) -->
                 <div class="form-group">
                     <label for="enrollment">Enrollment</label>
