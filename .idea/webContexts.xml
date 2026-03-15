@@ -12,6 +12,7 @@
         <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/findMany/aaa.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/findMany" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/findMany/student.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/findMany" />
         <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/index.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher" />
+        <entry key="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/student/releaseGrade.jsp" value="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/views/teacher/student" />
       </map>
     </option>
   </component>
