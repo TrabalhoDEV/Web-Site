@@ -14,11 +14,11 @@
     position: relative;
     background: linear-gradient(to left, #9094ff 0%, #5750de 50%, #4361EE 100%);
     border-radius: 1rem;
-    padding: 24px 32px;
+    padding: 48px 64px;
     overflow: hidden;
-    width: 80%;
-    height: 14vh;
-    max-height: 200px;
+    width: 90%;
+    height: 20dvh;
+    max-height: 280px;
     display: flex;
     align-items: center;
     margin: 0 auto;
@@ -104,7 +104,9 @@
     background: var(--primary-color);
     border: none;
     color: white;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-decoration: none;
     padding: 8px 12px;
     border-radius: 8px;
@@ -120,13 +122,16 @@
 .secondary-button{
     font-size: var(--text-sm);
     background: transparent;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-decoration: none;
     border: solid 3px var(--primary-color);
     color: var(--primary-color);
     padding: 8px 12px;
     border-radius: 8px;
-    width: 120px;
+    width: fit-content;
+    min-width: 120px;
     cursor: pointer;
 }
 
@@ -233,49 +238,27 @@ dialog::backdrop {
     background: rgba(0, 0, 0, 0.7);
 }
 
-.modal-cardU, .modal-cardD {
+.modal-card {
     padding: 30px;
     width: 350px;
-}
-
-.modal-cardU { height: 480px; }
-
-.modal-cardD {
-    height: 170px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 32px;
     align-items: center;
 }
 
-.modal-cardU input, .modal-cardD input {
-    width: 90%;
-    padding: 8px;
-    margin-bottom: 15px;
+.modal-card input {
     background-color: var(--background-color1);
     color: var(--text-color);
     border-radius: var(--medium-radius);
     border: 1px solid var(--border-color);
 }
 
-
 .modal-actions {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-top: 30px;
+    gap: 12px;
     margin-bottom: 0;
-}
-
-.modal-actions button{
-    font-size: var(--text-sm) ;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    width: 110px;
-    height: 40px;
-    border-radius: 8px;
-    cursor: pointer;
 }
 
 .pagination{
@@ -338,4 +321,28 @@ dialog::backdrop {
 
 .not-found{
     margin-top: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.form-group select[multiple] {
+    height: auto;
 }

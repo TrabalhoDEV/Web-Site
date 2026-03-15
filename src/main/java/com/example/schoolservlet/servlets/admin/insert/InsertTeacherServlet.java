@@ -4,6 +4,7 @@ import com.example.schoolservlet.daos.*;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.*;
 import com.example.schoolservlet.utils.*;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -27,6 +28,24 @@ public class InsertTeacherServlet extends HttpServlet {
     private SubjectTeacherDAO subjectTeacherDAO = new SubjectTeacherDAO();
     private SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
 
+    private static String enrollInURL;
+
+    static{
+        Dotenv dotenv = null;
+
+        // Firstly, it tries to load .env locally
+        try {
+            dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            dotenv = null;
+        }
+
+        enrollInURL = ConfigService.getEnv("BASE_URL", dotenv);
+    }
+
     /**
      * Handles POST requests for teacher registration.
      * <p>
@@ -49,7 +68,6 @@ public class InsertTeacherServlet extends HttpServlet {
         String username = InputNormalizer.normalizeUserName(request.getParameter("username"));
         String password = request.getParameter("password");
         String[] subjectIdsParam = request.getParameterValues("subjectIds");
-        String[] schoolClassIdsParam = request.getParameterValues("schoolClassIds");
 
         try {
             InputValidation.validateTeacherName(name);
@@ -91,35 +109,17 @@ public class InsertTeacherServlet extends HttpServlet {
                 subjectTeacherDAO.createMany(subjectTeachersToInsert);
             }
 
-            List<Integer> validClassIds = InputValidation.validateIdsExist(schoolClassIdsParam, schoolClassDAO.findAllIds());
-            if(validClassIds != null && !validClassIds.isEmpty()){
-                List<SchoolClassTeacher> classTeachersToInsert = new ArrayList<>();
-                for (Integer classId : validClassIds) {
-                    if (!schoolClassDAO.hasStudentsById(classId)) {
-                        // Rollback teacher creation (cascade deletes subject-teacher relationships)
-                        teacherDAO.delete(teacherId);
-                        throw new ValidationException("A turma selecionada não possui alunos vinculados.");
-                    }
-
-                    SchoolClass schoolClass = schoolClassDAO.findById(classId);
-                    SchoolClassTeacher schoolClassTeacher = new SchoolClassTeacher();
-                    schoolClassTeacher.setTeacher(teacher);
-                    schoolClassTeacher.setSchoolClass(schoolClass);
-                    classTeachersToInsert.add(schoolClassTeacher);
-                }
-                schoolClassTeacherDAO.createMany(classTeachersToInsert);
-            }
-
             try {
-                String assunto = "Acesso ao Sistema Escolar";
-                String mensagem = "Olá " + OutputFormatService.formatName(teacher.getName()) + ",<br><br>"
-                        + "Você já pode acessar o sistema escolar.<br>"
-                        + "A senha será enviada pelo administrador da escola.<br>"
-                        + String.format("<a href=\"%s/index.jsp\">Clique aqui para logar</a><br><br>", request.getContextPath())
-                        + "Atenciosamente,<br>"
-                        + "Secretaria Vértice";
+                String topic = "Acesso ao Sistema Escolar";
+                String message = "<h3 style=\"text-align:center;\">Olá " + OutputFormatService.formatName(teacher.getName()) + ",</h3>"
+                        + "<p style=\"text-align:center;\">Você já pode acessar o sistema escolar.</p>"
+                        + "<p style=\"text-align:center;\">A senha será enviada pelo administrador da escola.</p>"
+                        + "<p style=\"text-align:center;\">Conheça o sistema pelo link abaixo: </p><br>"
+                        + "<p style=\"text-align:center;\">" + enrollInURL + "</p><br>"
+                        + "<p style=\"text-align:center;\">Atenciosamente,<br>"
+                        + "Secretaria Vértice</p>";
 
-                EmailService.sendEmail(teacher.getEmail(), assunto, mensagem);
+                EmailService.sendEmail(teacher.getEmail(), topic, message);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -127,37 +127,13 @@ public class InsertTeacherServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
 
         } catch (NumberFormatException nfe){
-            getAllSchoolClasses(request);
             getAllSubjects(request);
             request.setAttribute("error", nfe.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
-        } catch (NotFoundException nfe){
-            getAllSchoolClasses(request);
+        } catch (ValidationException | NotFoundException | DataException e) {
             getAllSubjects(request);
-            request.setAttribute("error", nfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/findMany/teacher.jsp").forward(request, response);
-        } catch (RequiredFieldException rfe){
-            getAllSchoolClasses(request);
-            getAllSubjects(request);
-            request.setAttribute("error", rfe.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
-        } catch (ValueAlreadyExistsException vaee) {
-            getAllSchoolClasses(request);
-            getAllSubjects(request);
-            request.setAttribute("error", vaee.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
-        } catch (ValidationException ve){
-            getAllSchoolClasses(request);
-            getAllSubjects(request);
-            request.setAttribute("error",ve.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
-        }catch (DataException de) {
-            getAllSchoolClasses(request);
-            getAllSubjects(request);
-            request.setAttribute("error", de.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
+            ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/admin/findMany/teacher.jsp");
         }
-
     }
 
     /**
@@ -174,7 +150,6 @@ public class InsertTeacherServlet extends HttpServlet {
         response.setContentType("text/html");
         if (!AccessValidation.isAdmin(request, response)) return;
         getAllSubjects(request);
-        getAllSchoolClasses(request);
         request.getRequestDispatcher("/WEB-INF/views/admin/insert/teacher.jsp").forward(request,response);
     }
 
@@ -189,21 +164,6 @@ public class InsertTeacherServlet extends HttpServlet {
             List<Subject> subjects = subjectDAO.findAll();
             request.setAttribute("subjects", subjects);
         } catch (DataException de){
-            request.setAttribute("error", de.getMessage());
-        }
-    }
-
-    /**
-     * Retrieves all school classes from the database and sets them as a request attribute.
-     * If an error occurs, sets the error message as a request attribute.
-     *
-     * @param request the HTTP request object to set attributes
-     */
-    private void getAllSchoolClasses(HttpServletRequest request) {
-        try {
-            List<SchoolClass> classes = schoolClassDAO.findAll();
-            request.setAttribute("classes", classes);
-        } catch (DataException de) {
             request.setAttribute("error", de.getMessage());
         }
     }

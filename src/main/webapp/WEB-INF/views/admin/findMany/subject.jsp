@@ -256,8 +256,8 @@
                             <a href="${pageContext.request.contextPath}/admin/subject/find-many" class="secondary-button">Limpar</a>
                         </section>
 
-                        <a href="${pageContext.request.contextPath}/admin/subject/insert">
-                            <button class="primary-button">Adicionar Turma</button>
+                        <a href="${pageContext.request.contextPath}/admin/subject/insert" class="primary-button">
+                            Adicionar Matéria
                         </a>
                     </form>
                 </div>
@@ -359,13 +359,13 @@
         </section>
     </main>
 <dialog id="deleteDialog">
-    <div class="modal-cardD">
+    <div class="modal-card">
         <h3>Deseja deletar esta matéria?</h3>
         <p id="deleteText">Essa é uma ação irreversível</p>
 
         <div class="modal-actions">
-            <button id="confirmDelete">Confirmar</button>
-            <button id="closeDelete">Cancelar</button>
+            <button class="primary-button" id="confirmDelete">Confirmar</button>
+            <a class="secondary-button" id="closeDelete">Cancelar</a>
         </div>
     </div>
 </dialog>

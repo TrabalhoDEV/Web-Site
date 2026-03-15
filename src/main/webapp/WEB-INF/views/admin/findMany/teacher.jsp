@@ -310,13 +310,13 @@
     </main>
 
     <dialog id="deleteDialog">
-        <div class="modal-cardD">
+        <div class="modal-card">
             <h3>Deseja deletar este professor?</h3>
             <p id="deleteText">Essa é uma ação irreversível</p>
 
             <div class="modal-actions">
-                <button id="confirmDelete">Confirmar</button>
-                <button id="closeDelete">Cancelar</button>
+                <button class="primary-button" id="confirmDelete">Confirmar</button>
+                <a class="secondary-button" id="closeDelete">Cancelar</a>
             </div>
         </div>
     </dialog>

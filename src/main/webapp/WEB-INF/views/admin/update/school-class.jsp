@@ -17,15 +17,6 @@
 </head>
 <%
   SchoolClass schoolClass = (SchoolClass) request.getAttribute("schoolClass");
-  List<Subject> schoolClassSubjects = (List<Subject>) request.getAttribute("schoolClassSubjects");
-  List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
-
-  Set<Integer> subjectsIds = new HashSet<>();
-  if (schoolClassSubjects != null) {
-    for (Subject ts : schoolClassSubjects) {
-      subjectsIds.add(ts.getId());
-    }
-  }
 %>
 
 <body>
@@ -207,30 +198,10 @@
             <label for="schoolYear">Nome da turma:</label>
             <input type="text" name="schoolYear" id="schoolYear"
                    placeholder="Digite o nome da turma aqui"
-                   value="<%= schoolClass.getSchoolYear().toUpperCase() %>">
+                   value="<%= OutputFormatService.formatName(schoolClass.getSchoolYear()) %>">
             <input type="hidden" name="id" value="<%= schoolClass.getId() %>">
           </div>
           <% } %>
-
-          <div class="fieldset-group">
-            <fieldset class="checkbox-fieldset">
-              <legend>Selecione as matérias:</legend>
-              <div class="checkbox-grid">
-                <% for (Subject subject : subjects) { %>
-                <div class="checkbox-item">
-                  <input type="checkbox"
-                         id="subject_<%= subject.getId() %>"
-                         name="subjectIds"
-                         value="<%= subject.getId() %>"
-                    <%= subjectsIds.contains(subject.getId()) ? "checked" : "" %>>
-                  <label for="subject_<%= subject.getId() %>">
-                    <%= OutputFormatService.formatName(subject.getName()) %>
-                  </label>
-                </div>
-                <% } %>
-              </div>
-            </fieldset>
-          </div>
 
           <% if (request.getAttribute("error") != null) { %>
           <p style="color: red;"><%= request.getAttribute("error") %></p>

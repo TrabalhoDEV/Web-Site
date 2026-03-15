@@ -12,13 +12,9 @@ import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.exceptions.ValueAlreadyExistsException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
-import com.example.schoolservlet.utils.AccessValidation;
-import com.example.schoolservlet.utils.EmailService;
-import com.example.schoolservlet.utils.ErrorHandler;
-import com.example.schoolservlet.utils.FieldAlreadyUsedValidation;
-import com.example.schoolservlet.utils.InputNormalizer;
-import com.example.schoolservlet.utils.InputValidation;
+import com.example.schoolservlet.utils.*;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -32,6 +28,23 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "admin-add-student",value = "/admin/student/insert")
 public class InsertStudentServlet extends HttpServlet {
+    private static String enrollInURL;
+
+    static{
+        Dotenv dotenv = null;
+
+        // Firstly, it tries to load .env locally
+        try {
+            dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            dotenv = null;
+        }
+
+        enrollInURL = ConfigService.getEnv("BASE_URL", dotenv);
+    }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         if (!AccessValidation.isAdmin(request, response)) return;
@@ -134,14 +147,16 @@ public class InsertStudentServlet extends HttpServlet {
 
             response.setStatus(HttpServletResponse.SC_OK);
 
-            String link = request.getRequestURL().toString().replace(request.getRequestURI(), "") +
-                    request.getContextPath() + "/pages/students/signupCpf.jsp";
+            String topic = "Concluir cadastro no Colégio Vértice";
+            String menssage = "<h3 style=\"text-align:center;\">Olá, tudo bem?</h3>"
+                    + "<p style=\"text-align:center;\">Você está a um passo de ser o mais novo aluno da Vértice</p>"
+                    + "<p style=\"text-align:center;\">Em nossa escola você alcançará qualquer lugar, posição, o que está esperando?</p>"
+                    + "<p style=\"text-align:center;\">Conclua seu cadastro pelo link abaixo: </p><br>"
+                    + "<p style=\"text-align:center;\">" + enrollInURL + "/student/validate/cpf" + "</p>"
+                    + "<p style=\"text-align:center;\">Atenciosamente,<br>"
+                    + "Secretaria Vértice</p>";
 
-            EmailService.sendEmail(student.getEmail(), "Cadastro na Vértice",
-            "<h2>Faça sua matrícula na Vértice</h2>" +
-                    "<p>Se você realmente for o próximo aluno da Vértice:</p>" +
-                    String.format("<p><a href=\"%s/student/validate/cpf\">Clique aqui</a> para fazer o seu cadastro</p>",request.getContextPath())
-                    );
+            EmailService.sendEmail(student.getEmail(), topic, menssage);
         } catch (DataException de) {
             getAllData(request, response);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

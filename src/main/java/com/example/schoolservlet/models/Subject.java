@@ -19,6 +19,9 @@ public class Subject {
         this.deadline = deadline;
     }
 
+    public Subject(int id) {
+        this.id = id;
+    }
 
     // Getters
     public int getId() {

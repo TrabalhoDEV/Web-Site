@@ -15,6 +15,9 @@ public class SchoolClass {
         this.id = id;
         this.schoolYear = schoolYear;
     }
+    public SchoolClass (int id) {
+        this.id = id;
+    }
 
     // Getters:
     public int getId() {

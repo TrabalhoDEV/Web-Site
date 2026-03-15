@@ -13,10 +13,6 @@
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
   <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
-<%
-  List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
-  List<SchoolClass> schoolClasses= (List<SchoolClass>) request.getAttribute("schoolClasses");
-%>
 
 <body>
 
@@ -201,27 +197,6 @@
           <div class="form-group">
             <label for="name">Nome da turma:</label>
             <input type="text" id="name" name="name" placeholder="Digite o nome da turma" required>
-          </div>
-
-          <!-- Subjects Fieldset -->
-          <div class="fieldset-group">
-            <fieldset class="checkbox-fieldset">
-              <legend>Selecione as Matérias:</legend>
-              <div class="checkbox-grid">
-                <%
-                  if (subjects != null) {
-                    for (Subject subject : subjects) {
-                %>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="subject_<%= subject.getId() %>" name="subjectIds" value="<%= subject.getId() %>">
-                  <label for="subject_<%= subject.getId() %>"><%= OutputFormatService.formatName(subject.getName()) %></label>
-                </div>
-                <%
-                    }
-                  }
-                %>
-              </div>
-            </fieldset>
           </div>
 
           <%

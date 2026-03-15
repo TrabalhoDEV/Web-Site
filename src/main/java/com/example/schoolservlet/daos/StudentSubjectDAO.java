@@ -88,36 +88,30 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         Map<Integer, List<StudentSubject>> studentsMap = new HashMap<>();
 
         try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(
-                     "SELECT\n" +
-                             "    ss.id, ss.obs, ss.grade1, ss.grade2,\n" +
-                             "    st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email,\n" +
-                             "    sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline\n" +
-                             "FROM student st\n" +
-                             "JOIN school_class sc ON sc.id = st.id_school_class\n" +
-                             "JOIN student_subject ss ON ss.id_student = st.id\n" +
-                             "JOIN subject sb ON sb.id = ss.id_subject\n" +
-                             "WHERE st.status = ?\n" +
-                             "AND EXISTS (\n" +
-                             "    SELECT 1\n" +
-                             "    FROM school_class_teacher sct\n" +
-                             "    WHERE sct.id_school_class = sc.id\n" +
-                             "    AND sct.id_teacher = ?\n" +
-                             ")\n" +
-                             "AND EXISTS (\n" +
-                             "    SELECT 1\n" +
-                             "    FROM subject_teacher stt\n" +
-                             "    WHERE stt.id_subject = sb.id\n" +
-                             "    AND stt.id_teacher = ?\n" +
-                             ")\n" +
-                             "ORDER BY st.id\n" +
-                             "LIMIT ? OFFSET ?;")) {
+             PreparedStatement pstmt = conn.prepareStatement("""
+                 SELECT
+                     ss.id, ss.obs, ss.grade1, ss.grade2,
+                     st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email,
+                     sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline
+                 FROM student st
+                 JOIN school_class sc ON sc.id = st.id_school_class
+                 JOIN student_subject ss ON ss.id_student = st.id
+                 JOIN subject sb ON sb.id = ss.id_subject
+                 WHERE st.status = ?
+                 AND EXISTS (
+                     SELECT 1 FROM school_class_teacher sct
+                     WHERE sct.id_school_class = sc.id
+                     AND sct.id_teacher = ?
+                     AND sb.id = ANY(sct.subject_list)
+                 )
+                 ORDER BY st.id
+                 LIMIT ? OFFSET ?
+                 """)) {
 
             pstmt.setInt(1, StudentStatusEnum.ACTIVE.ordinal() + 1);
             pstmt.setInt(2, teacherId);
-            pstmt.setInt(3, teacherId);
-            pstmt.setInt(4, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
-            pstmt.setInt(5, skip < 0 ? 0 : skip);
+            pstmt.setInt(3, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(4, skip < 0 ? 0 : skip);
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -162,6 +156,35 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    public int countByTeacherId(int teacherId) throws DataException, ValidationException {
+        InputValidation.validateId(teacherId, "id do professor");
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("""
+                 SELECT COUNT(DISTINCT st.id)
+                 FROM student st
+                 JOIN school_class sc ON sc.id = st.id_school_class
+                 JOIN student_subject ss ON ss.id_student = st.id
+                 JOIN subject sb ON sb.id = ss.id_subject
+                 WHERE st.status = ?
+                 AND EXISTS (
+                     SELECT 1 FROM school_class_teacher sct
+                     WHERE sct.id_school_class = sc.id
+                     AND sct.id_teacher = ?
+                     AND sb.id = ANY(sct.subject_list)
+                 )
+                 """)) {
+
+            pstmt.setInt(1, StudentStatusEnum.ACTIVE.ordinal() + 1);
+            pstmt.setInt(2, teacherId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) return rs.getInt(1);
+            return 0;
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar relações do professor", sqle);
+        }
+    }
     @Override
     public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
@@ -564,59 +587,41 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         InputValidation.validateId(idTeacher, "id do professor");
 
         try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT\n" +
-                     "COALESCE(\n" +
-                     "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
-                     "    ), 0) AS approved,\n" +
-                     "\n" +
-                     "COALESCE(\n" +
-                     "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
-                     "    ), 0) AS failed,\n" +
-                     "\n" +
-                     "COALESCE(\n" +
-                     "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
-                     "    ), 0) AS pending\n" +
-                     "\n" +
-                     "FROM (\n" +
-                     "    SELECT\n" +
-                     "        ss.id,\n" +
-                     "        sb.deadline,\n" +
-                     "        ss.grade1,\n" +
-                     "        ss.grade2,\n" +
-                     "        CASE\n" +
-                     "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL\n" +
-                     "                THEN (ss.grade1 + ss.grade2) / 2.0\n" +
-                     "            WHEN ss.grade1 IS NOT NULL\n" +
-                     "                THEN ss.grade1\n" +
-                     "            WHEN ss.grade2 IS NOT NULL\n" +
-                     "                THEN ss.grade2\n" +
-                     "            ELSE NULL\n" +
-                     "        END AS media\n" +
-                     "\n" +
-                     "    FROM student_subject ss\n" +
-                     "    JOIN student s\n" +
-                     "        ON s.id = ss.id_student\n" +
-                     "    JOIN subject sb\n" +
-                     "        ON sb.id = ss.id_subject\n" +
-                     "    JOIN school_class sc\n" +
-                     "        ON sc.id = s.id_school_class\n" +
-                     "    JOIN school_class_teacher sct\n" +
-                     "        ON sct.id_school_class = sc.id\n" +
-                     "    JOIN subject_teacher stt\n" +
-                     "        ON stt.id_subject = sb.id\n" +
-                     "\n" +
-                     "    WHERE sct.id_teacher = ?\n" +
-                     "      AND stt.id_teacher = ?\n" +
-                     "      AND s.status = ?\n" +
-                     ") AS sub;")) {
+             PreparedStatement pstmt = conn.prepareStatement("""
+                 SELECT
+                 COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS approved,
+                 COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS failed,
+                 COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS pending
+                 FROM (
+                     SELECT
+                         ss.id,
+                         sb.deadline,
+                         ss.grade1,
+                         ss.grade2,
+                         CASE
+                             WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0
+                             WHEN ss.grade1 IS NOT NULL THEN ss.grade1
+                             WHEN ss.grade2 IS NOT NULL THEN ss.grade2
+                             ELSE NULL
+                         END AS media
+                     FROM student_subject ss
+                     JOIN student s ON s.id = ss.id_student
+                     JOIN subject sb ON sb.id = ss.id_subject
+                     JOIN school_class sc ON sc.id = s.id_school_class
+                     WHERE s.status = ?
+                     AND EXISTS (
+                         SELECT 1 FROM school_class_teacher sct
+                         WHERE sct.id_school_class = sc.id
+                         AND sct.id_teacher = ?
+                         AND sb.id = ANY(sct.subject_list)
+                     )
+                 ) AS sub
+                 """)) {
+
             pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APPROVAL);
             pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APPROVAL);
-            pstmt.setInt(3, idTeacher);
+            pstmt.setInt(3, StudentStatusEnum.ACTIVE.ordinal() + 1);
             pstmt.setInt(4, idTeacher);
-            pstmt.setInt(5, StudentStatusEnum.ACTIVE.ordinal() + 1);
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -706,29 +711,6 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new DataException("Erro ao contar relações entre alunos e professores", sqle);
-        }
-    }
-
-    public int countByTeacherId(int teacherId) throws DataException, ValidationException {
-        InputValidation.validateId(teacherId, "id do professor");
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(
-                     "SELECT COUNT(*) AS totalCount " +
-                             "FROM student_subject ss " +
-                             "JOIN subject sb ON sb.id = ss.id_subject " +
-                             "JOIN subject_teacher sbt ON sbt.id_subject = sb.id " +
-                             "WHERE sbt.id_teacher = ?")) {
-
-            pstmt.setInt(1, teacherId);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("totalCount");
-            }
-            return -1;
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-            throw new DataException("Erro ao contar relações do professor", sqle);
         }
     }
 

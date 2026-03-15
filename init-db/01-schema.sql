@@ -44,6 +44,7 @@ CREATE TABLE school_class_teacher
     id              SERIAL PRIMARY KEY,
     id_school_class INT NOT NULL REFERENCES school_class (id) ON DELETE CASCADE,
     id_teacher      INT NOT NULL REFERENCES teacher (id) ON DELETE CASCADE,
+    subject_list    INT[] NOT NULL DEFAULT '{}',
     CONSTRAINT uk_school_class_teacher UNIQUE (id_school_class, id_teacher)
 );
 

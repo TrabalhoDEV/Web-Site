@@ -18,12 +18,16 @@
     color: white;
 }
 
+a{
+    text-decoration: none;
+}
+
 .main-content {
     margin-left: 16rem;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 0 32px 32px 32px;
+    padding: 0 32px 0 32px;
 }
 
 .hero h1 {
@@ -243,6 +247,9 @@
 .student-list {
     list-style: none;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     margin-top: var(--space-4);
 }
 
@@ -311,11 +318,10 @@
 .student-alert {
     display: flex;
     align-items: center;
-    margin-bottom: var(--space-4);
     background-color: var(--background-color1);
     border-radius: var(--medium-radius);
     gap: 0.8rem;
-    padding: 0.5rem 0;
+    padding: 8px;
     transition: background-color 0.3s ease;
 }
 
