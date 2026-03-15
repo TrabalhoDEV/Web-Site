@@ -394,11 +394,14 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("SELECT " +
-                     "SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) AS approved, " +
-                     "SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) AS failed, " +
-                     "SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) AS pending " +
+                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
+                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) AS failed, " +
+                     "SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) AS pending " +
                      "FROM (" +
                      "    SELECT " +
+                     "        sb.deadline, " +
+                     "        ss.grade1, " +
+                     "        ss.grade2, " +
                      "        CASE " +
                      "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
                      "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
@@ -435,11 +438,14 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
                      "SELECT " +
-                             "SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) AS approved, " +
-                             "SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) AS failed, " +
-                             "SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) AS pending " +
+                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
+                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) AS failed, " +
+                             "SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) AS pending " +
                              "FROM (" +
                              "    SELECT " +
+                             "        sb.deadline, " +
+                             "        ss.grade1, " +
+                             "        ss.grade2, " +
                              "        CASE " +
                              "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
                              "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
@@ -448,6 +454,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                              "        END AS media " +
                              "    FROM student_subject ss " +
                              "    JOIN student st ON st.id = ss.id_student " +
+                             "    JOIN subject sb ON sb.id = ss.id_subject " +
                              "    WHERE ss.id_student = ? AND st.status = ? " +
                              ") AS sub"
              )) {
@@ -560,22 +567,25 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
              PreparedStatement pstmt = conn.prepareStatement("SELECT\n" +
                      "COALESCE(\n" +
                      "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
+                     "        100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
                      "    ), 0) AS approved,\n" +
                      "\n" +
                      "COALESCE(\n" +
                      "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
+                     "        100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
                      "    ), 0) AS failed,\n" +
                      "\n" +
                      "COALESCE(\n" +
                      "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
+                     "        100.0 * SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
                      "    ), 0) AS pending\n" +
                      "\n" +
                      "FROM (\n" +
                      "    SELECT\n" +
-                     "        s.id,\n" +
+                     "        ss.id,\n" +
+                     "        sb.deadline,\n" +
+                     "        ss.grade1,\n" +
+                     "        ss.grade2,\n" +
                      "        CASE\n" +
                      "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL\n" +
                      "                THEN (ss.grade1 + ss.grade2) / 2.0\n" +
@@ -586,20 +596,27 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                      "            ELSE NULL\n" +
                      "        END AS media\n" +
                      "\n" +
-                     "    FROM student s\n" +
+                     "    FROM student_subject ss\n" +
+                     "    JOIN student s\n" +
+                     "        ON s.id = ss.id_student\n" +
+                     "    JOIN subject sb\n" +
+                     "        ON sb.id = ss.id_subject\n" +
                      "    JOIN school_class sc\n" +
                      "        ON sc.id = s.id_school_class\n" +
                      "    JOIN school_class_teacher sct\n" +
                      "        ON sct.id_school_class = sc.id\n" +
-                     "    LEFT JOIN student_subject ss\n" +
-                     "        ON ss.id_student = s.id\n" +
+                     "    JOIN subject_teacher stt\n" +
+                     "        ON stt.id_subject = sb.id\n" +
                      "\n" +
-                     "    WHERE sct.id_teacher = ?\n AND s.status = ?" +
+                     "    WHERE sct.id_teacher = ?\n" +
+                     "      AND stt.id_teacher = ?\n" +
+                     "      AND s.status = ?\n" +
                      ") AS sub;")) {
             pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APPROVAL);
             pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APPROVAL);
             pstmt.setInt(3, idTeacher);
-            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal() + 1);
+            pstmt.setInt(4, idTeacher);
+            pstmt.setInt(5, StudentStatusEnum.ACTIVE.ordinal() + 1);
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -960,3 +977,4 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 }
+
