@@ -308,7 +308,7 @@ a.blue_button {
     cursor: pointer;
 }
 .info{
-    color: var(--text-color);
+    color: var(--text-color)!important;
 }
 .btn-cancel:hover {
     background-color: var(--red-secondary-color);
