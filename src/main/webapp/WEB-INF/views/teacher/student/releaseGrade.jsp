@@ -16,7 +16,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
     <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/img/logo_pequena.svg" type="image/x-icon">
-
 </head>
 <body>
 
@@ -173,6 +172,7 @@
         </div>
     </aside>
 
+
     <!-- MAIN CONTENT -->
 
     <main class="main-content">
@@ -202,10 +202,10 @@
                 <div class="form-container">
 
                     <div class="info-card">
-                        <p><strong>Aluno:</strong> <%= OutputFormatService.formatName(ss.getStudent().getName()) %></p>
-                        <p><strong>Matrícula:</strong> <%= ss.getStudent().getEnrollment() %></p>
-                        <p><strong>Disciplina:</strong> <%= ss.getSubject().getName() %></p>
-                        <p><strong>Status:</strong> <%= ss.getStatus() != null ? ss.getStatus() : "Pendente" %></p>
+                        <p class="info student-name"><strong>Aluno:</strong> <%= OutputFormatService.formatName(ss.getStudent().getName()) %></p>
+                        <p class="info student-enrollment"><strong>Matrícula:</strong> <%= ss.getStudent().getEnrollment() %></p>
+                        <p class="info student-subject"><strong>Disciplina:</strong> <%= ss.getSubject().getName() %></p>
+                        <p class="info student-status"><strong>Status:</strong> <%= ss.getStatus() != null ? ss.getStatus() : "Pendente" %></p>
                     </div>
 
                     <form method="POST" action="<%= request.getContextPath() %>/teacher/students/grades/release" class="generic-form">
