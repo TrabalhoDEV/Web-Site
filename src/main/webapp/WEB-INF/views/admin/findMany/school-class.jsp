@@ -257,7 +257,7 @@
             <% if (!schoolClassMap.isEmpty()) { %>
 
             <table class="grade-table"
-                   style="--cols: 2; grid-template-columns: 1fr 90px">
+                   style="--cols: 2; grid-template-columns: 1fr 120px">
 
                 <thead>
                 <tr>
@@ -277,6 +277,18 @@
 
                     <td class="actions">
                         <div class="btn-action">
+                            <%-- Teachers --%>
+                            <a href="${pageContext.request.contextPath}/admin/school-class/teacher/find-many?classId=<%=schoolClass.getId()%>">
+                                <button title="Ver professores" class="btn-icon btn-details">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                </button>
+                            </a>
+
                             <%-- Modify --%>
                             <a href="${pageContext.request.contextPath}/admin/school-class/update?id=<%= schoolClass.getId()%>">
                                 <button title="Modificar" class="btn-icon btn-edit">

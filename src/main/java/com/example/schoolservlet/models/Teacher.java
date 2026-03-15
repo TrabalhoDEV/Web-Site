@@ -1,5 +1,7 @@
 package com.example.schoolservlet.models;
 
+import java.util.List;
+
 public class Teacher {
 //    Atributes:   
     private int id;
@@ -7,6 +9,7 @@ public class Teacher {
     private String email;
     private String username;
     private String password;
+    private int subjectCount;
 
 //    Construtors:
     public Teacher(int id, String name, String email, String username) {
@@ -45,7 +48,9 @@ public class Teacher {
         return password;
     }
 
-//    Setters:
+    public int getSubjectCount() { return subjectCount; }
+
+    //    Setters:
     public void setId(int id) {
         this.id = id;
     }
@@ -66,6 +71,7 @@ public class Teacher {
         this.password = password;
     }
 
+    public void setSubjectCount(int subjectCount) { this.subjectCount = subjectCount; }
 
     @Override
     public String toString() {
