@@ -14,11 +14,11 @@
     position: relative;
     background: linear-gradient(to left, #9094ff 0%, #5750de 50%, #4361EE 100%);
     border-radius: 1rem;
-    padding: 24px 32px;
+    padding: 48px 64px;
     overflow: hidden;
-    width: 80%;
-    height: 14vh;
-    max-height: 200px;
+    width: 90%;
+    height: 20dvh;
+    max-height: 280px;
     display: flex;
     align-items: center;
     margin: 0 auto;
@@ -241,34 +241,23 @@ dialog::backdrop {
 .modal-card {
     padding: 30px;
     width: 350px;
-}
-
-.modal-cardU { height: 480px; }
-
-.modal-cardD {
-    height: 170px;
     display: flex;
     flex-direction: column;
     gap: 32px;
     align-items: center;
 }
 
-.modal-cardU input, .modal-cardD input {
-    width: 90%;
-    padding: 8px;
-    margin-bottom: 15px;
+.modal-card input {
     background-color: var(--background-color1);
     color: var(--text-color);
     border-radius: var(--medium-radius);
     border: 1px solid var(--border-color);
 }
 
-
 .modal-actions {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-top: 30px;
+    gap: 12px;
     margin-bottom: 0;
 }
 

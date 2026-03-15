@@ -15,7 +15,7 @@
     <title>Liberar Notas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
-    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/img/logo_pequena.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
 <body>
 
@@ -204,7 +204,7 @@
                     <div class="info-card">
                         <p class="info student-name"><strong>Aluno:</strong> <%= OutputFormatService.formatName(ss.getStudent().getName()) %></p>
                         <p class="info student-enrollment"><strong>Matrícula:</strong> <%= ss.getStudent().getEnrollment() %></p>
-                        <p class="info student-subject"><strong>Disciplina:</strong> <%= ss.getSubject().getName() %></p>
+                        <p class="info student-subject"><strong>Disciplina:</strong> <%= OutputFormatService.formatName(ss.getSubject().getName()) %></p>
                         <p class="info student-status"><strong>Status:</strong> <%= ss.getStatus() != null ? ss.getStatus() : "Pendente" %></p>
                     </div>
 
@@ -231,7 +231,7 @@
 
                         <div class="form-group">
                             <label for="obs">Observações:</label>
-                            <textarea id="obs" name="obs" rows="4"><%= ss.getObs() != null ? ss.getObs() : "" %></textarea>
+                            <textarea id="obs" name="obs" rows="4" placeholder="Digite seu comentário sobre o aluno aqui..."><%= ss.getObs() != null ? ss.getObs() : "" %></textarea>
                         </div>
 
                         <div class="form-actions">
