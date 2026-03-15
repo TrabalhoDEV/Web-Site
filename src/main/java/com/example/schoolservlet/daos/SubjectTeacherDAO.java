@@ -21,47 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
-
-    @Override
-    public void create(SubjectTeacher subjectTeacher) throws DataException, ValidationException {
-        InputValidation.validateId(subjectTeacher.getTeacher().getId(), "id_teacher");
-        InputValidation.validateId(subjectTeacher.getSubject().getId(), "id_subject");
-
-        try(Connection conn = PostgreConnection.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(
-                    "INSERT INTO subject_teacher (id_subject, id_teacher) VALUES (?, ?)"
-            )){
-
-            pstmt.setInt(1, subjectTeacher.getSubject().getId());
-            pstmt.setInt(2, subjectTeacher.getTeacher().getId());
-
-            pstmt.executeUpdate();
-        } catch(SQLException sqle){
-            sqle.printStackTrace();
-            throw new DataException("Erro ao criar relação de matéria com professor", sqle);
-        }
-    }
-
-    public void createMany(List<SubjectTeacher> subjectTeachers) throws DataException {
-        String sql = "INSERT INTO subject_teacher (id_subject, id_teacher) VALUES (?, ?)";
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            conn.setAutoCommit(false);
-
-            for (SubjectTeacher st : subjectTeachers) {
-                ps.setInt(1, st.getSubject().getId());
-                ps.setInt(2, st.getTeacher().getId());
-                ps.addBatch();
-            }
-
-            ps.executeBatch();
-            conn.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DataException("Erro ao inserir múltiplos registros de relacionamentos entre matéria e professor");
-        }
-    }
     @Override
     public Map<Integer, SubjectTeacher> findMany(int skip, int take) throws DataException {
         Map<Integer, SubjectTeacher> subjectTeacherMap = new HashMap<>();
@@ -153,6 +112,47 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar subject_teacher pelo id", sqle);
+        }
+    }
+
+    @Override
+    public void create(SubjectTeacher subjectTeacher) throws DataException, ValidationException {
+        InputValidation.validateId(subjectTeacher.getTeacher().getId(), "id_teacher");
+        InputValidation.validateId(subjectTeacher.getSubject().getId(), "id_subject");
+
+        try(Connection conn = PostgreConnection.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "INSERT INTO subject_teacher (id_subject, id_teacher) VALUES (?, ?)"
+            )){
+
+            pstmt.setInt(1, subjectTeacher.getSubject().getId());
+            pstmt.setInt(2, subjectTeacher.getTeacher().getId());
+
+            pstmt.executeUpdate();
+        } catch(SQLException sqle){
+            sqle.printStackTrace();
+            throw new DataException("Erro ao criar relação de matéria com professor", sqle);
+        }
+    }
+
+    public void createMany(List<SubjectTeacher> subjectTeachers) throws DataException {
+        String sql = "INSERT INTO subject_teacher (id_subject, id_teacher) VALUES (?, ?)";
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            conn.setAutoCommit(false);
+
+            for (SubjectTeacher st : subjectTeachers) {
+                ps.setInt(1, st.getSubject().getId());
+                ps.setInt(2, st.getTeacher().getId());
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao inserir múltiplos registros de relacionamentos entre matéria e professor");
         }
     }
 
