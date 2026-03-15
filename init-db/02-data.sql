@@ -69,10 +69,10 @@ VALUES
 -- =========================
 -- SCHOOL CLASS TEACHER
 -- =========================
-INSERT INTO school_class_teacher (id_school_class, id_teacher)
+INSERT INTO school_class_teacher (id_school_class, id_teacher, subject_list)
 VALUES
-    (1, 1),
-    (2, 1);
+    (1, 1, '{1, 2, 3, 4}'),
+    (2, 1, '{1, 2, 3, 4}');
 
 -- =========================
 -- SCHOOL CLASS SUBJECT

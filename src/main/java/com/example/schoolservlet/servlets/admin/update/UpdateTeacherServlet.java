@@ -155,30 +155,6 @@ public class UpdateTeacherServlet extends HttpServlet {
                 currentSchoolClassIds.add(sc.getId());
             }
 
-            Set<Integer> toAddClasses = new HashSet<>(newSchoolClassIds);
-            toAddClasses.removeAll(currentSchoolClassIds);
-
-            Set<Integer> toRemoveClasses = new HashSet<>(currentSchoolClassIds);
-            toRemoveClasses.removeAll(newSchoolClassIds);
-
-            if (!toAddClasses.isEmpty()) {
-                List<SchoolClassTeacher> classTeachersToInsert = new ArrayList<>();
-
-                for (Integer classId : toAddClasses) {
-                    SchoolClass schoolClass = schoolClassDAO.findById(classId);
-
-                    SchoolClassTeacher sct = new SchoolClassTeacher();
-                    sct.setTeacher(teacher);
-                    sct.setSchoolClass(schoolClass);
-                    classTeachersToInsert.add(sct);
-                }
-
-                schoolClassTeacherDAO.createMany(classTeachersToInsert);
-            }
-
-
-            schoolClassTeacherDAO.deleteManyByTeacherAndClasses(teacher.getId(), toRemoveClasses);
-
             try {
                 String assunto = "Edição dos dados do Sistema Escolar";
                 String mensagem = "Olá " + OutputFormatService.formatName(teacher.getName()) + ",<br><br>"
@@ -223,17 +199,9 @@ public class UpdateTeacherServlet extends HttpServlet {
         List<Subject> teacherSubjects =
                 subjectDAO.findByTeacherId(teacherId);
 
-        List<SchoolClass> allSchoolClasses =
-                schoolClassDAO.findAll();
-        List<SchoolClass> teacherSchoolClasses =
-                schoolClassDAO.findByTeacherId(teacherId);
-
         request.setAttribute("teacher", teacher);
         request.setAttribute("subjects", allSubjects);
         request.setAttribute("teacherSubjects", teacherSubjects);
-        request.setAttribute("schoolClasses", allSchoolClasses);
-        request.setAttribute("teacherSchoolClasses",
-                teacherSchoolClasses);
     }
 
     private void loadSafely(HttpServletRequest request, int id) {

@@ -15,7 +15,6 @@
 </head>
 <%
   List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
-  List<SchoolClass> classes = (List<SchoolClass>) request.getAttribute("classes");
 %>
 
 <body>
@@ -219,27 +218,6 @@
                 <div class="checkbox-item">
                   <input type="checkbox" id="subject_<%= subject.getId() %>" name="subjectIds" value="<%= subject.getId() %>">
                   <label for="subject_<%= subject.getId() %>"><%= OutputFormatService.formatName(subject.getName()) %></label>
-                </div>
-                <%
-                    }
-                  }
-                %>
-              </div>
-            </fieldset>
-          </div>
-
-          <!-- Classes Fieldset -->
-          <div class="fieldset-group">
-            <fieldset class="checkbox-fieldset">
-              <legend>Selecione as Turmas:</legend>
-              <div class="checkbox-grid">
-                <%
-                  if (classes != null) {
-                    for (SchoolClass sc : classes) {
-                %>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="class_<%= sc.getId() %>" name="schoolClassIds" value="<%= sc.getId() %>">
-                  <label for="class_<%= sc.getId() %>"><%= OutputFormatService.formatName(sc.getSchoolYear()) %></label>
                 </div>
                 <%
                     }
