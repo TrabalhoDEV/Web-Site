@@ -173,6 +173,38 @@ public class SchoolClassSubjectDAO implements GenericDAO<SchoolClassSubject> {
         }
     }
 
+    public List<Subject> findAvailable(int classId) throws DataException {
+        String sql = """
+            SELECT id, name, deadline FROM subject
+            WHERE id NOT IN (
+                SELECT id_subject FROM school_class_subject
+                WHERE id_school_class = ?
+            )
+            ORDER BY name
+            """;
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, classId);
+            ResultSet rs = stmt.executeQuery();
+
+            List<Subject> list = new ArrayList<>();
+            while (rs.next()) {
+                Subject s = new Subject();
+                s.setId(rs.getInt("id"));
+                s.setName(rs.getString("name"));
+                s.setDeadline(rs.getDate("deadline"));
+                list.add(s);
+            }
+            return list;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao buscar matérias disponíveis.", e);
+        }
+    }
+
     @Override
     public void create(SchoolClassSubject scs) throws DataException, ValidationException {
         InputValidation.validateId(scs.getSchoolClass().getId(), "id da turma");
@@ -195,40 +227,69 @@ public class SchoolClassSubjectDAO implements GenericDAO<SchoolClassSubject> {
         }
     }
 
-    public void createMany(List<SchoolClassSubject> schoolClassSubjects)
-            throws DataException, ValidationException {
+    public void createWithRelations(int classId, int subjectId, String[] teacherIds) throws DataException {
+        String sqlClassSubject   = "INSERT INTO school_class_subject (id_school_class, id_subject) VALUES (?, ?)";
+        String sqlStudentSubject = """
+            INSERT INTO student_subject (id_student, id_subject)
+            SELECT id, ? FROM student
+            WHERE id_school_class = ?
+            ON CONFLICT (id_student, id_subject) DO NOTHING
+            """;
+        String sqlClassTeacher   = "INSERT INTO school_class_teacher (id_school_class, id_teacher) VALUES (?, ?) ON CONFLICT DO NOTHING";
+        String sqlSubjectTeacher = "INSERT INTO subject_teacher (id_subject, id_teacher) VALUES (?, ?) ON CONFLICT DO NOTHING";
 
-        if (schoolClassSubjects == null || schoolClassSubjects.isEmpty()) {
-            throw new ValidationException("Lista de associações não pode ser vazia");
-        }
-
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO school_class_subject (id_school_class, id_subject) VALUES (?, ?)")) {
-
+        Connection conn = null;
+        try {
+            conn = PostgreConnection.getConnection();
             conn.setAutoCommit(false);
 
-            try {
-                for (SchoolClassSubject scs : schoolClassSubjects) {
-                    pstmt.setInt(1, scs.getSchoolClass().getId());
-                    pstmt.setInt(2, scs.getSubject().getId());
-                    pstmt.addBatch();
-                }
-
-                pstmt.executeBatch();
-                conn.commit();
-
-            } catch (SQLException e) {
-                conn.rollback();
-
-                if (e.getSQLState().equals("23505")) {
-                    throw new ValidationException("Uma ou mais matérias já estão associadas a esta turma");
-                }
-                throw e;
+            try (PreparedStatement stmt = conn.prepareStatement(sqlClassSubject)) {
+                stmt.setInt(1, classId);
+                stmt.setInt(2, subjectId);
+                stmt.executeUpdate();
             }
 
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-            throw new DataException("Erro ao associar matérias à turma", sqle);
+            try (PreparedStatement stmt = conn.prepareStatement(sqlStudentSubject)) {
+                stmt.setInt(1, subjectId);
+                stmt.setInt(2, classId);
+                stmt.executeUpdate();
+            }
+
+            if (teacherIds != null && teacherIds.length > 0) {
+                try (PreparedStatement stmtCT = conn.prepareStatement(sqlClassTeacher);
+                     PreparedStatement stmtST = conn.prepareStatement(sqlSubjectTeacher)) {
+
+                    for (String teacherIdStr : teacherIds) {
+                        int teacherId = Integer.parseInt(teacherIdStr);
+
+                        stmtCT.setInt(1, classId);
+                        stmtCT.setInt(2, teacherId);
+                        stmtCT.addBatch();
+
+                        stmtST.setInt(1, subjectId);
+                        stmtST.setInt(2, teacherId);
+                        stmtST.addBatch();
+                    }
+
+                    stmtCT.executeBatch();
+                    stmtST.executeBatch();
+                }
+            }
+
+            conn.commit();
+
+        } catch (SQLException e) {
+            try { if (conn != null) conn.rollback(); } catch (SQLException ignored) {}
+
+            if (e.getSQLState().startsWith("23")) throw new DataException("Essa matéria já está vinculada a esta turma.", e);
+            throw new DataException("Erro ao vincular matéria à turma.", e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException ignored) {}
         }
     }
 

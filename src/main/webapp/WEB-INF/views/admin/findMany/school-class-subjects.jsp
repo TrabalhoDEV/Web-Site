@@ -3,12 +3,15 @@
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
 <%@ page import="java.util.TreeMap" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
     Map<Integer, Subject> subjectMap = new HashMap<>();
     if (request.getAttribute("subjectMap") != null) subjectMap = (Map<Integer, Subject>) request.getAttribute("subjectMap");
     subjectMap = new TreeMap<>(subjectMap);
+
+    List<Subject> availableSubjects = (List<Subject>) request.getAttribute("availableSubjects");
 
     int currentPage = 1;
     if (request.getAttribute("page") != null) currentPage = (Integer) request.getAttribute("page");
@@ -193,7 +196,7 @@
                     </section>
 
                     <div style="display: flex; flex-direction: row; gap: 12px">
-                        <a href="${pageContext.request.contextPath}/admin/school-class/subject/insert" class="secondary-button">Adicionar matéria</a>
+                        <a href="#" onclick="document.getElementById('insertDialog').showModal()" class="secondary-button">Adicionar matéria</a>
                         <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="primary-button">
                             Ver turmas
                         </a>
@@ -279,7 +282,7 @@
 </main>
 
 <dialog id="deleteDialog">
-    <div class="modal-cardD">
+    <div class="modal-card">
         <h3>Deseja deletar esta turma?</h3>
         <p id="deleteText">Essa é uma ação irreversível</p>
 
@@ -287,6 +290,54 @@
             <button class="primary-button" id="confirmDelete">Confirmar</button>
             <button class="secondary-button" id="closeDelete">Cancelar</button>
         </div>
+    </div>
+</dialog>
+
+<dialog id="insertDialog">
+    <div class="modal-card">
+        <h3>Adicionar matéria à turma</h3>
+
+        <form method="post" action="${pageContext.request.contextPath}/admin/school-class/subject/insert">
+            <input type="hidden" name="classId" value="<%= classId %>"/>
+
+            <% if (availableSubjects == null || availableSubjects.isEmpty()) { %>
+            <p>Nenhuma matéria disponível para adicionar.</p>
+            <div class="modal-actions">
+                <button type="button" class="primary-button"
+                        onclick="document.getElementById('insertDialog').close()">
+                    Voltar
+                </button>
+            </div>
+            <% } else { %>
+
+            <div class="form-group">
+                <label for="subjectSelect">Matéria</label>
+                <select name="subjectId" id="subjectSelect">
+                    <option value="">Selecione...</option>
+                    <% for (Subject s : availableSubjects) { %>
+                    <option value="<%= s.getId() %>">
+                        <%= OutputFormatService.formatName(s.getName()) %>
+                    </option>
+                    <% } %>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Professores</label>
+                <div id="teacherList">
+                    <span>Selecione uma matéria primeiro</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="primary-button">Confirmar</button>
+                <button type="button" class="secondary-button"
+                        onclick="document.getElementById('insertDialog').close()">
+                    Cancelar
+                </button>
+            </div>
+            <% } %>
+        </form>
     </div>
 </dialog>
 
@@ -305,6 +356,41 @@
     document.getElementById('confirmDelete').onclick = function () {
         window.location.href = deleteUrl;
     }
+
+    document.getElementById('subjectSelect').addEventListener('change', function () {
+        const subjectId = this.value;
+        const container = document.getElementById('teacherList');
+
+        container.innerHTML = '';
+
+        if (!subjectId) {
+            container.innerHTML = '<span>Selecione uma matéria primeiro</span>';
+            return;
+        }
+
+        fetch('${pageContext.request.contextPath}/admin/subject/teachers?subjectId=' + subjectId)
+            .then(res => res.json())
+            .then(teachers => {
+                if (teachers.length === 0) {
+                    container.innerHTML = '<span>Nenhum professor disponível</span>';
+                    return;
+                }
+
+                teachers.forEach(t => {
+                    const label = document.createElement('label');
+                    label.style.cssText = 'display:flex; align-items:center; gap:6px; padding:4px 0; cursor:pointer';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type  = 'checkbox';
+                    checkbox.name  = 'teacherIds';
+                    checkbox.value = t.id;
+
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(t.name));
+                    container.appendChild(label);
+                });
+            });
+    });
 </script>
 
 </body>
