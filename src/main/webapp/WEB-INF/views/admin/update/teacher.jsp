@@ -338,7 +338,10 @@
     const subjectsBySchoolClass = {
         <%
             boolean firstClass = true;
-            for (SchoolClass schoolClass : schoolClasses) {
+            List<SchoolClass> safeSchoolClasses = (schoolClasses != null)
+                    ? schoolClasses
+                    : java.util.Collections.<SchoolClass>emptyList();
+            for (SchoolClass schoolClass : safeSchoolClasses) {
                 if (!firstClass) {
                     out.print(",");
                 }
