@@ -311,7 +311,7 @@
                     if (request.getAttribute("error") != null) { %>
                     <p style="color: #9b0404; text-align: start; padding: 8px">
                         <%= request.getAttribute("error") %>
-                    </p>clea
+                    </p>
                     <% } else { %>
                         <p class="not-found">Nenhum aluno(a) possui essa matrícula</p>
                     <% } %>
