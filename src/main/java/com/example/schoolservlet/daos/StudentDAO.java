@@ -322,10 +322,11 @@ public class StudentDAO implements GenericDAO<Student>, IStudentDAO {
 
         try (Connection conn = PostgreConnection.getConnection();
             PreparedStatement pstmt = conn.prepareStatement("UPDATE student SET name = ?, " +
-                    "email = ? WHERE id = ?")){
+                    "email = ?, id_school_class = ? WHERE id = ?")){
             pstmt.setString(1, InputNormalizer.normalizeName(student.getName()));
             pstmt.setString(2, InputNormalizer.normalizeEmail(student.getEmail()));
-            pstmt.setInt(3, student.getId());
+            pstmt.setInt(3, student.getIdSchoolClass());
+            pstmt.setInt(4, student.getId());
 
             if (pstmt.executeUpdate() <= 0) throw new NotFoundException("aluno", "matrícula", String.valueOf(student.getId()));
         } catch (SQLException sqle){
