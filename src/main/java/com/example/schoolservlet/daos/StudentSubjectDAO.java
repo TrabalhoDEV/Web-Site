@@ -6,10 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentSubjectDAO;
@@ -759,6 +756,122 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
             sqle.printStackTrace();
             throw new DataException("Erro ao contar matérias do aluno", sqle);
         }
+    }
+
+    /**
+     * Deletes student_subject records for a specific student
+     * restricted to the given set of subject IDs.
+     *
+     * Used during class transfer to remove only the subjects that
+     * are NOT offered in the new class, preserving shared grades.
+     *
+     * DELETE FROM student_subject
+     *  WHERE id_student = ?
+     *    AND id_subject  = ANY(?)
+     *
+     * @param studentId  the student ID
+     * @param subjectIds set of subject IDs to delete
+     * @throws DataException if a database error occurs
+     */
+    public void deleteByStudentAndSubjects(int studentId, Set<Integer> subjectIds) throws DataException {
+        String sql = "DELETE FROM student_subject WHERE id_student = ? AND id_subject = ANY(?)";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+
+            // Convert Set<Integer> → Integer[] → java.sql.Array
+            Integer[] ids = subjectIds.toArray(new Integer[0]);
+            java.sql.Array sqlArray = conn.createArrayOf("integer", ids);
+            ps.setArray(2, sqlArray);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao remover disciplinas do aluno: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Inserts blank student_subject records for a given student
+     * for each subject ID in the provided set.
+     *
+     * Used during class transfer to add only the subjects that are
+     * NEW in the target class (subjects shared with the old class
+     * are skipped — their records already exist with grades).
+     *
+     * INSERT INTO student_subject (id_student, id_subject)
+     * VALUES (?, ?) ON CONFLICT DO NOTHING
+     *
+     * ON CONFLICT DO NOTHING is a safety net: if a record already
+     * exists for any reason, the insert is silently skipped so no
+     * existing grade is overwritten.
+     *
+     * @param studentId  the student ID
+     * @param subjectIds set of subject IDs to insert
+     * @throws DataException if a database error occurs
+     */
+    public void createManyBySubjectIds(int studentId, Set<Integer> subjectIds) throws DataException {
+        String sql = """
+            INSERT INTO student_subject (id_student, id_subject)
+            VALUES (?, ?)
+            ON CONFLICT ON CONSTRAINT uk_student_subject DO NOTHING
+            """;
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (int subjectId : subjectIds) {
+                ps.setInt(1, studentId);
+                ps.setInt(2, subjectId);
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao inserir disciplinas para o aluno: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Returns the set of subject IDs for which the student already
+     * has a student_subject record (with or without grades).
+     *
+     * Used by UpdateStudentServlet.ensureMissingSubjects to calculate
+     * the delta between class subjects and existing student records.
+     *
+     * SELECT id_subject FROM student_subject WHERE id_student = ?
+     *
+     * @param studentId the student ID
+     * @return a Set of subject IDs; empty if no records exist yet
+     * @throws DataException if a database error occurs
+     */
+    public Set<Integer> findSubjectIdsByStudent(int studentId) throws DataException {
+        String sql = "SELECT id_subject FROM student_subject WHERE id_student = ?";
+
+        Set<Integer> subjectIds = new java.util.HashSet<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    subjectIds.add(rs.getInt("id_subject"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao buscar disciplinas do aluno: " + e.getMessage());
+        }
+
+        return subjectIds;
     }
 
     @Override

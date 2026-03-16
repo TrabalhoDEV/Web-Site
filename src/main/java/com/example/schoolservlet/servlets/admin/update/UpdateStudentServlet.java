@@ -2,9 +2,11 @@ package com.example.schoolservlet.servlets.admin.update;
 
 import com.example.schoolservlet.daos.SchoolClassDAO;
 import com.example.schoolservlet.daos.StudentDAO;
+import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.InputNormalizer;
@@ -15,256 +17,328 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Servlet for managing student data updates.
+ * Servlet responsible for updating student data, including
+ * personal fields (name, email, CPF) and school class transfer.
  *
- * Responsibilities:
- * - Load student data for editing (doGet)
- * - Process and persist student data updates (doPost)
+ * Both operations are handled in the same POST:
+ *   - Name and email are always validated and persisted.
+ *   - Missing student_subject records are always reconciled, regardless
+ *     of whether the class changed (covers cases where a subject was added
+ *     to the class after the student was already enrolled).
+ *   - If {@code newClassId} differs from the student's current class,
+ *     a smart subject merge is performed to preserve existing grades:
  *
- * Workflow:
- * 1. GET: Retrieves and displays form pre-filled with student data
- * 2. POST: Validates, updates and persists modified data
+ *   OLD class subjects: {Mat, Port, Hist}
+ *   NEW class subjects: {Mat, Port, Fis}
  *
- * @author School Management System
- * @version 1.0
+ *   ┌──────────────┬─────────────────────────────────────────────────────┐
+ *   │  Situation   │  Action                                             │
+ *   ├──────────────┼─────────────────────────────────────────────────────┤
+ *   │ Mat, Port    │  KEEP   – subject in both classes, grades preserved │
+ *   │ Hist         │  DELETE – not offered in the new class              │
+ *   │ Fis          │  INSERT – new subject, blank grade record           │
+ *   └──────────────┴─────────────────────────────────────────────────────┘
+ *
+ * After any class operation, {@link #ensureMissingSubjects} is always called
+ * to guarantee every subject of the final class has a student_subject row.
+ *
+ * Access: administrators only.
  */
-@WebServlet("/admin/student/update")
+@WebServlet(name = "admin-update-student", value = "/admin/student/update")
 public class UpdateStudentServlet extends HttpServlet {
 
-    private static final Logger logger = Logger.getLogger(UpdateStudentServlet.class.getName());
-    private static final String UPDATE_VIEW = "/WEB-INF/views/admin/update/student.jsp";
-    private static final String STUDENT_LIST_URL = "/admin/student/find-many";
+    private static final Logger       LOGGER        = Logger.getLogger(UpdateStudentServlet.class.getName());
+    private static final String       UPDATE_VIEW   = "/WEB-INF/views/admin/update/student.jsp";
+    private static final String       STUDENT_LIST  = "/admin/student/find-many";
+    private static final SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+
+    // ------------------------------------------------------------------ GET --
 
     /**
-     * Loads student data for display in the update form.
+     * Loads the student and all school classes for the edit form.
      *
-     * Required parameters:
-     * - enrollment: Student enrollment number (will be normalized and validated)
+     * Required query parameter:
+     * - {@code id} – student enrollment (integer)
      *
-     * Request attributes added on success:
-     * - student: Student object containing current student data
-     * - schoolYear: School year of the student's class
-     *
-     * On validation or not found errors:
-     * - "error" attribute is added with descriptive message
-     * - Redirects to student list page
-     *
-     * @param request HTTP request containing "enrollment" parameter
-     * @param response HTTP response for forwarding or redirecting
-     * @throws ServletException If servlet processing error occurs
-     * @throws IOException If input/output error occurs
+     * Attributes forwarded to the view:
+     * - {@code student}       – Student object with current data
+     * - {@code schoolClass}   – student's current SchoolClass
+     * - {@code schoolClasses} – all available SchoolClass options
      */
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        // Validate session:
         if (!AccessValidation.isAdmin(request, response)) return;
 
-        // Get parameters:
-        String enrollmentParam = request.getParameter("id");
+        String idParam = request.getParameter("id");
 
         try {
-            // Validate and normalize enrollment parameter:
-            int enrollment = validateAndNormalizeEnrollment(enrollmentParam);
-
-            // Load student and school year data:
-            StudentData studentData = loadStudentData(enrollment);
-
-            // Forward student and school year data to the JSP form:
-            request.setAttribute("student", studentData.getStudent());
-            request.setAttribute("schoolYear", studentData.getSchoolYear());
+            int studentId = parseStudentId(idParam);
+            loadFormData(request, studentId);
             request.getRequestDispatcher(UPDATE_VIEW).forward(request, response);
 
         } catch (ValidationException | NotFoundException | DataException e) {
-            if(session == null) session = request.getSession();
-
-            // Log error and redirect to student list:
-            logger.log(Level.WARNING, "Error loading student data: " + e.getMessage());
-            session.setAttribute("error", e.getMessage());
-            response.sendRedirect(request.getContextPath() + STUDENT_LIST_URL);
+            LOGGER.log(Level.WARNING, "Error loading student for update: " + e.getMessage());
+            redirectWithError(request, response, e.getMessage());
         }
     }
 
+    // ----------------------------------------------------------------- POST --
+
     /**
-     * Processes student data update request.
+     * Processes the full student update: personal data + optional class transfer
+     * + subject reconciliation.
      *
      * Required form parameters:
-     * - enrollment: Student enrollment number (unique identifier, read-only)
-     * - name: Student full name (editable)
-     * - email: Student email address (editable)
-     * - cpf: Student CPF number (validation, read-only)
+     * - {@code enrollment} – student ID (read-only identifier)
+     * - {@code name}       – student full name
+     * - {@code email}      – student e-mail address
+     * - {@code cpf}        – student CPF (validated for integrity, not re-persisted)
+     * - {@code newClassId} – target school class ID (may equal the current class)
      *
-     * Validations performed:
-     * - Enrollment is normalized according to system standards
-     * - Name and email are validated according to business rules
-     * - CPF is validated to ensure data integrity
+     * Flow:
+     * 1. Parse and validate all parameters.
+     * 2. Apply name and email changes to the student object.
+     * 3. If {@code newClassId} differs from the current class, run the
+     *    smart subject merge and update {@code id_school_class}.
+     * 4. Reconcile any missing student_subject rows for the final class.
+     * 5. Persist the student with a single {@code studentDAO.update()} call.
      *
-     * Success flow:
-     * - All parameters are validated
-     * - Student data is updated in the database
-     * - User is redirected to student list page
-     *
-     * Error flow:
-     * - Error message is displayed on the form
-     * - Form is reloaded with current data and error message
-     * - If error loading data, redirects to list with generic message
-     *
-     * @param request HTTP request containing form parameters
-     * @param response HTTP response for redirecting or forwarding
-     * @throws ServletException If servlet processing error occurs
-     * @throws IOException If input/output error occurs
+     * On success  → redirects to the student list.
+     * On failure  → reloads the form with an error message.
      */
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Validate session:
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         if (!AccessValidation.isAdmin(request, response)) return;
 
-        // Get form parameters:
         String enrollmentParam = request.getParameter("enrollment");
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String cpf = request.getParameter("cpf");
-
-        if (name != null) {
-            name = InputNormalizer.normalizeName(name);
-        }
-        if (email != null) {
-            email =InputNormalizer.normalizeEmail(email);
-        }
-        if (cpf != null) {
-            cpf = InputNormalizer.normalizeCpf(cpf);
-        }
+        String name            = request.getParameter("name");
+        String email           = request.getParameter("email");
+        String cpf             = request.getParameter("cpf");
+        String newClassParam   = request.getParameter("newClassId");
 
         try {
-            // Validate all parameters:
-            enrollmentParam = String.valueOf(Integer.parseInt(enrollmentParam));
-            int enrollment = validateAndNormalizeEnrollment(enrollmentParam);
-            validateStudentFields(name, email, cpf);
+            // ---- parse & validate -------------------------------------------
+            int studentId  = parseStudentId(enrollmentParam);
+            int newClassId = parseClassId(newClassParam);
 
-            // Load student and update editable fields:
-            Student student = new StudentDAO().findById(enrollment);
+            name  = InputNormalizer.normalizeName(name);
+            email = InputNormalizer.normalizeEmail(email);
+            cpf   = InputNormalizer.normalizeCpf(cpf);
+
+            InputValidation.validateStudentName(name);
+            InputValidation.validateEmail(email);
+            InputValidation.validateCpf(cpf);
+
+            // ---- load student -----------------------------------------------
+            StudentDAO studentDAO = new StudentDAO();
+            Student student = studentDAO.findById(studentId);
+
+            // ---- apply personal field changes --------------------------------
             student.setName(name);
             student.setEmail(email);
 
-            // Persist updated student data to database:
-            new StudentDAO().update(student);
+            // ---- class transfer (only when the class actually changed) -------
+            if (student.getIdSchoolClass() != newClassId) {
+                System.out.println(student);
+                SchoolClass newClass = schoolClassDAO.findById(newClassId);
+                mergeStudentSubjects(student, newClass);
+                student.setIdSchoolClass(newClassId);
 
-            // Log successful update:
-            logger.log(Level.INFO, "Student updated successfully - Enrollment: " + enrollment);
+                LOGGER.log(Level.INFO,
+                        "Student id={0} transferred to class id={1}",
+                        new Object[]{ studentId, newClassId });
+            }
 
-            // Redirect to student list page on successful update:
-            response.sendRedirect(request.getContextPath() + STUDENT_LIST_URL);
+            // ---- reconcile: insert any subject still missing for the final class
+            // This covers: no class change + subject added to the class later,
+            // or any gap left after a merge.
+            ensureMissingSubjects(student.getId(), student.getIdSchoolClass());
+
+            // ---- persist everything in one shot ------------------------------
+            studentDAO.update(student);
+
+            LOGGER.log(Level.INFO, "Student id={0} updated successfully", studentId);
+            response.sendRedirect(request.getContextPath() + STUDENT_LIST);
 
         } catch (ValidationException | NotFoundException | DataException e) {
-            // Log error:
-            logger.log(Level.WARNING, "Error updating student: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "Error updating student: " + e.getMessage());
+            handlePostError(request, response, enrollmentParam, e.getMessage());
+        }
+    }
 
-            // Handle validation and data access errors by reloading form:
-            handleUpdateError(request, response, enrollmentParam, e.getMessage());
+    // --------------------------------------------------------------- helpers --
+
+    /**
+     * Performs a smart merge of student_subject records when a student
+     * is transferred to a different class:
+     *
+     * <ul>
+     *   <li><b>old ∩ new</b> → grades kept, no action.</li>
+     *   <li><b>old − new</b> → records deleted (subject no longer offered).</li>
+     *   <li><b>new − old</b> → blank records inserted (new subjects, no grades yet).</li>
+     * </ul>
+     *
+     * Note: after this method returns, {@link #ensureMissingSubjects} is still
+     * called by the caller as a safety net for any remaining gaps.
+     *
+     * @param student  student being transferred (still holds the old class ID)
+     * @param newClass target school class
+     * @throws DataException if any database operation fails
+     */
+    private void mergeStudentSubjects(Student student, SchoolClass newClass) throws DataException {
+
+        StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
+
+        Set<Integer> oldSubjects = schoolClassDAO.findSubjectIdsByClass(student.getIdSchoolClass());
+        Set<Integer> newSubjects = schoolClassDAO.findSubjectIdsByClass(newClass.getId());
+
+        // subjects exclusive to the old class → delete
+        Set<Integer> toDelete = new HashSet<>(oldSubjects);
+        toDelete.removeAll(newSubjects);
+        if (!toDelete.isEmpty()) {
+            studentSubjectDAO.deleteByStudentAndSubjects(student.getId(), toDelete);
+        }
+
+        // subjects exclusive to the new class → insert blank records
+        Set<Integer> toInsert = new HashSet<>(newSubjects);
+        toInsert.removeAll(oldSubjects);
+        if (!toInsert.isEmpty()) {
+            studentSubjectDAO.createManyBySubjectIds(student.getId(), toInsert);
         }
     }
 
     /**
-     * Validates and normalizes the enrollment parameter.
+     * Ensures every subject of a given class has a corresponding
+     * {@code student_subject} row for the student.
      *
-     * @param enrollmentParam The raw enrollment parameter from request
-     * @return Normalized enrollment number
-     * @throws ValidationException If enrollment is invalid
+     * This handles two scenarios:
+     * <ol>
+     *   <li>The student's class did not change, but a new subject was added
+     *       to the class after the student was enrolled.</li>
+     *   <li>A gap remained after {@link #mergeStudentSubjects} (defensive).</li>
+     * </ol>
+     *
+     * Implementation relies on {@code ON CONFLICT DO NOTHING} inside
+     * {@code StudentSubjectDAO.createManyBySubjectIds}, so existing records
+     * (with or without grades) are never overwritten.
+     *
+     * @param studentId     the student whose records need reconciliation
+     * @param classId       the class whose subjects are the reference
+     * @throws DataException if any database operation fails
      */
-    private int validateAndNormalizeEnrollment(String enrollmentParam) throws ValidationException {
-        int enrollment = InputNormalizer.normalizeEnrollment(enrollmentParam);
-        InputValidation.validateEnrollment(String.format("%06d", enrollment));
-        return enrollment;
+    private void ensureMissingSubjects(int studentId, int classId) throws DataException {
+
+        StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
+
+        // All subjects the class currently offers
+        Set<Integer> classSubjects = schoolClassDAO.findSubjectIdsByClass(classId);
+
+        // Subjects the student already has a record for
+        Set<Integer> existingSubjects = studentSubjectDAO.findSubjectIdsByStudent(studentId);
+
+        // Only the delta: class subjects the student does not yet have
+        Set<Integer> missing = new HashSet<>(classSubjects);
+        missing.removeAll(existingSubjects);
+
+        if (!missing.isEmpty()) {
+            LOGGER.log(Level.INFO,
+                    "Student id={0}: inserting {1} missing subject record(s)",
+                    new Object[]{ studentId, missing.size() });
+            studentSubjectDAO.createManyBySubjectIds(studentId, missing);
+        }
     }
 
     /**
-     * Validates all student fields.
+     * Populates request attributes needed to render the edit form.
      *
-     * @param name Student name
-     * @param email Student email
-     * @param cpf Student CPF
-     * @throws ValidationException If any field is invalid
+     * @param request   HTTP request to populate
+     * @param studentId student enrollment ID
+     * @throws NotFoundException   if the student or current class is not found
+     * @throws DataException       if a database error occurs
+     * @throws ValidationException if the ID is invalid
      */
-    private void validateStudentFields(String name, String email, String cpf) throws ValidationException {
-        InputValidation.validateStudentName(name);
-        InputValidation.validateEmail(email);
-        InputValidation.validateCpf(cpf);
+    private void loadFormData(HttpServletRequest request, int studentId)
+            throws NotFoundException, DataException, ValidationException {
+
+        Student           student      = new StudentDAO().findById(studentId);
+        SchoolClass       currentClass = schoolClassDAO.findById(student.getIdSchoolClass());
+        List<SchoolClass> allClasses   = schoolClassDAO.findAll();
+
+        request.setAttribute("student",       student);
+        request.setAttribute("schoolClass",   currentClass);
+        request.setAttribute("schoolClasses", allClasses);
     }
 
     /**
-     * Loads student and school year data from database.
-     *
-     * @param enrollment Student enrollment number
-     * @return StudentData containing student object and school year
-     * @throws NotFoundException If student or school class not found
-     * @throws DataException If database error occurs
+     * Reloads the edit form with an error message after a failed POST.
+     * Falls back to a session-based redirect if form data cannot be reloaded.
      */
-    private StudentData loadStudentData(int enrollment) throws NotFoundException, DataException, ValidationException {
-        Student student = new StudentDAO().findById(enrollment);
-        String schoolYear = new SchoolClassDAO().findById(student.getIdSchoolClass()).getSchoolYear();
-        return new StudentData(student, schoolYear);
-    }
-
-    /**
-     * Handles errors during student update by reloading the form with error message.
-     * If data reload fails, redirects to student list page.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @param enrollmentParam The enrollment parameter
-     * @param errorMessage The error message to display
-     * @throws ServletException If request dispatcher error occurs
-     * @throws IOException If I/O error occurs
-     */
-    private void handleUpdateError(HttpServletRequest request, HttpServletResponse response,
-                                   String enrollmentParam, String errorMessage) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-
+    private void handlePostError(HttpServletRequest request, HttpServletResponse response,
+                                 String enrollmentParam, String errorMessage)
+            throws ServletException, IOException {
         try {
-            // Attempt to reload student data for form re-population:
-            int enrollment = validateAndNormalizeEnrollment(enrollmentParam);
-            StudentData studentData = loadStudentData(enrollment);
-
-            request.setAttribute("student", studentData.getStudent());
-            request.setAttribute("schoolYear", studentData.getSchoolYear());
+            int studentId = parseStudentId(enrollmentParam);
+            loadFormData(request, studentId);
             request.setAttribute("error", errorMessage);
-
-            // Forward back to update form with error message:
             request.getRequestDispatcher(UPDATE_VIEW).forward(request, response);
 
-        } catch (NotFoundException | DataException | ValidationException e) {
-            if (session == null) session = request.getSession();
-
-            // If unable to reload student data, redirect to list:
-            logger.log(Level.WARNING, "Error reloading student data during error handling", e);
-            session.setAttribute("error", "Não foi possível atualizar o aluno");
-            response.sendRedirect(request.getContextPath() + STUDENT_LIST_URL);
+        } catch (ValidationException | NotFoundException | DataException e) {
+            LOGGER.log(Level.WARNING, "Error reloading form during error handling", e);
+            redirectWithError(request, response, "Não foi possível atualizar o aluno.");
         }
     }
 
     /**
-     * Inner class to encapsulate student and school year data.
+     * Parses and validates a student ID parameter.
+     *
+     * @param param raw string from the request
+     * @return validated ID as int
+     * @throws ValidationException if the value is null, blank or not a positive integer
      */
-    private static class StudentData {
-        private final Student student;
-        private final String schoolYear;
-
-        public StudentData(Student student, String schoolYear) {
-            this.student = student;
-            this.schoolYear = schoolYear;
+    private int parseStudentId(String param) throws ValidationException {
+        try {
+            int id = Integer.parseInt(param.trim());
+            InputValidation.validateId(id, "id do aluno");
+            return id;
+        } catch (NumberFormatException e) {
+            throw new ValidationException("ID do aluno precisa ser um valor numérico inteiro.");
         }
+    }
 
-        public Student getStudent() {
-            return student;
+    /**
+     * Parses and validates a school class ID parameter.
+     *
+     * @param param raw string from the request
+     * @return validated ID as int
+     * @throws ValidationException if the value is null, blank or not a positive integer
+     */
+    private int parseClassId(String param) throws ValidationException {
+        try {
+            int id = Integer.parseInt(param.trim());
+            InputValidation.validateId(id, "id da turma");
+            return id;
+        } catch (NumberFormatException e) {
+            throw new ValidationException("ID da turma precisa ser um valor numérico inteiro.");
         }
+    }
 
-        public String getSchoolYear() {
-            return schoolYear;
-        }
+    /** Stores an error message in the session and redirects to the student list. */
+    private void redirectWithError(HttpServletRequest request, HttpServletResponse response,
+                                   String message) throws IOException {
+        HttpSession session = request.getSession();
+        session.setAttribute("error", message);
+        response.sendRedirect(request.getContextPath() + STUDENT_LIST);
     }
 }
