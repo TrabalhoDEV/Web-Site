@@ -345,29 +345,32 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         if (teacherId != null) {
             InputValidation.validateId(teacherId, "id do professor");
             try (Connection conn = PostgreConnection.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(
-                         "SELECT \n" +
-                                 "    ss.id, ss.obs, ss.grade1, ss.grade2,\n" +
-                                 "    st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email,\n" +
-                                 "    sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline\n" +
-                                 "FROM student st\n" +
-                                 "JOIN school_class sc ON sc.id = st.id_school_class\n" +
-                                 "JOIN student_subject ss ON ss.id_student = st.id\n" +
-                                 "JOIN school_class_subject scs \n" +
-                                 "    ON scs.id_school_class = sc.id \n" +
-                                 "    AND scs.id_subject = ss.id_subject\n" +
-                                 "JOIN subject sb ON sb.id = ss.id_subject\n" +
-                                 "JOIN subject_teacher stc ON stc.id_subject = sb.id\n" +
-                                 "JOIN teacher t ON t.id = stc.id_teacher\n" +
-                                 "WHERE st.id = ?\n" +
-                                 "AND t.id = ?\n" +
-                                 "ORDER BY ss.id\n" +
-                                 "LIMIT ? OFFSET ?;")) {
+                 PreparedStatement pstmt = conn.prepareStatement("""
+                         SELECT
+                             ss.id, ss.obs, ss.grade1, ss.grade2,
+                             st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email,
+                             sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline
+                         FROM student st
+                         JOIN school_class sc ON sc.id = st.id_school_class
+                         JOIN student_subject ss ON ss.id_student = st.id
+                         JOIN subject sb ON sb.id = ss.id_subject
+                         WHERE st.id = ?
+                         AND st.status = ?
+                         AND EXISTS (
+                             SELECT 1 FROM school_class_teacher sct
+                             WHERE sct.id_school_class = sc.id
+                             AND sct.id_teacher = ?
+                             AND ss.id_subject = ANY(sct.subject_list)
+                         )
+                         ORDER BY ss.id
+                         LIMIT ? OFFSET ?
+                         """)) {
 
                 pstmt.setInt(1, studentId);
-                pstmt.setInt(2, teacherId);
-                pstmt.setInt(3, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
-                pstmt.setInt(4, skip < 0 ? 0 : skip);
+                pstmt.setInt(2, StudentStatusEnum.ACTIVE.ordinal() + 1);
+                pstmt.setInt(3, teacherId);
+                pstmt.setInt(4, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+                pstmt.setInt(5, skip < 0 ? 0 : skip);
 
                 ResultSet rs = pstmt.executeQuery();
                 while (rs.next()) {
@@ -454,7 +457,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
     }
 
     @Override
-    public StudentSubject findById ( int id) throws NotFoundException, DataException, ValidationException {
+    public StudentSubject findById(int id) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId(id, "id");
 
         try (Connection conn = PostgreConnection.getConnection();
