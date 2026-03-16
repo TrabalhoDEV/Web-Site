@@ -125,6 +125,8 @@ Após iniciar o servidor, abra no navegador:
 http://localhost:8080
 ```
 
+Para ter acesso é necessário acessar o esqueci minha senha, pois o dataload povoa com senhas não hasheadas.
+
 ------------------------------------------------------------------------
 
 # 👩‍💻 Autores
