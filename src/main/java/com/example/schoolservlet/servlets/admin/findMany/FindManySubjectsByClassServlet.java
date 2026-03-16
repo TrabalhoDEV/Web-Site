@@ -44,7 +44,6 @@ public class FindManySubjectsByClassServlet extends HttpServlet {
             session.removeAttribute("error");
         }
 
-        // Valida o id da turma
         if (classIdParam == null || classIdParam.isBlank()) {
             response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
             return;
@@ -76,9 +75,9 @@ public class FindManySubjectsByClassServlet extends HttpServlet {
             List<Subject> availableSubjects = schoolClassSubjectDAO.findAvailable(schoolClassId);
             request.setAttribute("availableSubjects", availableSubjects);
 
-            request.setAttribute("subjectMap",    subjectMap);
-            request.setAttribute("page",          page);
-            request.setAttribute("totalPages",    totalPages);
+            request.setAttribute("subjectMap", subjectMap);
+            request.setAttribute("page", page);
+            request.setAttribute("totalPages", totalPages);
             request.setAttribute("schoolClassId", schoolClassId);
 
         } catch (DataException de) {
