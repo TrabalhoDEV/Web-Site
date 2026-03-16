@@ -16,7 +16,6 @@
 
     int totalPages = (Integer) request.getAttribute("totalPages");
     int currentPage = (Integer) request.getAttribute("page");
-
     String enrollment = request.getAttribute("enrollment") != null ? (String) request.getAttribute("enrollment") : "";
 %>
 

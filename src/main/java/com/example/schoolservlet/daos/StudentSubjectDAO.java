@@ -182,6 +182,38 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
             throw new DataException("Erro ao contar relações do professor", sqle);
         }
     }
+
+    public int countByStudentIdAndTeacherId(int studentId, int teacherId) throws DataException, ValidationException {
+        InputValidation.validateId(studentId, "id do aluno");
+        InputValidation.validateId(teacherId, "id do professor");
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("""
+                SELECT COUNT(ss.id)
+                FROM student st
+                JOIN school_class sc ON sc.id = st.id_school_class
+                JOIN student_subject ss ON ss.id_student = st.id
+                JOIN school_class_subject scs\s
+                    ON scs.id_school_class = sc.id\s
+                    AND scs.id_subject = ss.id_subject
+                JOIN subject sb ON sb.id = ss.id_subject
+                JOIN subject_teacher stc ON stc.id_subject = sb.id
+                JOIN teacher t ON t.id = stc.id_teacher
+                WHERE st.id = ?
+                AND t.id = ?
+                 """)) {
+
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, teacherId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) return rs.getInt(1);
+            return 0;
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar relações do professor", sqle);
+        }
+    }
+
     @Override
     public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
@@ -463,7 +495,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                         subject
                 );
             } else throw new NotFoundException("student_subject", "id", String.valueOf(id));
-        } catch (SQLException | NotFoundException sqle) {
+        } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar relação entre aluno e matéria", sqle);
         }
