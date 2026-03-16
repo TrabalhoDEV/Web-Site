@@ -90,7 +90,7 @@ public class FindManyStudentsServlet extends HttpServlet {
                 request.setAttribute("studentSubjectMap", new HashMap<>());
                 request.setAttribute("page", 1);
                 request.setAttribute("totalPages", 1);
-                request.getRequestDispatcher(responsePath).forward(request, response);
+                ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), responsePath);
                 return;
             }
         }

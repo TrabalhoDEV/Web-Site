@@ -246,11 +246,6 @@
                 </div>
 
                 <hr>
-                <%if (request.getAttribute("error") != null) { %>tr>
-                    <p style="color: #9b0404; text-align: start; padding: 8px">
-                        <%= request.getAttribute("error") %>
-                    </p>
-                <% } %>
 
                 <% if (!studentSubjectMap.isEmpty()) { %>
                 <table class="grade-table" style="--cols: 8; grid-template-columns:
@@ -312,8 +307,14 @@
                     </tbody>
                 </table>
 
-                <% } else if (enrollment != null && !enrollment.trim().isEmpty()) {%>
-                <p class="not-found">Nenhum aluno(a) possui essa matrícula</p>
+                <% } else if (enrollment != null && !enrollment.trim().isEmpty()) {
+                    if (request.getAttribute("error") != null) { %>
+                    <p style="color: #9b0404; text-align: start; padding: 8px">
+                        <%= request.getAttribute("error") %>
+                    </p>clea
+                    <% } else { %>
+                        <p class="not-found">Nenhum aluno(a) possui essa matrícula</p>
+                    <% } %>
                 <% } else if (request.getAttribute("error") == null){%>
                 <p class="not-found">Você ainda não possui alunos</p>
                 <%}%>
