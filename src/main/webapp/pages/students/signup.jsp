@@ -14,8 +14,6 @@
     <p>Sua matrícula é ${student.getEnrollment()}</p>
 
     <form action="${pageContext.request.contextPath}/student/register" method="post">
-        <input hidden type="text" id="cpf" name="cpf" value="${student.cpf}">
-
         <div class="input-group">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
