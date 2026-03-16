@@ -64,6 +64,6 @@ public class PaginationUtilities {
         }
         int totalPages = (int) Math.ceil((double) totalSubjects / maxTake);
         LOGGER.log(Level.FINE, "Total subjects: " + totalSubjects + ", Max take: " + maxTake + ", Total pages calculated: " + totalPages);
-        return totalPages -1;
+        return totalPages;
     }
 }

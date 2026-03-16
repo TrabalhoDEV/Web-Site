@@ -1,5 +1,8 @@
 <%@ page import="com.example.schoolservlet.models.Student" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
+<%@ page import="com.example.schoolservlet.models.SchoolClass" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 
@@ -18,18 +21,10 @@
     Student student = (Student) request.getAttribute("student");
     String errorMessage = (String) request.getAttribute("error");
     boolean hasError = errorMessage != null && !errorMessage.trim().isEmpty();
-    String schoolYear = (String) request.getAttribute("schoolYear");
 
-    // Verify that student object exists before rendering form
-    if (student == null) {
-%>
-<div class="error-message">
-    <strong>Error:</strong> Student data could not be loaded. Please try again.
-</div>
-<a href="${pageContext.request.contextPath}/admin/student/find-many">Back to Student List</a>
-<%
-        return;
-    }
+    SchoolClass schoolClass = (SchoolClass) request.getAttribute("schoolClass");
+    List<SchoolClass> schoolClasses = new ArrayList<>();
+    if (request.getAttribute("schoolClasses") != null) schoolClasses = (List<SchoolClass>) request.getAttribute("schoolClasses");
 %>
 
 <!-- SIDEBAR -->
@@ -248,9 +243,10 @@
             <!-- Student update form: POST to update servlet -->
             <form method="post" action="${pageContext.request.contextPath}/admin/student/update" class="generic-form">
                 <!-- Enrollment field (read-only identifier) -->
+                <input type="hidden" name="enrollment" value="<%= student.getId() %>"/>
                 <div class="form-group">
-                    <label for="enrollment">Enrollment</label>
-                    <input type="text" id="enrollment" name="enrollment"
+                    <label for="enrollment">Matrícula</label>
+                    <input type="text" id="enrollment"
                            value="<%= String.format("%06d", student.getId()) %>" readonly/>
                 </div>
 
@@ -273,6 +269,26 @@
                     <label for="cpf">CPF</label>
                     <input type="text" id="cpf" name="cpf"
                            value="<%= student.getCpf() != null ? OutputFormatService.formatCpf(student.getCpf()) : "" %>" readonly/>
+                </div>
+
+                <!-- School class dropdown
+                     - Current class comes first with its real id as value (selected)
+                     - Other classes are filtered by id so there is no duplicate
+                     - value="" is never submitted, avoiding parseClassId ValidationException -->
+                <div class="form-group">
+                    <label for="newClassId">Ano Escolar</label>
+                    <select id="newClassId" name="newClassId" required>
+                        <option value="<%= schoolClass.getId() %>" selected>
+                            <%= OutputFormatService.formatName(schoolClass.getSchoolYear()) %>
+                        </option>
+                        <% for (SchoolClass sc : schoolClasses) { %>
+                        <% if (sc.getId() != schoolClass.getId()) { %>
+                        <option value="<%= sc.getId() %>">
+                            <%= OutputFormatService.formatName(sc.getSchoolYear()) %>
+                        </option>
+                        <% } %>
+                        <% } %>
+                    </select>
                 </div>
 
                 <%if (hasError) {%>

@@ -9,10 +9,7 @@ import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SchoolClassDAO implements GenericDAO<SchoolClass> {
 
@@ -242,6 +239,39 @@ public class SchoolClassDAO implements GenericDAO<SchoolClass> {
         }
 
         return ids;
+    }
+
+    /**
+     * Returns the set of subject IDs linked to a given school class.
+     *
+     * SELECT id_subject FROM school_class_subject WHERE id_school_class = ?
+     *
+     * @param classId the school class ID
+     * @return a Set of subject IDs; empty if the class has no subjects
+     * @throws DataException if a database error occurs
+     */
+    public Set<Integer> findSubjectIdsByClass(int classId) throws DataException {
+        String sql = "SELECT id_subject FROM school_class_subject WHERE id_school_class = ?";
+
+        Set<Integer> subjectIds = new java.util.HashSet<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, classId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    subjectIds.add(rs.getInt("id_subject"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao buscar disciplinas da turma: " + e.getMessage());
+        }
+
+        return subjectIds;
     }
 
     @Override
