@@ -87,6 +87,9 @@ public class FindManyStudentsServlet extends HttpServlet {
                 InputValidation.validateEnrollment(enrollmentFilter);
                 id = InputNormalizer.normalizeEnrollment(enrollmentFilter);
             } catch (ValidationException e){
+                request.setAttribute("studentSubjectMap", new HashMap<>());
+                request.setAttribute("page", 1);
+                request.setAttribute("totalPages", 1);
                 ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), responsePath);
                 return;
             }
