@@ -117,7 +117,7 @@ public class FindManyStudentsServlet extends HttpServlet {
                 page = Math.max(1, Math.min(page, totalPages));
 
                 skip = take * (page - 1);
-                studentSubjectMap = studentSubjectDAO.findManyByStudentId(skip, take, id);
+                studentSubjectMap = studentSubjectDAO.findManyByStudentId(skip, take, id, teacher.getId());
             } else {
                 count = studentSubjectDAO.countByTeacherId(teacher.getId());
                 totalPages = Math.max(1, (int)Math.ceil((double) count / Constants.MAX_TAKE));
