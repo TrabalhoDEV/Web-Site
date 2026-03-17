@@ -53,9 +53,6 @@ public class GenerateBulletinPdfServlet extends HttpServlet {
             Student student = studentDAO.findById(user.id());
             SchoolClass schoolClass = schoolClassDAO.findById(student.getIdSchoolClass());
 
-            System.out.println(take);
-            System.out.println(student);
-
             GenerateBulletinPdf.generatePDF(request, response, student, studentSubjectsMap.get(user.id()), schoolClass);
         } catch (ValidationException | NotFoundException | DataException e){
             ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), "/WEB-INF/views/student/bulletin.jsp");
