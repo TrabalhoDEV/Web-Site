@@ -11,7 +11,7 @@
 }
 
 .boletim-grid{
-    background-color: var(--surface-color);
+    background-color: var(--surface-color)!important;
     border-radius: var(--medium-radius);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     padding: 24px 32px;
@@ -30,7 +30,7 @@
 
 .btn-add{
     font-size: var(--text-sm) ;
-    background: #4c63ff;
+    background: var(--primary-color);
     color: white;
     border: none;
     padding: 15px 35px;
@@ -41,7 +41,7 @@
 
 td button{
     font-size: var(--text-sm) ;
-    background: #4c63ff;
+    background: var(--primary-color);
     color: white;
     border: none;
     width: 110px;
@@ -62,7 +62,7 @@ td button{
 
 .grade-table th{
     text-align: left;
-    color: #8b97b3;
+    color: var(--muted-text-color);
     font-weight: 600;
     padding-top: 30px;
     padding-bottom: 15px;
@@ -71,7 +71,7 @@ td button{
 .grade-table td{
     width: 20%;
     padding: 20px 0px;
-    border-top: 1px solid #eef1f6;
+    border-top: 1px solid var(--border-color);
     padding-bottom: 30px;
 }
 .status{
@@ -82,21 +82,21 @@ td button{
 }
 
 .approved{
-    color:#10b981;
-    background:#e7f8f1;
-    border:1px solid #10b981;
+    color:var(--green-secondary-color);
+    background: var(--background-color1);
+    border:1px solid var(--green-secondary-color);
 }
 
 .reproved{
-    color:#ff0066;
-    background:#ffe6ef;
-    border:1px solid #ff0066;
+    color: var(--red-secondary-color);
+    background:var(--background-color1);
+    border:1px solid var(--red-secondary-color);
 }
 
 .pending{
-    color:#8b97b3;
-    background:#eef1f6;
-    border:1px solid #cfd6e6;
+    color: var(--muted-text-color);
+    background: var(--background-color1);
+    border:1px solid var(--border-color);
 }
 
 dialog {
@@ -104,7 +104,7 @@ dialog {
     border-radius: 12px;
     padding: 0px;
     border-radius: var(--medium-radius);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color)!important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
@@ -131,7 +131,7 @@ dialog {
     padding: 8px;
     margin-bottom: 15px;
     border-radius: var(--medium-radius);
-    border: 1px solid rgb(201, 201, 201);
+    border: 1px solid var(--border-color);
 }
 
 input, select {
@@ -142,7 +142,7 @@ input, select {
     width: 100%;
     padding:8px;
     border-radius:8px;
-    border:1px solid #dfe3ea;
+    border:1px solid var(--border-color)!important;
     font-size:13px;
     min-width: 250px;
 }
@@ -159,7 +159,7 @@ select{
     padding: 8px;
     margin-bottom: 15px;
     border-radius: var(--medium-radius);
-    border: 1px solid rgb(201, 201, 201);
+    border: 1px solid var(--border-color);
 }
 .modal-cardD input {
     width: 90%;
@@ -177,7 +177,7 @@ select{
 
 .modal-actions button{
     font-size: var(--text-sm) ;
-    background: #4c63ff;
+    background: var(--primary-color);
     color: white;
     border: none;
     width: 110px;
@@ -207,7 +207,7 @@ select{
 .form-group label {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--text-color);
+    color: var(--text-color)!important;
     line-height: 1.4;
     margin-bottom: 4px;
 }
@@ -216,30 +216,30 @@ select{
 .form-group select {
     padding: 10px 14px;
     font-size: var(--text-sm);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color)!important;
     border-radius: var(--medium-radius);
-    background-color: #ffffff;
-    color: var(--text-color);
+    background-color: var(--surface-color) !important;
+    color: var(--text-color)!important;
     transition: all 0.2s ease;
     font-family: inherit;
 }
 
 .form-group input::placeholder {
-    color: #a0aec0;
+    color: var(--muted-text-color)!important;
     opacity: 1;
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #4c63ff;
+    border-color: var(--border-color);
     box-shadow: 0 0 0 3px rgba(76, 99, 255, 0.1);
-    background-color: #ffffff;
+    background-color: var(--surface-color);
 }
 
 .form-group input:hover,
 .form-group select:hover {
-    border-color: #cbd5e1;
+    border-color: var(--border-color);
 }
 
 .form-group select {
@@ -253,12 +253,12 @@ select{
 
 .form-group select option {
     padding: 8px;
-    color: var(--text-color);
-    background-color: #ffffff;
+    color: var(--text-color)!important;
+    background-color: var(--surface-color)!important;
 }
 
 .form-group select option:disabled {
-    color: #a0aec0;
+    color: var(--muted-text-color);
 }
 
 /* ===== FORM ACTIONS ===== */
@@ -274,7 +274,7 @@ select{
     font-size: var(--text-sm);
     font-weight: 600;
     color: white;
-    background-color: #4c63ff;
+    background-color: var(--primary-color);
     border: none;
     border-radius: var(--medium-radius);
     cursor: pointer;
@@ -284,7 +284,7 @@ select{
 }
 
 .btn-submit:hover {
-    background-color: #3f52e6;
+    background-color: var(--button-hover-color);
     box-shadow: 0 4px 12px rgba(76, 99, 255, 0.3);
 }
 
@@ -302,7 +302,7 @@ select{
 /* ===== FORM VALIDATION STATES ===== */
 
 .form-group input:invalid:not(:placeholder-shown) {
-    border-color: #ff0066;
+    border-color: var(--red-secondary-color);
 }
 
 .form-group input:invalid:not(:placeholder-shown):focus {
@@ -310,7 +310,7 @@ select{
 }
 
 .form-group input:valid:not(:placeholder-shown) {
-    border-color: #10b981;
+    border-color: var(--green-secondary-color);
 }
 
 .form-group input:valid:not(:placeholder-shown):focus {
@@ -513,12 +513,13 @@ a.blue_button:active {
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: solid 3px var(--primary-color);
-    color: var(--primary-color);
+    border: solid 2px var(--red-secondary-color);
+    color: var(--red-secondary-color);
+    font-weight: var(--text-medium);
 }
 
 .btn-cancel:hover{
-    background: transparent;
+    background: rgba(255,255,255,0.1);
     border: solid 3px var(--button-hover-color);
     color: var(--button-hover-color);
 }
@@ -526,4 +527,21 @@ a.blue_button:active {
 textarea{
     padding: 10px 14px;
     border-radius: var(--medium-radius);
+}
+.info{
+    color: var(--text-color);
+}
+.media-display{
+    color: var(--text-color);
+}
+#obs{
+    background-color: var(--surface-color);
+    color: var(--text-color)!important;
+}
+#obs:focus{
+    outline: none;
+    border: 2px solid var(--border-color);
+}
+.title-grade{
+    color: var(--text-color)!important;
 }

@@ -236,7 +236,7 @@
                     <form method="get" action="${pageContext.request.contextPath}/teacher/student/find-many"
                           class="form-filter">
                         <section>
-                            <input type="text" name="enrollment" value="<%= enrollment %>" placeholder="Matrícula"/>
+                            <input class="enrollment-filterli" type="text" name="enrollment" value="<%= enrollment %>" placeholder="Matrícula"/>
                             <input type="hidden" name="page" value="1"/>
                             <button type="submit" class="primary-button">Buscar</button>
                             <a href="${pageContext.request.contextPath}/teacher/student/find-many" class="secondary-button">Limpar</a>
