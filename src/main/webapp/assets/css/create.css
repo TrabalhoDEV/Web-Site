@@ -536,11 +536,12 @@ textarea{
 }
 #obs{
     background-color: var(--surface-color);
+    color: var(--text-color)!important;
 }
 #obs:focus{
     outline: none;
     border: 2px solid var(--border-color);
 }
-.head-title{
-    color: var(--text-color);
+.title-grade{
+    color: var(--text-color)!important;
 }

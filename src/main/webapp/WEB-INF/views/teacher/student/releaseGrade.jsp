@@ -12,7 +12,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <title class="head-title">Liberar Notas</title>
+    <title id="title-grade">Liberar Notas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
     <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
@@ -182,7 +182,7 @@
             <div class="boletim-grid">
 
                 <div class="header-grid">
-                    <h1>Liberar Notas</h1>
+                    <h1 class="title-grade">Liberar Notas</h1>
                 </div>
 
                 <hr>
