@@ -48,6 +48,8 @@ public class FindManyStudentsServlet extends HttpServlet {
 
         request.setAttribute("enrollment", enrollmentFilter);
 
+        request.setAttribute("enrollment", enrollmentFilter);
+
         try {
             user = (AuthenticatedUser) session.getAttribute("user");
             teacher = (Teacher) session.getAttribute("teacher");

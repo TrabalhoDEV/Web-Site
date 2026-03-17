@@ -527,6 +527,7 @@ a.blue_button:active {
 textarea{
     padding: 10px 14px;
     border-radius: var(--medium-radius);
+<<<<<<< HEAD
 }
 .info{
     color: var(--text-color);
@@ -544,4 +545,6 @@ textarea{
 }
 .title-grade{
     color: var(--text-color)!important;
+=======
+>>>>>>> 92505858797fa473301b72c795a1b8403b4f2370
 }
