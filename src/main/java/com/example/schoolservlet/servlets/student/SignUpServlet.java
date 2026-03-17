@@ -5,6 +5,7 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Student;
+import com.example.schoolservlet.utils.ErrorHandler;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import jakarta.servlet.ServletException;
@@ -12,6 +13,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -23,32 +25,43 @@ public class SignUpServlet extends HttpServlet {
 
         request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
     }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         request.setCharacterEncoding("UTF-8");
 
+        HttpSession session = request.getSession(false);
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String password = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
-        String cpf = request.getParameter("cpf");
+        int id = 0;
+        Student student = new Student();
+
+        if (session.getAttribute("student") != null) {
+            student = (Student) session.getAttribute("student");
+
+            id = student.getId();
+        } else {
+            ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST, "Sessão expirada, informe seu cpf novamente", "/pages/students/signupCpf.jsp");
+            return;
+        }
 
         Student newStudent = new Student();
         StudentDAO dao = new StudentDAO();
 
         try {
-            newStudent = dao.findByCpf(cpf);
+            newStudent = dao.findById(id);
         } catch (ValidationException ve) {
-            request.setAttribute("student", newStudent);
+            request.setAttribute("student", student);
             request.setAttribute("error", ve.getMessage());
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
         } catch (NotFoundException nfe) {
-            request.setAttribute("student", newStudent);
+            request.setAttribute("student", student);
             request.setAttribute("error", nfe.getMessage());
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
         } catch (DataException de) {
-            request.setAttribute("student", newStudent);
+            request.setAttribute("student", student);
             request.setAttribute("error", de.getMessage());
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
         }
@@ -67,6 +80,7 @@ public class SignUpServlet extends HttpServlet {
 
             newStudent.setPassword(password);
         } catch (ValidationException ve) {
+            request.setAttribute("student", student);
             request.setAttribute("error", ve.getMessage());
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
             return;
@@ -76,15 +90,15 @@ public class SignUpServlet extends HttpServlet {
             dao.enrollIn(newStudent);
             response.sendRedirect(request.getContextPath() + "/index.jsp");
         } catch (ValidationException ve) {
-            request.setAttribute("student", newStudent);
+            request.setAttribute("student", student);
             request.setAttribute("error", ve.getMessage());
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
         } catch (NotFoundException nfe) {
-            request.setAttribute("student", newStudent);
+            request.setAttribute("student", student);
             request.setAttribute("error", "Matrícula Inválida");
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
         } catch (DataException de) {
-            request.setAttribute("student", newStudent);
+            request.setAttribute("student", student);
             request.setAttribute("error", de.getMessage());
             request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
         }

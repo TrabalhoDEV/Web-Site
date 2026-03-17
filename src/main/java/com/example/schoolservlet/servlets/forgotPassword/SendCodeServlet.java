@@ -10,6 +10,7 @@ import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.EmailService;
 import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
+import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 import com.example.schoolservlet.utils.enums.UserRoleEnum;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -77,15 +78,15 @@ public class SendCodeServlet extends HttpServlet {
                 StudentDAO studentDAO = new StudentDAO();
                 Student student = studentDAO.findById(id);
 
-                if (student != null) {
+                if (student == null || student.getStatus() == StudentStatusEnum.INACTIVE) {
+                    request.setAttribute("error", "Usuário não encontrado");
+                    hasException = true;
+                } else {
                     email = student.getEmail();
 
                     session.setAttribute("userId", student.getId());
                     session.setAttribute("role", UserRoleEnum.STUDENT);
                     session.setMaxInactiveInterval(60 * 15);
-                } else {
-                    request.setAttribute("error", "Usuário não encontrado");
-                    hasException = true;
                 }
             } catch (ValidationException e) {
                 request.setAttribute("error", e.getMessage());
