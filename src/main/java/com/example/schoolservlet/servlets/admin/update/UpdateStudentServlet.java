@@ -133,13 +133,11 @@ public class UpdateStudentServlet extends HttpServlet {
             int studentId  = parseStudentId(enrollmentParam);
             int newClassId = parseClassId(newClassParam);
 
-            name  = InputNormalizer.normalizeName(name);
-            email = InputNormalizer.normalizeEmail(email);
-            cpf   = InputNormalizer.normalizeCpf(cpf);
-
             InputValidation.validateStudentName(name);
             InputValidation.validateEmail(email);
-            InputValidation.validateCpf(cpf);
+
+            name  = InputNormalizer.normalizeName(name);
+            email = InputNormalizer.normalizeEmail(email);
 
             // ---- load student -----------------------------------------------
             StudentDAO studentDAO = new StudentDAO();
@@ -151,7 +149,6 @@ public class UpdateStudentServlet extends HttpServlet {
 
             // ---- class transfer (only when the class actually changed) -------
             if (student.getIdSchoolClass() != newClassId) {
-                System.out.println(student);
                 SchoolClass newClass = schoolClassDAO.findById(newClassId);
                 mergeStudentSubjects(student, newClass);
                 student.setIdSchoolClass(newClassId);

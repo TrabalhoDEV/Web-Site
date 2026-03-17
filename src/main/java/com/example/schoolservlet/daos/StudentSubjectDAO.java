@@ -237,7 +237,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                      "sb.deadline AS subject_deadline " +
                      "FROM student_subject ss JOIN student st ON st.id = ss.id_student JOIN subject sb " +
                      "ON sb.id = ss.id_subject " +
-                     "WHERE st.ID = ? " +
+                     "WHERE st.id = ? " +
                      "ORDER BY ss.id LIMIT ? OFFSET ?")
         ) {
             pstmt.setInt(1, studentId);
@@ -420,7 +420,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                              "ORDER BY ss.id LIMIT ? OFFSET ?")) {
 
             pstmt.setInt(1, studentId);
-            pstmt.setInt(2, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(2, take < 0 ? 0 : take);
             pstmt.setInt(3, skip < 0 ? 0 : skip);
 
             ResultSet rs = pstmt.executeQuery();
@@ -817,6 +817,26 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
                      "SELECT COUNT(*) AS totalCount FROM student_subject WHERE id_student = ?"
+             )) {
+            pstmt.setInt(1, studentId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("totalCount");
+            }
+            return -1;
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar relações entre alunos e professores", sqle);
+        }
+    }
+
+    public int countObs(int studentId) throws DataException, ValidationException {
+        InputValidation.validateId(studentId, "id do aluno");
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                     "SELECT COUNT(*) AS totalCount FROM student_subject WHERE id_student = ? AND obs IS NOT NULL"
              )) {
             pstmt.setInt(1, studentId);
             ResultSet rs = pstmt.executeQuery();
