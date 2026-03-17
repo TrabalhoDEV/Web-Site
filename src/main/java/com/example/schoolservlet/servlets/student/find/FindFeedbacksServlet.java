@@ -5,7 +5,6 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
-import com.example.schoolservlet.utils.PaginationUtilities;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
