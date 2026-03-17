@@ -49,7 +49,7 @@ public class GenerateBulletinPdfServlet extends HttpServlet {
         try{
             int take = studentSubjectDAO.totalCount(user.id());
 
-            Map<Integer, List<StudentSubject>> studentSubjectsMap = studentSubjectDAO.findManyByStudentId(0, take, user.id());
+            Map<Integer, List<StudentSubject>> studentSubjectsMap = studentSubjectDAO.findManyByStudentId(0, take, user.id(), null);
             Student student = studentDAO.findById(user.id());
             SchoolClass schoolClass = schoolClassDAO.findById(student.getIdSchoolClass());
 

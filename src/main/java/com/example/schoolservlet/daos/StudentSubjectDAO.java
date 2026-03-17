@@ -182,6 +182,41 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
             throw new DataException("Erro ao contar relações do professor", sqle);
         }
     }
+
+    public int countByStudentIdAndTeacherId(int studentId, int teacherId) throws DataException, ValidationException {
+        InputValidation.validateId(studentId, "id do aluno");
+        InputValidation.validateId(teacherId, "id do professor");
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("""
+                 SELECT COUNT(ss.id)
+                 FROM student st
+                 JOIN school_class sc ON sc.id = st.id_school_class
+                 JOIN student_subject ss ON ss.id_student = st.id
+                 JOIN school_class_subject scs
+                     ON scs.id_school_class = sc.id
+                     AND scs.id_subject = ss.id_subject
+                 WHERE st.id = ?
+                 AND EXISTS (
+                     SELECT 1
+                     FROM school_class_teacher sct
+                     WHERE sct.id_school_class = sc.id
+                     AND sct.id_teacher = ?
+                     AND ss.id_subject = ANY (sct.subject_list)
+                 )
+                 """)) {
+
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, teacherId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) return rs.getInt(1);
+            return 0;
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar relações do professor", sqle);
+        }
+    }
+
     @Override
     public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
@@ -303,9 +338,72 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         return studentsSubjects;
     }
 
-    public Map<Integer, List<StudentSubject>> findManyByStudentId(int skip, int take, int studentId) throws DataException, ValidationException {
+    public Map<Integer, List<StudentSubject>> findManyByStudentId(int skip, int take, int studentId, Integer teacherId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         Map<Integer, List<StudentSubject>> studentsMap = new HashMap<>();
+
+        if (teacherId != null) {
+            InputValidation.validateId(teacherId, "id do professor");
+            try (Connection conn = PostgreConnection.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement("""
+                         SELECT
+                             ss.id, ss.obs, ss.grade1, ss.grade2,
+                             st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email,
+                             sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline
+                         FROM student st
+                         JOIN school_class sc ON sc.id = st.id_school_class
+                         JOIN student_subject ss ON ss.id_student = st.id
+                         JOIN subject sb ON sb.id = ss.id_subject
+                         WHERE st.id = ?
+                         AND st.status = ?
+                         AND EXISTS (
+                             SELECT 1 FROM school_class_teacher sct
+                             WHERE sct.id_school_class = sc.id
+                             AND sct.id_teacher = ?
+                             AND ss.id_subject = ANY(sct.subject_list)
+                         )
+                         ORDER BY ss.id
+                         LIMIT ? OFFSET ?
+                         """)) {
+
+                pstmt.setInt(1, studentId);
+                pstmt.setInt(2, StudentStatusEnum.ACTIVE.ordinal() + 1);
+                pstmt.setInt(3, teacherId);
+                pstmt.setInt(4, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+                pstmt.setInt(5, skip < 0 ? 0 : skip);
+
+                ResultSet rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    Student student = new Student();
+                    student.setId(rs.getInt("id_student"));
+                    student.setName(rs.getString("student_name"));
+                    student.setCpf(rs.getString("student_cpf"));
+                    student.setEmail(rs.getString("student_email"));
+                    student.setStatus(StudentStatusEnum.ACTIVE);
+
+                    Subject subject = new Subject();
+                    subject.setId(rs.getInt("id_subject"));
+                    subject.setName(rs.getString("subject_name"));
+                    subject.setDeadline(rs.getDate("subject_deadline"));
+
+                    StudentSubject studentSubject = new StudentSubject(
+                            rs.getInt("id"),
+                            rs.getString("obs"),
+                            rs.getBigDecimal("grade1") != null ? rs.getDouble("grade1") : null,
+                            rs.getBigDecimal("grade2") != null ? rs.getDouble("grade2") : null,
+                            student,
+                            subject
+                    );
+
+                    studentsMap.computeIfAbsent(studentId, k -> new ArrayList<>()).add(studentSubject);
+                }
+
+                return studentsMap;
+            } catch (SQLException sqle) {
+                sqle.printStackTrace();
+                throw new DataException("Erro ao listar matérias do aluno", sqle);
+            }
+        }
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(

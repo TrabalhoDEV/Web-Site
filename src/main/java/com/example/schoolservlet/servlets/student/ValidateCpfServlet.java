@@ -28,6 +28,8 @@ public class ValidateCpfServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String cpf = request.getParameter("cpf");
 
+        HttpSession session = request.getSession(true);
+
         try {
             InputValidation.validateCpf(cpf);
             cpf = InputNormalizer.normalizeCpf(cpf);
@@ -36,6 +38,7 @@ public class ValidateCpfServlet extends HttpServlet {
 
             if (student.getStatus() == StudentStatusEnum.INACTIVE) {
                 request.setAttribute("student", student);
+                session.setAttribute("student", student);
                 request.getRequestDispatcher("/pages/students/signup.jsp").forward(request, response);
             } else {
                 ErrorHandler.forward(request, response, HttpServletResponse.SC_NOT_FOUND, "Aluno não encontrado", "/pages/students/signupCpf.jsp");

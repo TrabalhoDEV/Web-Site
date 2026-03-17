@@ -44,6 +44,7 @@ public class FindManyStudentsServlet extends HttpServlet {
         Teacher teacher = null;
         StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
         String responsePath = "/WEB-INF/views/teacher/student/find-many.jsp";
+        Map<Integer, List<StudentSubject>> studentSubjectMap;
 
         request.setAttribute("enrollment", enrollmentFilter);
 
@@ -79,15 +80,17 @@ public class FindManyStudentsServlet extends HttpServlet {
             enrollmentFilter = enrollmentFilter.trim();
             hasFilter = true;
             request.setAttribute("hasFilter", hasFilter);
-        } catch (ValidationException e){}
+        } catch (ValidationException ignored){}
 
         if (hasFilter){
             try {
                 InputValidation.validateEnrollment(enrollmentFilter);
                 id = InputNormalizer.normalizeEnrollment(enrollmentFilter);
             } catch (ValidationException e){
-                e.printStackTrace();
-                ErrorHandler.forward(request, response, e.getStatus(), e.getMessage(), responsePath);
+                request.setAttribute("studentSubjectMap", new HashMap<>());
+                request.setAttribute("page", 1);
+                request.setAttribute("totalPages", 1);
+                ErrorHandler.forward(request, response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), responsePath);
                 return;
             }
         }
@@ -106,18 +109,16 @@ public class FindManyStudentsServlet extends HttpServlet {
             page = 1;
         }
 
-        Map<Integer, List<StudentSubject>> studentSubjectMap;
-
         int totalPages = 0;
         try {
             if (hasFilter) {
-                count = studentSubjectDAO.countByStudentId(id);
+                count = studentSubjectDAO.countByStudentIdAndTeacherId(id, teacher.getId());
                 totalPages = Math.max(1, (int)Math.ceil((double) count / Constants.MAX_TAKE));
 
                 page = Math.max(1, Math.min(page, totalPages));
 
                 skip = take * (page - 1);
-                studentSubjectMap = studentSubjectDAO.findManyByStudentId(skip, take, id);
+                studentSubjectMap = studentSubjectDAO.findManyByStudentId(skip, take, id, teacher.getId());
             } else {
                 count = studentSubjectDAO.countByTeacherId(teacher.getId());
                 totalPages = Math.max(1, (int)Math.ceil((double) count / Constants.MAX_TAKE));
