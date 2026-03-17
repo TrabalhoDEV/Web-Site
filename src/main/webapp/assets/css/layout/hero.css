@@ -71,7 +71,7 @@
 body {
     background-color: var(--background-color1);
     font-family: 'Poppins', sans-serif;
-    color: var(--text-description);
+    color: var(--description-color);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -96,7 +96,6 @@ a:hover {
     justify-content: center;
     border: none;
     cursor: pointer;
-    font-family: var(--font-family);
     font-weight: var(--text-medium);
     transition: all 0.2s ease;
 }
@@ -143,6 +142,24 @@ a:hover {
     align-items: center;
     gap: 30px;
 }
+
+.nav-links a {
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 16px;
+    transition: color 0.2s;
+}
+
+.nav-links a:hover {
+    color: var(--primary-color);
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
 
 .login-link {
     color: var(--description-color);
@@ -277,7 +294,7 @@ a:hover {
 .sent {
     align-self: flex-end;
     background-color: var(--primary-color);
-    color: var(--white);
+    color: white;
     border-radius: 12px 12px 0 12px;
 }
 
@@ -311,7 +328,6 @@ a:hover {
     flex: 1;
     border: none;
     outline: none;
-    font-family: var(--font-family);
     font-size: var(--text-sm);
     color: var(--description-color);
 }
@@ -374,6 +390,7 @@ a:hover {
 }
 
 @media (max-width: 968px) {
+    .nav-links { display: none; }
     .hero-container {
         flex-direction: column;
         text-align: center;

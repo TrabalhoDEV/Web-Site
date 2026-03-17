@@ -12,10 +12,11 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <title>Liberar Notas</title>
+    <title class="head-title">Liberar Notas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
     <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
+    <script src="${pageContext.request.contextPath}/assets/js/theme.js"></script>
 </head>
 <body>
 
