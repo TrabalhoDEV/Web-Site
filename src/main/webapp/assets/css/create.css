@@ -528,6 +528,9 @@ textarea{
     padding: 10px 14px;
     border-radius: var(--medium-radius);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 1492461c80d9b7619ef1955562df8384e971d78b
 }
 .info{
     color: var(--text-color);
@@ -545,6 +548,4 @@ textarea{
 }
 .title-grade{
     color: var(--text-color)!important;
-=======
->>>>>>> 92505858797fa473301b72c795a1b8403b4f2370
 }
