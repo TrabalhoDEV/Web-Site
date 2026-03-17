@@ -812,7 +812,6 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
     @Override
     public int totalCount(int studentId) throws DataException, ValidationException {
-<<<<<<< HEAD
         InputValidation.validateId(studentId, "id do aluno");
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -833,8 +832,6 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
     }
 
     public int countObs(int studentId) throws DataException, ValidationException {
-=======
->>>>>>> 92505858797fa473301b72c795a1b8403b4f2370
         InputValidation.validateId(studentId, "id do aluno");
 
         try (Connection conn = PostgreConnection.getConnection();
