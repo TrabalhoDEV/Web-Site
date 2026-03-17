@@ -126,18 +126,19 @@
     justify-content: center;
     align-items: center;
     text-decoration: none;
-    border: solid 3px var(--primary-color);
+    border: solid 2px var(--primary-color);
     color: var(--primary-color);
     padding: 8px 12px;
     border-radius: 8px;
     width: fit-content;
     min-width: 120px;
     cursor: pointer;
+    font-weight: var(--text-medium);
 }
 
 .secondary-button:hover{
     color: var(--button-hover-color);
-    background-color: #e7e9ff;
+    background-color: rgba(255,255,255,0.3);
     border: var(--button-hover-color) solid 3px;
 }
 
@@ -199,22 +200,22 @@ th{
 }
 
 .active-student{
-    color:#10b981;
+    color:var(--green-secondary-color);
 }
 
 .inactive-student{
-    color:#8b97b3;
+    color: var(--muted-text-color);
 }
 .approved{
-    color: #10b981;
+    color: var(--green-secondary-color);
     background: rgba(16, 185, 129, 0.15);
-    border: 1px solid #10b981;
+    border: 1px solid var(--green-secondary-color);
 }
 
 .reproved{
-    color: #ff0066;
+    color: var(--red-secondary-color);
     background: rgba(255, 0, 102, 0.15);
-    border: 1px solid #ff0066;
+    border: 1px solid var(--red-secondary-color);
 }
 
 .pending{
@@ -269,6 +270,7 @@ dialog::backdrop {
     flex-direction: row;
     align-items: center;
     gap: 12px;
+    color: var(--text-color);
 }
 
 .pagination > a{
@@ -345,4 +347,14 @@ dialog::backdrop {
 
 .form-group select[multiple] {
     height: auto;
+}
+.enrollment-filter{
+    background-color: var(--surface-color);
+    border: 2px solid var(--border-color);
+}
+.enrollment-filter::placeholder{
+    color: var(--muted-text-color);
+}
+.enrollment-filter:active{
+    border: none;
 }
