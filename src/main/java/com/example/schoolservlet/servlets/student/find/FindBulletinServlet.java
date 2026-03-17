@@ -12,7 +12,6 @@ import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.ErrorHandler;
-import com.example.schoolservlet.utils.PaginationUtilities;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 
 import com.example.schoolservlet.utils.records.StudentsPerformanceCount;
