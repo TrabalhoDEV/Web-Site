@@ -7,6 +7,7 @@ import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.Admin;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.ErrorHandler;
+import com.example.schoolservlet.utils.InputNormalizer;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.*;
@@ -104,7 +105,7 @@ public class UpdateAdminServlet extends HttpServlet {
         Admin admin = new Admin();
         admin.setId(user.id());
         admin.setEmail(email);
-        admin.setDocument(document);
+        admin.setDocument(InputNormalizer.normalizeCpf(document));
 
         try {
             AdminDAO adminDAO = new AdminDAO();

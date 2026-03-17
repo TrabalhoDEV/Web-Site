@@ -188,7 +188,6 @@
         <!-- TOPBAR -->
 
         <header class="topbar">
-            <div class="topbar-left"></div>
             <div class="topbar-right">
                 <div class="topbar-actions">
                     <button type="button" class="icon-button" id="theme-button">
