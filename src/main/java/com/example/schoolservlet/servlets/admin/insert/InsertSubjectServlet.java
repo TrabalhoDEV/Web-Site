@@ -16,6 +16,15 @@ import java.util.Date;
 
 @WebServlet(name = "admin-insert-subject", value = "/admin/subject/insert")
 public class InsertSubjectServlet extends HttpServlet {
+
+    /**
+     * Processes GET requests to show the subject insertion page for admins.
+     *
+     * @param request  HttpServletRequest containing client request data.
+     * @param response HttpServletResponse used to forward to the JSP page.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -25,6 +34,14 @@ public class InsertSubjectServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/admin/insert/subject.jsp").forward(request, response);
     }
 
+    /**
+     * Handles HTTP GET requests to display the form for inserting a new subject.
+     *
+     * @param request  The HttpServletRequest containing client request information.
+     * @param response The HttpServletResponse used to send the JSP page to the client.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");

@@ -20,6 +20,22 @@ import java.security.SecureRandom;
 
 @WebServlet(name = "forget-password-send-code", value = "/auth/forgot-password/send-code")
 public class SendCodeServlet extends HttpServlet {
+
+    /**
+     * Handles password recovery requests.
+     *
+     * <p>GET: Forwards to the send code JSP page.
+     * POST: Validates the user input, identifies the user role (Student, Admin, Teacher),
+     * retrieves the email, generates a verification code, sends it, and sets session attributes.
+     *
+     * <p>Session attributes include userId, role, and code with a 15-minute timeout.
+     * Errors are handled by forwarding to the JSP page or redirecting to the validation page.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/WEB-INF/views/forgotPassword/sendCode.jsp").forward(request, response);
@@ -153,14 +169,14 @@ public class SendCodeServlet extends HttpServlet {
             session.setAttribute("code", code);
 
             try {
-                EmailService.sendEmail(email, "Recuperação de senha", "<h1>Recuperação da sua senha na Vértice</h1>" +
-                        "<p>Esse código expirará em 15 minutos, caso não tenha sido você, ignore.</p>" +
+                EmailService.sendEmail(email, "Recuperação de senha", "<h1 style=\"text-align:center;\">Recuperação da sua senha no Colégio Vértice</h1>" +
+                        "<p style=\"text-align:center;\">Esse código expirará em 15 minutos, caso não tenha sido você, ignore.</p>" +
                         "<br>" +
                         "<div><h3 style=\"text-align:center;\">Código:</h3>" +
                         "<h2 style=\"text-align:center;\">" + code + "</h2></div>"
                         + "<br>"
-                        + "Atenciosamente,<br>"
-                        + "Secretaria Vértice"
+                        + "<p style=\"text-align:center;\">Atenciosamente,<br>"
+                        + "Secretaria Vértice</p>"
                 );
             } catch (Exception e) {
                 e.printStackTrace();

@@ -2,6 +2,14 @@ package com.example.schoolservlet.exceptions;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Exception thrown when a validation error occurs in a school-related servlet operation.
+ *
+ * <p>This exception extends SchoolServletException and can optionally specify
+ * the field that caused the validation failure. It returns an HTTP 400 Bad Request status.</p>
+ *
+ * @see SchoolServletException
+ */
 public class ValidationException extends SchoolServletException{
     private String field;
     public ValidationException(String message){

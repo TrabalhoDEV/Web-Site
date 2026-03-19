@@ -16,6 +16,18 @@ import java.util.Date;
 
 @WebServlet(name = "admin-update-subject", value = "/admin/subject/update")
 public class UpdateSubjectServlet extends HttpServlet {
+
+    /**
+     * Handles GET requests to load a subject by ID for update.
+     *
+     * <p>Validates the subject ID, fetches the subject data, and forwards to the update JSP page.
+     * If the ID is invalid, not found, or an error occurs, sets an error message and redirects or forwards accordingly.</p>
+     *
+     * @param request  HttpServletRequest containing client request data.
+     * @param response HttpServletResponse used to forward to JSP or redirect on error.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding or redirect.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -50,6 +62,18 @@ public class UpdateSubjectServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Handles POST requests to update a subject's name and deadline.
+     *
+     * <p>Validates input, normalizes values, checks for duplicate names, updates the subject
+     * in the database, and redirects to the subject listing. Errors are handled by forwarding
+     * back to the update JSP with messages.</p>
+     *
+     * @param request  HttpServletRequest containing form data for the subject.
+     * @param response HttpServletResponse used to redirect or forward on error.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding or redirect.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

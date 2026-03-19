@@ -6,10 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentSubjectDAO;
@@ -29,6 +26,16 @@ import com.example.schoolservlet.utils.records.TeacherPendency;
 
 
 public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSubjectDAO {
+
+    /**
+     * Retrieves a paginated collection of StudentSubject entries from the database.
+     * Each entry includes its associated Student and Subject objects with relevant details.
+     *
+     * @param skip the number of records to skip (used as the OFFSET in the SQL query)
+     * @param take the maximum number of records to retrieve (used as the LIMIT in the SQL query)
+     * @return a map where the key is the StudentSubject ID and the value is the corresponding StudentSubject object
+     * @throws DataException if any SQL exception occurs while accessing the database
+     */
     @Override
     public Map<Integer, StudentSubject> findMany(int skip, int take) throws DataException {
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
@@ -83,41 +90,47 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a paginated mapping of students and their associated subjects for a specific teacher.
+     * Each key in the returned map corresponds to a student ID, and the value is a list of StudentSubject objects.
+     * If a student has no subjects assigned under the teacher, a placeholder StudentSubject with null subject is included.
+     *
+     * @param skip the number of student records to skip (used as the OFFSET in the SQL query)
+     * @param take the maximum number of student records to retrieve (used as the LIMIT in the SQL query)
+     * @param teacherId the ID of the teacher for which to fetch students and subjects
+     * @return a map where each key is a student ID and the value is a list of StudentSubject objects for that student
+     * @throws ValidationException if the teacherId is invalid
+     * @throws DataException if any SQL exception occurs while accessing the database
+     */
     public Map<Integer, List<StudentSubject>> findManyByTeacherId(int skip, int take, int teacherId) throws DataException, ValidationException {
         InputValidation.validateId(teacherId, "id do professor");
         Map<Integer, List<StudentSubject>> studentsMap = new HashMap<>();
 
         try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(
-                     "SELECT\n" +
-                             "    ss.id, ss.obs, ss.grade1, ss.grade2,\n" +
-                             "    st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email,\n" +
-                             "    sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline\n" +
-                             "FROM student st\n" +
-                             "JOIN school_class sc ON sc.id = st.id_school_class\n" +
-                             "JOIN student_subject ss ON ss.id_student = st.id\n" +
-                             "JOIN subject sb ON sb.id = ss.id_subject\n" +
-                             "WHERE st.status = ?\n" +
-                             "AND EXISTS (\n" +
-                             "    SELECT 1\n" +
-                             "    FROM school_class_teacher sct\n" +
-                             "    WHERE sct.id_school_class = sc.id\n" +
-                             "    AND sct.id_teacher = ?\n" +
-                             ")\n" +
-                             "AND EXISTS (\n" +
-                             "    SELECT 1\n" +
-                             "    FROM subject_teacher stt\n" +
-                             "    WHERE stt.id_subject = sb.id\n" +
-                             "    AND stt.id_teacher = ?\n" +
-                             ")\n" +
-                             "ORDER BY st.id\n" +
-                             "LIMIT ? OFFSET ?;")) {
+             PreparedStatement pstmt = conn.prepareStatement("""
+                 SELECT
+                     ss.id, ss.obs, ss.grade1, ss.grade2,
+                     st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email,
+                     sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline
+                 FROM student st
+                 JOIN school_class sc ON sc.id = st.id_school_class
+                 JOIN student_subject ss ON ss.id_student = st.id
+                 JOIN subject sb ON sb.id = ss.id_subject
+                 WHERE st.status = ?
+                 AND EXISTS (
+                     SELECT 1 FROM school_class_teacher sct
+                     WHERE sct.id_school_class = sc.id
+                     AND sct.id_teacher = ?
+                     AND sb.id = ANY(sct.subject_list)
+                 )
+                 ORDER BY st.id
+                 LIMIT ? OFFSET ?
+                 """)) {
 
             pstmt.setInt(1, StudentStatusEnum.ACTIVE.ordinal() + 1);
             pstmt.setInt(2, teacherId);
-            pstmt.setInt(3, teacherId);
-            pstmt.setInt(4, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
-            pstmt.setInt(5, skip < 0 ? 0 : skip);
+            pstmt.setInt(3, take < 0 ? 0 : (take > Constants.MAX_TAKE ? Constants.MAX_TAKE : take));
+            pstmt.setInt(4, skip < 0 ? 0 : skip);
 
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -162,6 +175,61 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Counts the number of active students associated with a specific teacher
+     * through class and subject relationships.
+     * <p>
+     * The method verifies whether the teacher is assigned to teach subjects
+     * within a class and counts distinct active students enrolled in those
+     * subjects. Only students with an active status are considered in the result.
+     * </p>
+     *
+     * @param teacherId the identifier of the teacher whose related students will be counted
+     * @return the total number of distinct active students associated with the teacher
+     * @throws DataException if an error occurs while accessing the database
+     * @throws ValidationException if the provided teacher identifier is invalid
+     */
+    public int countByTeacherId(int teacherId) throws DataException, ValidationException {
+        InputValidation.validateId(teacherId, "id do professor");
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("""
+                 SELECT COUNT(DISTINCT st.id)
+                 FROM student st
+                 JOIN school_class sc ON sc.id = st.id_school_class
+                 JOIN student_subject ss ON ss.id_student = st.id
+                 JOIN subject sb ON sb.id = ss.id_subject
+                 WHERE st.status = ?
+                 AND EXISTS (
+                     SELECT 1 FROM school_class_teacher sct
+                     WHERE sct.id_school_class = sc.id
+                     AND sct.id_teacher = ?
+                     AND sb.id = ANY(sct.subject_list)
+                 )
+                 """)) {
+
+            pstmt.setInt(1, StudentStatusEnum.ACTIVE.ordinal() + 1);
+            pstmt.setInt(2, teacherId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) return rs.getInt(1);
+            return 0;
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar relações do professor", sqle);
+        }
+    }
+
+    /**
+     * Retrieves a paginated map of subjects associated with a specific student.
+     * Each key in the returned map corresponds to a student_subject ID, and the value is the StudentSubject object.
+     *
+     * @param skip the number of records to skip (used as OFFSET in the SQL query)
+     * @param take the maximum number of records to retrieve (used as LIMIT in the SQL query)
+     * @param studentId the ID of the student for whom the subjects are fetched
+     * @return a map where each key is a student_subject ID and the value is a StudentSubject object
+     * @throws ValidationException if the provided studentId is invalid
+     * @throws DataException if a database access error occurs
+     */
     @Override
     public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
@@ -223,6 +291,17 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         return studentsSubjects;
     }
 
+    /**
+     * Retrieves a paginated map of StudentSubject entries for a specific student that have feedback notes.
+     * Only entries where the 'obs' field is not null are included.
+     *
+     * @param skip the number of records to skip (used as OFFSET in the SQL query)
+     * @param take the maximum number of records to retrieve (used as LIMIT in the SQL query)
+     * @param studentId the ID of the student whose subjects with feedback are fetched
+     * @return a map where each key is a student_subject ID and the value is the corresponding StudentSubject object
+     * @throws ValidationException if the provided studentId is invalid
+     * @throws DataException if a database access error occurs
+     */
     public Map<Integer, StudentSubject> findManyThatHasFeedbacks(int skip, int take, int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
@@ -283,6 +362,17 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         return studentsSubjects;
     }
 
+    /**
+     * Retrieves a paginated mapping of a student's subjects with their associated StudentSubject records.
+     * Each student ID maps to a list of StudentSubject objects containing the subject details, grades, and observations.
+     *
+     * @param skip the number of records to skip (used for pagination OFFSET)
+     * @param take the maximum number of records to retrieve (used for pagination LIMIT)
+     * @param studentId the ID of the student whose subjects are being retrieved
+     * @return a map where the key is the student ID and the value is a list of StudentSubject objects for that student
+     * @throws ValidationException if the provided studentId is invalid
+     * @throws DataException if a database access error occurs while fetching the data
+     */
     public Map<Integer, List<StudentSubject>> findManyByStudentId(int skip, int take, int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         Map<Integer, List<StudentSubject>> studentsMap = new HashMap<>();
@@ -338,6 +428,15 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a specific StudentSubject record by its unique ID, including the associated Student and Subject details.
+     *
+     * @param id the unique identifier of the StudentSubject record
+     * @return the StudentSubject object containing the student's information, the subject's information, grades, and observations
+     * @throws ValidationException if the provided ID is invalid
+     * @throws NotFoundException if no StudentSubject record exists for the given ID
+     * @throws DataException if a database access error occurs while fetching the data
+     */
     @Override
     public StudentSubject findById(int id) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId(id, "id");
@@ -389,16 +488,28 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Calculates the performance summary of students for a given teacher.
+     * The summary includes counts of approved, failed, and pending students based on their grades.
+     *
+     * @param teacherId the unique identifier of the teacher whose students' performance is being evaluated
+     * @return a StudentsPerformanceCount object containing counts of approved, pending, and failed students
+     * @throws ValidationException if the provided teacher ID is invalid
+     * @throws DataException if a database access error occurs while fetching the performance data
+     */
     public StudentsPerformanceCount studentsPerformanceCount(int teacherId) throws DataException, ValidationException {
         InputValidation.validateId(teacherId, "id do professor");
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("SELECT " +
-                     "SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) AS approved, " +
-                     "SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) AS failed, " +
-                     "SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) AS pending " +
+                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
+                     "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) AS failed, " +
+                     "SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) AS pending " +
                      "FROM (" +
                      "    SELECT " +
+                     "        sb.deadline, " +
+                     "        ss.grade1, " +
+                     "        ss.grade2, " +
                      "        CASE " +
                      "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
                      "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
@@ -429,17 +540,29 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves the performance summary of a specific student across all their subjects.
+     * The summary includes the number of approved, failed, and pending subjects based on the student's grades.
+     *
+     * @param studentId the unique identifier of the student whose performance is being evaluated
+     * @return a StudentsPerformanceCount object containing counts of approved, pending, and failed subjects
+     * @throws ValidationException if the provided student ID is invalid
+     * @throws DataException if a database access error occurs while fetching the performance data
+     */
     public StudentsPerformanceCount studentPerformanceCount(int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
                      "SELECT " +
-                             "SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) AS approved, " +
-                             "SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) AS failed, " +
-                             "SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) AS pending " +
+                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) AS approved, " +
+                             "SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) AS failed, " +
+                             "SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) AS pending " +
                              "FROM (" +
                              "    SELECT " +
+                             "        sb.deadline, " +
+                             "        ss.grade1, " +
+                             "        ss.grade2, " +
                              "        CASE " +
                              "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
                              "            WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
@@ -448,6 +571,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                              "        END AS media " +
                              "    FROM student_subject ss " +
                              "    JOIN student st ON st.id = ss.id_student " +
+                             "    JOIN subject sb ON sb.id = ss.id_subject " +
                              "    WHERE ss.id_student = ? AND st.status = ? " +
                              ") AS sub"
              )) {
@@ -475,6 +599,16 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a map of students along with their subjects where the student requires attention from a specific teacher.
+     * A student requires attention if their average grade (computed from grade1 and grade2) is below a defined threshold.
+     * Only active students are considered, and results are limited by a maximum count constant.
+     *
+     * @param teacherId the unique identifier of the teacher for whom students requiring attention are being queried
+     * @return a map where each key is the StudentSubject ID and the value is the corresponding StudentSubject object
+     * @throws ValidationException if the provided teacher ID is invalid
+     * @throws DataException if a database access error occurs while fetching the student-subject data
+     */
     @Override
     public Map<Integer, StudentSubject> findStudentsThatRequireTeacher(int teacherId) throws DataException, ValidationException {
         InputValidation.validateId(teacherId, "id do professor");
@@ -503,10 +637,10 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                 "   WHERE stt.id_subject = sb.id " +
                 "   AND stt.id_teacher = ? " +
                 ") " +
-                "AND (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL)" +
+                "AND (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL) " +
+                "AND st.status = ? " +
                 ") AS sub " +
-                "JOIN student st ON st.id = sub.id_student " +
-                "WHERE sub.media < ? AND st.status = ? " +
+                "WHERE sub.media < ? " +
                 "ORDER BY sub.media ASC " +
                 "LIMIT ?";
 
@@ -515,8 +649,8 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
             pstmt.setInt(1, teacherId);
             pstmt.setInt(2, teacherId);
-            pstmt.setInt(3, Constants.MAX_GRADE_TO_HELP);
-            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal());
+            pstmt.setInt(3, StudentStatusEnum.ACTIVE.ordinal() + 1);
+            pstmt.setInt(4, Constants.MAX_GRADE_TO_HELP);
             pstmt.setInt(5, Constants.STUDENTS_HELP_TAKE);
             ResultSet rs = pstmt.executeQuery();
 
@@ -552,54 +686,56 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Calculates the overall performance percentages of students for a specific teacher.
+     * The performance is categorized into approved, failed, and pending based on students' average grades.
+     * Only students with active status are included in the calculation.
+     *
+     * @param idTeacher the unique identifier of the teacher for whom student performance is being calculated
+     * @return a StudentsPerformance object containing the percentage of approved, pending, and failed students
+     * @throws ValidationException if the provided teacher ID is invalid
+     * @throws DataException if a database access error occurs while computing student performance
+     */
     @Override
     public StudentsPerformance studentsPerformance(int idTeacher) throws ValidationException, DataException {
         InputValidation.validateId(idTeacher, "id do professor");
 
         try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT\n" +
-                     "COALESCE(\n" +
-                     "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
-                     "    ), 0) AS approved,\n" +
-                     "\n" +
-                     "COALESCE(\n" +
-                     "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
-                     "    ), 0) AS failed,\n" +
-                     "\n" +
-                     "COALESCE(\n" +
-                     "    ROUND(\n" +
-                     "        100.0 * SUM(CASE WHEN media IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0\n" +
-                     "    ), 0) AS pending\n" +
-                     "\n" +
-                     "FROM (\n" +
-                     "    SELECT\n" +
-                     "        s.id,\n" +
-                     "        CASE\n" +
-                     "            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL\n" +
-                     "                THEN (ss.grade1 + ss.grade2) / 2.0\n" +
-                     "            WHEN ss.grade1 IS NOT NULL\n" +
-                     "                THEN ss.grade1\n" +
-                     "            WHEN ss.grade2 IS NOT NULL\n" +
-                     "                THEN ss.grade2\n" +
-                     "            ELSE NULL\n" +
-                     "        END AS media\n" +
-                     "\n" +
-                     "    FROM student s\n" +
-                     "    JOIN school_class sc\n" +
-                     "        ON sc.id = s.id_school_class\n" +
-                     "    JOIN school_class_teacher sct\n" +
-                     "        ON sct.id_school_class = sc.id\n" +
-                     "    LEFT JOIN student_subject ss\n" +
-                     "        ON ss.id_student = s.id\n" +
-                     "\n" +
-                     "    WHERE sct.id_teacher = ?\n AND s.status = ?" +
-                     ") AS sub;")) {
+             PreparedStatement pstmt = conn.prepareStatement("""
+                 SELECT
+                 COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS approved,
+                 COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS failed,
+                 COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS pending
+                 FROM (
+                     SELECT
+                         ss.id,
+                         sb.deadline,
+                         ss.grade1,
+                         ss.grade2,
+                         CASE
+                             WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0
+                             WHEN ss.grade1 IS NOT NULL THEN ss.grade1
+                             WHEN ss.grade2 IS NOT NULL THEN ss.grade2
+                             ELSE NULL
+                         END AS media
+                     FROM student_subject ss
+                     JOIN student s ON s.id = ss.id_student
+                     JOIN subject sb ON sb.id = ss.id_subject
+                     JOIN school_class sc ON sc.id = s.id_school_class
+                     WHERE s.status = ?
+                     AND EXISTS (
+                         SELECT 1 FROM school_class_teacher sct
+                         WHERE sct.id_school_class = sc.id
+                         AND sct.id_teacher = ?
+                         AND sb.id = ANY(sct.subject_list)
+                     )
+                 ) AS sub
+                 """)) {
+
             pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APPROVAL);
             pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APPROVAL);
-            pstmt.setInt(3, idTeacher);
-            pstmt.setInt(4, StudentStatusEnum.ACTIVE.ordinal() + 1);
+            pstmt.setInt(3, StudentStatusEnum.ACTIVE.ordinal() + 1);
+            pstmt.setInt(4, idTeacher);
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -612,6 +748,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a list of pending student subjects that require attention from a specific teacher.
+     * A pending is considered when a student has at least one missing grade (grade1 or grade2),
+     * and the student is actively enrolled. Each pendency includes information about the student,
+     * subject, grades, deadline, and the calculated status relative to the deadline:
+     * "Atrasada" (Overdue), "Perto do prazo" (Near deadline), or "Dentro do prazo" (Within deadline).
+     *
+     * @param idTeacher the unique identifier of the teacher for whom the pendencies are retrieved
+     * @return a List of TeacherPendency objects representing students with pending subjects
+     * @throws ValidationException if the provided teacher ID is invalid
+     * @throws DataException if a database access error occurs while retrieving pendencies
+     */
     @Override
     public List<TeacherPendency> teacherPendency(int idTeacher) throws DataException, ValidationException {
         InputValidation.validateId(idTeacher, "id do professor");
@@ -676,6 +824,13 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Returns the total number of records in the student_subject table, representing
+     * all existing associations between students and subjects.
+     *
+     * @return the total count of student-subject associations, or -1 if no records exist
+     * @throws DataException if a database access error occurs while counting the records
+     */
     @Override
     public int totalCount() throws DataException {
         try (Connection conn = PostgreConnection.getConnection();
@@ -692,29 +847,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
-    public int countByTeacherId(int teacherId) throws DataException, ValidationException {
-        InputValidation.validateId(teacherId, "id do professor");
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(
-                     "SELECT COUNT(*) AS totalCount " +
-                             "FROM student_subject ss " +
-                             "JOIN subject sb ON sb.id = ss.id_subject " +
-                             "JOIN subject_teacher sbt ON sbt.id_subject = sb.id " +
-                             "WHERE sbt.id_teacher = ?")) {
-
-            pstmt.setInt(1, teacherId);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("totalCount");
-            }
-            return -1;
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-            throw new DataException("Erro ao contar relações do professor", sqle);
-        }
-    }
-
+    /**
+     * Counts the total number of subject relationships associated with a specific student.
+     * <p>
+     * The method queries the student-subject relationship table and returns
+     * the number of subjects linked to the given student identifier.
+     * </p>
+     *
+     * @param studentId the identifier of the student whose subject relationships will be counted
+     * @return the total number of subjects associated with the student, or -1 if no result is obtained
+     * @throws DataException if an error occurs while accessing the database
+     * @throws ValidationException if the provided student identifier is invalid
+     */
     @Override
     public int totalCount(int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
@@ -736,6 +880,15 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Counts the total number of subjects a specific student is enrolled in,
+     * considering only valid school class-subject associations.
+     *
+     * @param studentId the ID of the student to count subjects for
+     * @return the total number of subjects associated with the student, or 0 if none are found
+     * @throws ValidationException if the provided studentId is invalid
+     * @throws DataException if a database access error occurs while counting the subjects
+     */
     public int countByStudentId(int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
 
@@ -761,6 +914,135 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Deletes student_subject records for a specific student
+     * restricted to the given set of subject IDs.
+     *
+     * Used during class transfer to remove only the subjects that
+     * are NOT offered in the new class, preserving shared grades.
+     *
+     * DELETE FROM student_subject
+     *  WHERE id_student = ?
+     *    AND id_subject  = ANY(?)
+     *
+     * @param studentId  the student ID
+     * @param subjectIds set of subject IDs to delete
+     * @throws DataException if a database error occurs
+     */
+    public void deleteByStudentAndSubjects(int studentId, Set<Integer> subjectIds) throws DataException {
+        String sql = "DELETE FROM student_subject WHERE id_student = ? AND id_subject = ANY(?)";
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+
+            // Convert Set<Integer> → Integer[] → java.sql.Array
+            Integer[] ids = subjectIds.toArray(new Integer[0]);
+            java.sql.Array sqlArray = conn.createArrayOf("integer", ids);
+            ps.setArray(2, sqlArray);
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao remover disciplinas do aluno: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Inserts blank student_subject records for a given student
+     * for each subject ID in the provided set.
+     *
+     * Used during class transfer to add only the subjects that are
+     * NEW in the target class (subjects shared with the old class
+     * are skipped — their records already exist with grades).
+     *
+     * INSERT INTO student_subject (id_student, id_subject)
+     * VALUES (?, ?) ON CONFLICT DO NOTHING
+     *
+     * ON CONFLICT DO NOTHING is a safety net: if a record already
+     * exists for any reason, the insert is silently skipped so no
+     * existing grade is overwritten.
+     *
+     * @param studentId  the student ID
+     * @param subjectIds set of subject IDs to insert
+     * @throws DataException if a database error occurs
+     */
+    public void createManyBySubjectIds(int studentId, Set<Integer> subjectIds) throws DataException {
+        String sql = """
+            INSERT INTO student_subject (id_student, id_subject)
+            VALUES (?, ?)
+            ON CONFLICT ON CONSTRAINT uk_student_subject DO NOTHING
+            """;
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (int subjectId : subjectIds) {
+                ps.setInt(1, studentId);
+                ps.setInt(2, subjectId);
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao inserir disciplinas para o aluno: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Returns the set of subject IDs for which the student already
+     * has a student_subject record (with or without grades).
+     *
+     * Used by UpdateStudentServlet.ensureMissingSubjects to calculate
+     * the delta between class subjects and existing student records.
+     *
+     * SELECT id_subject FROM student_subject WHERE id_student = ?
+     *
+     * @param studentId the student ID
+     * @return a Set of subject IDs; empty if no records exist yet
+     * @throws DataException if a database error occurs
+     */
+    public Set<Integer> findSubjectIdsByStudent(int studentId) throws DataException {
+        String sql = "SELECT id_subject FROM student_subject WHERE id_student = ?";
+
+        Set<Integer> subjectIds = new java.util.HashSet<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    subjectIds.add(rs.getInt("id_subject"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataException("Erro ao buscar disciplinas do aluno: " + e.getMessage());
+        }
+
+        return subjectIds;
+    }
+
+    /**
+     * Creates a new relationship between a student and a subject.
+     * <p>
+     * The method inserts a record into the student-subject relationship table,
+     * optionally including grade values and observations associated with the
+     * student's performance in the subject.
+     * </p>
+     *
+     * @param studentSubject the entity containing the student, subject,
+     *                       grades, and observation data to be stored
+     * @throws DataException if an error occurs while accessing or modifying the database
+     * @throws ValidationException if the provided student or subject identifiers are invalid
+     */
     @Override
     public void create(StudentSubject studentSubject) throws DataException, ValidationException {
         InputValidation.validateId(studentSubject.getStudent().getId(), "id_student");
@@ -791,6 +1073,19 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Assigns multiple subjects to all students of a specific school class in a batch operation.
+     *
+     * <p>This method validates the school class ID and each subject ID before attempting to insert
+     * records into the database. It executes the inserts in a single transaction, rolling back if
+     * any error occurs.</p>
+     *
+     * @param idSchoolClass the ID of the school class whose students will receive the subjects
+     * @param addedSubjectIds a list of subject IDs to assign to each student in the class
+     * @throws ValidationException if the school class ID or any subject ID is invalid,
+     *                             or if a student already has a subject assigned
+     * @throws DataException if a database access error occurs while performing the batch insert
+     */
     public void createManyBySchoolClass(int idSchoolClass, List<Integer> addedSubjectIds)
             throws DataException, ValidationException {
 
@@ -839,6 +1134,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Assigns all subjects of a specific school class to a single student.
+     *
+     * <p>This method fetches the subjects associated with the provided school class and inserts
+     * them for the given student in a batch operation within a transaction. If no subjects exist
+     * for the class, the method returns without performing any insert.</p>
+     *
+     * @param studentId the ID of the student to receive the subjects
+     * @param schoolClassId the ID of the school class from which subjects are retrieved
+     * @throws ValidationException if the student ID or school class ID is invalid
+     * @throws DataException if a database access error occurs during retrieval or insertion
+     */
     public void createManyByStudentClass(int studentId, int schoolClassId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         InputValidation.validateId(schoolClassId, "id da turma");
@@ -876,6 +1183,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Updates an existing student-subject relationship in the database.
+     *
+     * <p>This method modifies the student ID, subject ID, grades, and observation for a given
+     * student-subject entry. It validates all IDs before attempting the update and uses a
+     * prepared statement to perform the operation.</p>
+     *
+     * @param studentSubject the StudentSubject object containing updated data
+     * @throws ValidationException if any ID (student, subject, or student-subject) is invalid
+     * @throws NotFoundException if the student-subject entry does not exist in the database
+     * @throws DataException if a database access error occurs during the update
+     */
     @Override
     public void update(StudentSubject studentSubject) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId(studentSubject.getId(), "id");
@@ -908,6 +1227,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Deletes a student-subject relationship from the database by its ID.
+     *
+     * <p>This method validates the provided ID and attempts to remove the corresponding entry
+     * from the student_subject table. If no entry matches the given ID, a NotFoundException
+     * is thrown.</p>
+     *
+     * @param id the ID of the student-subject relationship to be deleted
+     * @throws ValidationException if the provided ID is invalid
+     * @throws NotFoundException if no student-subject entry exists with the specified ID
+     * @throws DataException if a database access error occurs during deletion
+     */
     @Override
     public void delete(int id) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId(id, "id");
@@ -923,6 +1254,19 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Deletes multiple student-subject relationships for all students in a given school class.
+     *
+     * <p>This method removes the specified subjects from all students who belong to the provided
+     * school class. The operation is performed in a batch within a single transaction to ensure
+     * atomicity. If the provided list of subject IDs is null or empty, the method exits without
+     * performing any deletion.</p>
+     *
+     * @param idSchoolClass the ID of the school class whose students will have subjects removed
+     * @param removedSubjectIds a list of subject IDs to be removed from the students
+     * @throws ValidationException if the provided school class ID or any subject ID is invalid
+     * @throws DataException if a database access error occurs during deletion
+     */
     public void deleteManyBySchoolClass(int idSchoolClass, List<Integer> removedSubjectIds)
             throws DataException, ValidationException {
         InputValidation.validateId(idSchoolClass, "id da turma");
@@ -960,3 +1304,4 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 }
+

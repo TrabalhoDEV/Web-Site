@@ -17,6 +17,17 @@ import java.io.IOException;
 
 @WebServlet(name = "ValidateCpfServlet", value = "/student/validate/cpf")
 public class ValidateCpfServlet extends HttpServlet {
+
+    /**
+     * Handles GET requests for the CPF-based student signup page.
+     *
+     * <p>Forwards the request to the "signupCpf.jsp" page and sets the response content type to HTML.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -24,6 +35,18 @@ public class ValidateCpfServlet extends HttpServlet {
         request.getRequestDispatcher("/pages/students/signupCpf.jsp").forward(request, response);
     }
 
+    /**
+     * Handles POST requests for CPF-based student signup.
+     *
+     * <p>Validates and normalizes the provided CPF, retrieves the corresponding student,
+     * and forwards to the signup page if the student is inactive. If not found or an error occurs,
+     * forwards to the CPF signup page with an appropriate error message.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String cpf = request.getParameter("cpf");

@@ -17,6 +17,34 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Servlet for displaying detailed information about a specific teacher.
+ *
+ * <p>This servlet handles HTTP GET requests to show the details of a teacher identified
+ * by the 'id' request parameter. It performs the following steps:
+ * <ul>
+ *     <li>Checks that the user has admin access using AccessValidation.</li>
+ *     <li>Validates and parses the 'id' parameter, throwing InvalidNumberException if invalid.</li>
+ *     <li>Fetches the teacher information from TeacherDAO.</li>
+ *     <li>Fetches the list of subjects taught by the teacher via SubjectDAO.</li>
+ *     <li>Fetches the list of school classes associated with the teacher via SchoolClassDAO.</li>
+ *     <li>Sets these objects as request attributes and forwards to the JSP page for display.</li>
+ * </ul>
+ *
+ * <p>If any validation, not-found, or data access error occurs, the servlet sets an
+ * appropriate error message either in the session or request scope and redirects or
+ * forwards to a fallback page.</p>
+ *
+ * @see HttpServlet
+ * @see TeacherDAO
+ * @see SubjectDAO
+ * @see SchoolClassDAO
+ * @see AccessValidation
+ * @see InvalidNumberException
+ * @see NotFoundException
+ * @see DataException
+ * @see ValidationException
+ */
 @WebServlet(name ="admin-teacher-details", value = "/admin/teacher/details")
 public class FindTeacherDetailsServlet extends HttpServlet {
     @Override

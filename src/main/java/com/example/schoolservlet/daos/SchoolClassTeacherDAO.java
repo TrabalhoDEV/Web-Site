@@ -7,6 +7,7 @@ import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.SchoolClass;
 import com.example.schoolservlet.models.SchoolClassTeacher;
 import com.example.schoolservlet.models.Teacher;
+import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.InputValidation;
 import com.example.schoolservlet.utils.PostgreConnection;
 import java.sql.*;
@@ -16,6 +17,20 @@ import java.util.Map;
 import java.util.Set;
 
 public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
+
+    /**
+     * Retrieves a SchoolClassTeacher record from the database using its unique identifier.
+     * The method validates the provided id and executes a query that joins the
+     * school_class_teacher, teacher, and school_class tables. The resulting data
+     * is mapped into a SchoolClassTeacher object containing the associated
+     * SchoolClass and Teacher entities.
+     *
+     * @param id the unique identifier of the SchoolClassTeacher record to be retrieved
+     * @return the SchoolClassTeacher object corresponding to the provided id
+     * @throws ValidationException if the provided id does not pass validation
+     * @throws NotFoundException if no record is found with the specified id
+     * @throws DataException if a database access error occurs during query execution
+     */
     @Override
     public SchoolClassTeacher findById(int id) throws ValidationException, NotFoundException, DataException{
         InputValidation.validateId( id, "id");
@@ -49,6 +64,130 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         }
     }
 
+    /**
+     * Retrieves a collection of teachers associated with a specific school class,
+     * supporting pagination and optional filtering by name or username.
+     * <p>
+     * The method queries the relationship between classes and teachers and
+     * returns teachers assigned to the specified class. It also calculates
+     * the number of subjects associated with each teacher. Results can be
+     * filtered and are returned in a paginated format.
+     * </p>
+     *
+     * @param skip the number of records to skip before starting to collect results
+     * @param take the maximum number of records to return
+     * @param schoolClassId the identifier of the school class whose teachers will be retrieved
+     * @param filter an optional filter used to search teachers by name or username
+     * @return a map containing teacher entities indexed by their identifier
+     * @throws DataException if an error occurs while accessing the database
+     */
+    public Map<Integer, Teacher> findManyByClass(int skip, int take, int schoolClassId, String filter) throws DataException {
+        boolean hasFilter = filter != null && !filter.isBlank();
+
+        String sql = "SELECT t.id, t.name, t.email, t.username, "
+                + "COUNT(st.id_subject) AS subject_count "
+                + "FROM teacher t "
+                + "INNER JOIN school_class_teacher sct ON sct.id_teacher = t.id "
+                + "LEFT JOIN subject_teacher st ON st.id_teacher = t.id "
+                + "WHERE sct.id_school_class = ? "
+                + (hasFilter ? "AND (t.name ILIKE ? OR t.username ILIKE ?) " : "")
+                + "GROUP BY t.id, t.name, t.email, t.username "
+                + "ORDER BY t.id "
+                + "LIMIT ? OFFSET ?";
+
+        Map<Integer, Teacher> teachers = new HashMap<>();
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int i = 1;
+            pstmt.setInt(i++, schoolClassId);
+
+            if (hasFilter) {
+                String like = "%" + filter.trim() + "%";
+                pstmt.setString(i++, like);
+                pstmt.setString(i++, like);
+            }
+
+            pstmt.setInt(i++, Math.min(Math.max(take, 0), Constants.MAX_TAKE));
+            pstmt.setInt(i,   Math.max(skip, 0));
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Teacher teacher = new Teacher(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("username")
+                );
+                teacher.setSubjectCount(rs.getInt("subject_count"));
+                teachers.put(teacher.getId(), teacher);
+            }
+
+            return teachers;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao listar professores da turma", sqle);
+        }
+    }
+
+    /**
+     * Counts the total number of teachers associated with a specific school class,
+     * with optional filtering by teacher name or username.
+     * <p>
+     * The method performs a query on the class-teacher relationship and returns
+     * the number of distinct teachers assigned to the specified class. When a
+     * filter is provided, only teachers whose name or username matches the
+     * filter criteria are included in the count.
+     * </p>
+     *
+     * @param schoolClassId the identifier of the school class whose teachers will be counted
+     * @param filter an optional filter used to search teachers by name or username
+     * @return the total number of teachers associated with the specified class
+     * @throws DataException if an error occurs while accessing the database
+     */
+    public int countByClass(int schoolClassId, String filter) throws DataException {
+        boolean hasFilter = filter != null && !filter.isBlank();
+
+        String sql = "SELECT COUNT(DISTINCT t.id) FROM teacher t "
+                + "INNER JOIN school_class_teacher sct ON sct.id_teacher = t.id "
+                + "WHERE sct.id_school_class = ? "
+                + (hasFilter ? "AND (t.name ILIKE ? OR t.username ILIKE ?)" : "");
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            int i = 1;
+            pstmt.setInt(i++, schoolClassId);
+
+            if (hasFilter) {
+                String like = "%" + filter.trim() + "%";
+                pstmt.setString(i++, like);
+                pstmt.setString(i,   like);
+            }
+
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next() ? rs.getInt(1) : 0;
+
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao contar professores da turma", sqle);
+        }
+    }
+
+    /**
+     * Retrieves multiple SchoolClassTeacher records from the database using pagination.
+     * The method executes a query that joins the school_class_teacher, teacher,
+     * and school_class tables to obtain related class and teacher information.
+     * Each result is mapped to a SchoolClassTeacher object and stored in a map
+     * where the key represents the record identifier.
+     *
+     * @param skip the number of records to skip before starting to return results
+     * @param take the maximum number of records to retrieve
+     * @return a map containing SchoolClassTeacher objects indexed by their unique identifier
+     * @throws DataException if a database access error occurs during query execution
+     */
     @Override
     public Map<Integer, SchoolClassTeacher> findMany(int skip, int take) throws DataException{
         Map<Integer, SchoolClassTeacher> schoolClassTeacherMap = new HashMap<>();
@@ -90,6 +229,15 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         }
     }
 
+    /**
+     * Retrieves the total number of SchoolClassTeacher records stored in the database.
+     * The method executes an aggregate COUNT query on the school_class_teacher table
+     * and returns the resulting value.
+     *
+     * @return the total number of SchoolClassTeacher records in the database,
+     *         or -1 if the query returns no result
+     * @throws DataException if a database access error occurs during query execution
+     */
     @Override
     public int totalCount() throws DataException{
         try(Connection conn = PostgreConnection.getConnection();
@@ -106,6 +254,17 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         }
     }
 
+    /**
+     * Creates a new association between a Teacher and a SchoolClass in the database.
+     * The method validates the identifiers of the related teacher and school class
+     * and inserts a new record into the school_class_teacher table representing
+     * the relationship between them.
+     *
+     * @param schoolClassTeacher the SchoolClassTeacher object containing the teacher
+     *                           and school class identifiers to be associated
+     * @throws DataException if a database access error occurs during the insert operation
+     * @throws ValidationException if the provided identifiers do not pass validation
+     */
     @Override
     public void create(SchoolClassTeacher schoolClassTeacher) throws DataException, ValidationException{
         InputValidation.validateId(schoolClassTeacher.getSchoolClass().getId(), "id da turma");
@@ -123,6 +282,17 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
             throw new DataException("Erro ao contar school_class_teacher", sqle);
         }
     }
+
+    /**
+     * Creates multiple associations between SchoolClass and Teacher records in the database.
+     * The method iterates through a list of SchoolClassTeacher objects and inserts each
+     * relationship into the school_class_teacher table using batch processing within
+     * a single transaction.
+     *
+     * @param scts the list of SchoolClassTeacher objects containing the associations
+     *             between school classes and teachers to be persisted
+     * @throws DataException if a database access error occurs during the batch insert operation
+     */
     public void createMany(List<SchoolClassTeacher> scts) throws DataException {
         String sql = "INSERT INTO school_class_teacher (id_school_class, id_teacher) VALUES (?, ?)";
         try (Connection conn = PostgreConnection.getConnection();
@@ -144,6 +314,18 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         }
     }
 
+    /**
+     * Updates an existing association between a Teacher and a SchoolClass in the database.
+     * The method validates the identifiers of the SchoolClassTeacher record, the related
+     * teacher, and the school class, then updates the corresponding record in the
+     * school_class_teacher table.
+     *
+     * @param schoolClassTeacher the SchoolClassTeacher object containing the identifier
+     *                           and updated relationship data
+     * @throws DataException if a database access error occurs during the update operation
+     * @throws ValidationException if any of the provided identifiers do not pass validation
+     * @throws NotFoundException if no record exists with the specified SchoolClassTeacher id
+     */
     @Override
     public void update(SchoolClassTeacher schoolClassTeacher) throws DataException, ValidationException, NotFoundException{
         InputValidation.validateId(schoolClassTeacher.getId(), "id");
@@ -164,6 +346,18 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         }
     }
 
+    /**
+     * Updates teacher associations by replacing occurrences of a specific teacher
+     * identifier with a new teacher identifier in the school_class_teacher records.
+     * The method validates both identifiers and performs an update operation
+     * affecting all records that reference the old teacher.
+     *
+     * @param oldTeacherId the identifier of the teacher currently associated with the records
+     * @param newTeacherId the identifier of the teacher that will replace the old one
+     * @throws DataException if a database access error occurs during the update operation
+     * @throws ValidationException if any of the provided identifiers do not pass validation
+     * @throws NotFoundException if no records exist with the specified old teacher identifier
+     */
     public void updateTeacher(int oldTeacherId, int newTeacherId) throws DataException, ValidationException, NotFoundException{
         InputValidation.validateId(oldTeacherId, "id");
         InputValidation.validateId(newTeacherId, "id");
@@ -180,7 +374,17 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         }
     }
 
-
+    /**
+     * Deletes a SchoolClassTeacher record from the database using its unique identifier.
+     * The method validates the provided id and executes a delete operation on the
+     * school_class_teacher table. If no record is affected by the operation,
+     * a not-found condition is raised.
+     *
+     * @param id the unique identifier of the SchoolClassTeacher record to be deleted
+     * @throws NotFoundException if no record exists with the specified id
+     * @throws DataException if a database access error occurs during the delete operation
+     * @throws ValidationException if the provided id does not pass validation
+     */
     @Override
     public void delete(int id) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId( id, "id");
@@ -196,27 +400,67 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
         }
     }
 
-    public void deleteManyByTeacherAndClasses(int teacherId, Set<Integer> classIds)
-            throws DataException {
+    /**
+     * Removes a set of subjects from the subject list assigned to a specific teacher
+     * across all related class-teacher records.
+     * <p>
+     * The method updates the teacher's subject list by removing each provided subject
+     * identifier. After the update, any class-teacher records that no longer contain
+     * subjects are deleted. All operations are executed within a database transaction
+     * to ensure consistency.
+     * </p>
+     *
+     * @param teacherId the identifier of the teacher whose subject assignments will be updated
+     * @param subjectIds the set of subject identifiers to be removed from the teacher's subject list
+     * @throws DataException if an error occurs while accessing or modifying the database
+     */
+    public void removeSubjectsFromList(int teacherId, Set<Integer> subjectIds) throws DataException {
+        String sql = """
+            UPDATE school_class_teacher
+            SET subject_list = array_remove(subject_list, ?)
+            WHERE id_teacher = ?
+            """;
 
-        if (classIds == null || classIds.isEmpty()) return;
+        String sqlDeleteEmpty = """
+            DELETE FROM school_class_teacher
+            WHERE id_teacher = ?
+            AND subject_list = '{}'
+            """;
 
-        String sql = "DELETE FROM school_class_teacher WHERE id_teacher = ? AND id_school_class = ?";
+        Connection conn = null;
+        try {
+            conn = PostgreConnection.getConnection();
+            conn.setAutoCommit(false);
 
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            for (Integer classId : classIds) {
-                ps.setInt(1, teacherId);
-                ps.setInt(2, classId);
-                ps.addBatch();
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                for (int subjectId : subjectIds) {
+                    pstmt.setInt(1, subjectId);
+                    pstmt.setInt(2, teacherId);
+                    pstmt.addBatch();
+                }
+                pstmt.executeBatch();
             }
 
-            ps.executeBatch();
+            // Deleta registros que ficaram sem nenhuma matéria
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlDeleteEmpty)) {
+                pstmt.setInt(1, teacherId);
+                pstmt.executeUpdate();
+            }
+
+            conn.commit();
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DataException("Erro ao remover múltiplos vínculos entre turmas e professores");
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ignored) {}
+            throw new DataException("Erro ao remover matérias do professor.", e);
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException ignored) {}
         }
     }
 }

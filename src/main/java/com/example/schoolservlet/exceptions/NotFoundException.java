@@ -2,6 +2,15 @@ package com.example.schoolservlet.exceptions;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * Exception thrown when a requested record is not found in the database.
+ *
+ * <p>This exception extends SchoolServletException and contains details about
+ * the table, field, and value that were searched for but not found. It also
+ * returns an HTTP 404 Not Found status.</p>
+ *
+ * @see SchoolServletException
+ */
 public class NotFoundException extends SchoolServletException{
     private String table;
     private String field;

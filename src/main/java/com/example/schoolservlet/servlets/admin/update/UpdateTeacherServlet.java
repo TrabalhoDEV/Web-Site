@@ -4,6 +4,7 @@ import com.example.schoolservlet.daos.*;
 import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.*;
 import com.example.schoolservlet.utils.*;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -28,6 +29,43 @@ public class UpdateTeacherServlet extends HttpServlet {
     private SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
     private TeacherDAO teacherDAO = new TeacherDAO();
 
+    private static String enrollInURL;
+
+    static{
+        Dotenv dotenv = null;
+
+        // Firstly, it tries to load .env locally
+        try {
+            dotenv = Dotenv.configure()
+                    .ignoreIfMissing()
+                    .load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            dotenv = null;
+        }
+
+        enrollInURL = ConfigService.getEnv("BASE_URL", dotenv);
+    }
+
+    /**
+     * Handles HTTP GET requests to load the teacher update page.
+     * <p>
+     * This method validates the teacher ID received from the request,
+     * retrieves the corresponding teacher from the database, and loads
+     * the necessary data to populate the update form. If the teacher is
+     * found, the request is forwarded to the teacher update JSP page.
+     * </p>
+     * <p>
+     * If the ID is invalid, missing, or the teacher does not exist,
+     * an appropriate error message is handled and displayed.
+     * Access to this endpoint is restricted to administrators.
+     * </p>
+     *
+     * @param request the {@link HttpServletRequest} containing the client request
+     * @param response the {@link HttpServletResponse} used to send the response
+     * @throws ServletException if a servlet-related error occurs
+     * @throws IOException if an input or output error occurs during request processing
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -141,11 +179,8 @@ public class UpdateTeacherServlet extends HttpServlet {
 
             subjectTeacherDAO.deleteManyByTeacherAndSubjects(teacher.getId(), toRemoveSubjects);
 
-            List<Integer> validClassIds = InputValidation.validateIdsExist(schoolClassIdsParam, schoolClassDAO.findAllIds());
-
-            Set<Integer> newSchoolClassIds = new HashSet<>();
-            if (validClassIds != null) {
-                newSchoolClassIds.addAll(validClassIds);
+            if (!toRemoveSubjects.isEmpty()) {
+                schoolClassTeacherDAO.removeSubjectsFromList(teacher.getId(), toRemoveSubjects);
             }
 
             List<SchoolClass> currentSchoolClasses = schoolClassDAO.findByTeacherId(teacher.getId());
@@ -155,39 +190,17 @@ public class UpdateTeacherServlet extends HttpServlet {
                 currentSchoolClassIds.add(sc.getId());
             }
 
-            Set<Integer> toAddClasses = new HashSet<>(newSchoolClassIds);
-            toAddClasses.removeAll(currentSchoolClassIds);
-
-            Set<Integer> toRemoveClasses = new HashSet<>(currentSchoolClassIds);
-            toRemoveClasses.removeAll(newSchoolClassIds);
-
-            if (!toAddClasses.isEmpty()) {
-                List<SchoolClassTeacher> classTeachersToInsert = new ArrayList<>();
-
-                for (Integer classId : toAddClasses) {
-                    SchoolClass schoolClass = schoolClassDAO.findById(classId);
-
-                    SchoolClassTeacher sct = new SchoolClassTeacher();
-                    sct.setTeacher(teacher);
-                    sct.setSchoolClass(schoolClass);
-                    classTeachersToInsert.add(sct);
-                }
-
-                schoolClassTeacherDAO.createMany(classTeachersToInsert);
-            }
-
-
-            schoolClassTeacherDAO.deleteManyByTeacherAndClasses(teacher.getId(), toRemoveClasses);
-
             try {
-                String assunto = "Edição dos dados do Sistema Escolar";
-                String mensagem = "Olá " + OutputFormatService.formatName(teacher.getName()) + ",<br><br>"
-                        + "Seus dados foram atualizados!.<br>"
-                        + String.format("<a href=\"%s/index.jsp\">Clique aqui para logar</a><br><br>", request.getContextPath())
-                        + "Atenciosamente,<br>"
-                        + "Secretaria Vértice";
+                String topic = "Acesso ao Sistema Escolar";
+                String message = "<h3 style=\"text-align:center;\">Olá " + OutputFormatService.formatName(teacher.getName()) + ",</h3>"
+                        + "<p style=\"text-align:center;\">Sua conta foi alterada pelo seu administrador.</p>"
+                        + "<p style=\"text-align:center;\">Caso tenha sido um engano fale com ele,</p>"
+                        + "<p style=\"text-align:center;\">Para logar, acesse o link abaixo:</p><br>"
+                        + "<p style=\"text-align:center;\">" + enrollInURL+"/auth" + "</p><br>"
+                        + "<p style=\"text-align:center;\">Atenciosamente,<br>"
+                        + "Secretaria Vértice</p>";
 
-                EmailService.sendEmail(teacher.getEmail(), assunto, mensagem);
+                EmailService.sendEmail(teacher.getEmail(), topic, message);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -197,24 +210,35 @@ public class UpdateTeacherServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             request.getSession().setAttribute("error", "ID inválido.");
             response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
-            return;
         } catch (DataException | NotFoundException e) {
             request.getSession().setAttribute("error", e.getMessage());
             response.sendRedirect(request.getContextPath() + "/admin/teacher/find-many");
-            return;
         } catch (ValueAlreadyExistsException vaee){
             loadSafely(request, id);
             request.setAttribute("error", vaee.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
-            return;
         } catch (ValidationException ve){
             loadSafely(request, id);
             request.setAttribute("error", ve.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/admin/update/teacher.jsp").forward(request, response);
-            return;
         }
     }
 
+    /**
+     * Loads the data required to populate the teacher update page.
+     * <p>
+     * This method retrieves the teacher information, the list of all
+     * available subjects, and the subjects currently associated with
+     * the teacher. These data are then stored as request attributes so
+     * they can be used to pre-fill the update form in the view layer.
+     * </p>
+     *
+     * @param request the {@link HttpServletRequest} used to store attributes for the view
+     * @param teacherId the unique identifier of the teacher whose data will be loaded
+     * @throws DataException if an error occurs while accessing the data source
+     * @throws NotFoundException if the teacher with the given ID does not exist
+     * @throws ValidationException if the provided teacher ID fails validation
+     */
     private void loadUpdateData(HttpServletRequest request, int teacherId)
             throws DataException, NotFoundException, ValidationException {
 
@@ -223,25 +247,44 @@ public class UpdateTeacherServlet extends HttpServlet {
         List<Subject> teacherSubjects =
                 subjectDAO.findByTeacherId(teacherId);
 
-        List<SchoolClass> allSchoolClasses =
-                schoolClassDAO.findAll();
-        List<SchoolClass> teacherSchoolClasses =
-                schoolClassDAO.findByTeacherId(teacherId);
-
         request.setAttribute("teacher", teacher);
         request.setAttribute("subjects", allSubjects);
         request.setAttribute("teacherSubjects", teacherSubjects);
-        request.setAttribute("schoolClasses", allSchoolClasses);
-        request.setAttribute("teacherSchoolClasses",
-                teacherSchoolClasses);
     }
 
+    /**
+     * Safely loads the data required for the teacher update page.
+     * <p>
+     * This method wraps the {@code loadUpdateData} call to prevent
+     * checked exceptions from interrupting the request flow. Any
+     * exception thrown during the loading process is silently ignored,
+     * allowing the application to continue rendering the view even if
+     * some data cannot be retrieved.
+     * </p>
+     *
+     * @param request the {@link HttpServletRequest} used to store attributes for the view
+     * @param id the unique identifier of the teacher whose data should be loaded
+     */
     private void loadSafely(HttpServletRequest request, int id) {
         try {
             loadUpdateData(request, id);
         } catch (Exception ignored) {}
     }
 
+    /**
+     * Handles errors that occur during the teacher update flow.
+     * <p>
+     * This method sets an error message as a request attribute and forwards
+     * the request to the teacher listing page so the message can be displayed
+     * to the user.
+     * </p>
+     *
+     * @param request the {@link HttpServletRequest} containing the current request
+     * @param response the {@link HttpServletResponse} used to send the response
+     * @param message the error message to be shown to the user
+     * @throws ServletException if an error occurs while forwarding the request
+     * @throws IOException if an input or output error occurs during request processing
+     */
     private void handleError(HttpServletRequest request,
                              HttpServletResponse response,
                              String message)

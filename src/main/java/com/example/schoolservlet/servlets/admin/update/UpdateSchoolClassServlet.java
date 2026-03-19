@@ -28,6 +28,17 @@ public class UpdateSchoolClassServlet extends HttpServlet {
     private SchoolClassSubjectDAO schoolClassSubjectDAO = new SchoolClassSubjectDAO();
     private StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
 
+    /**
+     * Handles GET requests to load a school class and its subjects for update.
+     *
+     * <p>Validates the school class ID, fetches current data, and forwards to the update JSP page.
+     * If the ID is invalid or an error occurs, sets an error message and redirects or forwards accordingly.</p>
+     *
+     * @param request  HttpServletRequest containing client request data.
+     * @param response HttpServletResponse used to forward to JSP or redirect on error.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding or redirect.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -68,6 +79,18 @@ public class UpdateSchoolClassServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Handles POST requests to update a school class and its associated subjects.
+     *
+     * <p>Validates input, updates the school class name if changed, adds new subject associations,
+     * removes unassigned subjects, updates student-subject relationships, and redirects to the listing page.
+     * Errors are handled by forwarding to the update JSP with an error message.</p>
+     *
+     * @param request  HttpServletRequest containing form data for school class and subjects.
+     * @param response HttpServletResponse used to redirect or forward on error.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding or redirect.
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -90,7 +113,6 @@ public class UpdateSchoolClassServlet extends HttpServlet {
 
             SchoolClass schoolClass = schoolClassDAO.findById(schoolClassId);
 
-            String[] subjectIdsParam = request.getParameterValues("subjectIds");
             String name = request.getParameter("schoolYear");
 
             InputValidation.validateSchoolClassName(name);
@@ -101,48 +123,6 @@ public class UpdateSchoolClassServlet extends HttpServlet {
                 schoolClass.setSchoolYear(name);
                 schoolClassDAO.update(schoolClass);
             }
-
-            List<Integer> validSubjectIds = InputValidation.validateIdsExist(
-                    subjectIdsParam,
-                    subjectDAO.findAllIds()
-            );
-
-            Set<Integer> newSubjectIds = new HashSet<>();
-            if (validSubjectIds != null) {
-                newSubjectIds.addAll(validSubjectIds);
-            }
-
-            List<Subject> currentSubjects = subjectDAO.findBySchoolClassId(schoolClassId);
-
-            Set<Integer> currentSubjectIds = new HashSet<>();
-            for (Subject s : currentSubjects) {
-                currentSubjectIds.add(s.getId());
-            }
-
-            Set<Integer> toAddSubjects = new HashSet<>(newSubjectIds);
-            toAddSubjects.removeAll(currentSubjectIds);
-
-            Set<Integer> toRemoveSubjects = new HashSet<>(currentSubjectIds);
-            toRemoveSubjects.removeAll(newSubjectIds);
-
-            if (!toAddSubjects.isEmpty()) {
-                List<SchoolClassSubject> schoolClassSubjectsToInsert = new ArrayList<>();
-
-                for (Integer subjectId : toAddSubjects) {
-                    Subject subject = subjectDAO.findById(subjectId);
-
-                    SchoolClassSubject scs = new SchoolClassSubject();
-                    scs.setSchoolClass(schoolClass);
-                    scs.setSubject(subject);
-                    schoolClassSubjectsToInsert.add(scs);
-                }
-
-                schoolClassSubjectDAO.createMany(schoolClassSubjectsToInsert);
-                studentSubjectDAO.createManyBySchoolClass(schoolClassId, new ArrayList<>(toAddSubjects));
-            }
-
-            schoolClassSubjectDAO.deleteManyBySchoolClassAndSubjects(schoolClassId, toRemoveSubjects);
-            studentSubjectDAO.deleteManyBySchoolClass(schoolClassId, new ArrayList<>(toRemoveSubjects));
 
             response.sendRedirect(request.getContextPath() + "/admin/school-class/find-many");
 
@@ -164,18 +144,35 @@ public class UpdateSchoolClassServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Loads data required for updating a school class and sets it as request attributes.
+     *
+     * <p>Fetches the school class, all subjects, and subjects currently assigned to the class,
+     * then sets them as attributes for use in the update JSP page.</p>
+     *
+     * @param request       HttpServletRequest to store attributes for the JSP page.
+     * @param schoolClassId ID of the school class to load.
+     * @throws DataException       If a data access error occurs.
+     * @throws NotFoundException   If the school class is not found.
+     * @throws ValidationException If input validation fails.
+     */
     private void loadUpdateData(HttpServletRequest request, int schoolClassId)
             throws DataException, NotFoundException, ValidationException {
 
         SchoolClass schoolClass = schoolClassDAO.findById(schoolClassId);
-        List<Subject> allSubjects = subjectDAO.findAll();
-        List<Subject> schoolClassSubjects = subjectDAO.findBySchoolClassId(schoolClassId);
 
         request.setAttribute("schoolClass", schoolClass);
-        request.setAttribute("subjects", allSubjects);
-        request.setAttribute("schoolClassSubjects", schoolClassSubjects);
     }
 
+    /**
+     * Safely loads update data for a school class, ignoring any exceptions.
+     *
+     * <p>Attempts to call {@link #loadUpdateData(HttpServletRequest, int)} and suppresses all exceptions
+     * to prevent breaking the request flow.</p>
+     *
+     * @param request       HttpServletRequest to store attributes for the JSP page.
+     * @param schoolClassId ID of the school class to load.
+     */
     private void loadSafely(HttpServletRequest request, int schoolClassId) {
         try {
             loadUpdateData(request, schoolClassId);

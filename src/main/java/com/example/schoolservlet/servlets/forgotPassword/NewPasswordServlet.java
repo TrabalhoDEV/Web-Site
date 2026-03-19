@@ -15,6 +15,20 @@ import java.io.IOException;
 
 @WebServlet(name = "forget-password-new-password", value = "/auth/forgot-password/new-password")
 public class NewPasswordServlet extends HttpServlet {
+
+    /**
+     * Handles GET requests for the new password page during password recovery.
+     *
+     * <p>Verifies that a valid session exists and contains both user ID and role.
+     * If the session is missing or attributes are invalid, forwards the user to
+     * the code request page with an appropriate error message. Otherwise, forwards
+     * the request to the page where the user can set a new password.</p>
+     *
+     * @param request  the HttpServletRequest containing session attributes
+     * @param response the HttpServletResponse used for forwarding or error handling
+     * @throws ServletException if an error occurs during request forwarding
+     * @throws IOException      if an I/O error occurs during request forwarding
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
@@ -35,6 +49,20 @@ public class NewPasswordServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/forgotPassword/newPassword.jsp").forward(request, response);
     }
 
+    /**
+     * Handles POST requests to set a new password during password recovery.
+     *
+     * <p>Validates the new password and confirmation, checks session for valid
+     * user ID and role, and updates the password for the corresponding user type
+     * (ADMIN, TEACHER, or STUDENT). If validation fails or an error occurs during
+     * update, the request is forwarded back to the new password page with an error message.
+     * Successful updates redirect the user to the appropriate login page.</p>
+     *
+     * @param request  the HttpServletRequest containing user input and session
+     * @param response the HttpServletResponse used for forwarding or redirecting
+     * @throws ServletException if an error occurs during request forwarding
+     * @throws IOException      if an I/O error occurs during request forwarding
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");

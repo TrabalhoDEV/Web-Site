@@ -19,6 +19,18 @@ import java.io.IOException;
 public class UpdateAdminServlet extends HttpServlet {
     private final String page = "/WEB-INF/views/admin/update/admin.jsp";
 
+    /**
+     * Handles GET requests to load the admin's current data for update.
+     *
+     * <p>Retrieves the authenticated user from the session, fetches admin data,
+     * and forwards to the admin update JSP page. If the session is expired or
+     * an error occurs, it forwards to the appropriate error or login page.</p>
+     *
+     * @param request  HttpServletRequest containing client request data.
+     * @param response HttpServletResponse used to forward to JSP or error page.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -47,6 +59,18 @@ public class UpdateAdminServlet extends HttpServlet {
         request.getRequestDispatcher(this.page).forward(request, response);
     }
 
+    /**
+     * Handles POST requests to update admin user information and password.
+     *
+     * <p>Validates email and document, updates password if provided and confirmed,
+     * updates admin data via {@link AdminDAO}, and redirects to the admin detail page.
+     * Errors are handled by forwarding to the update page with messages.</p>
+     *
+     * @param request  HttpServletRequest containing form data.
+     * @param response HttpServletResponse used to redirect or forward on error.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding or redirect.
+     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html");
@@ -118,6 +142,16 @@ public class UpdateAdminServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/admin/find-one");
     }
 
+    /**
+     * Retrieves the admin data for the given authenticated user and sets it as a request attribute.
+     *
+     * @param request  HttpServletRequest to store the admin data.
+     * @param response HttpServletResponse, not directly used but included for context.
+     * @param user     AuthenticatedUser whose admin data is to be fetched.
+     * @throws NotFoundException   If the admin record is not found.
+     * @throws DataException       If a data access error occurs.
+     * @throws ValidationException If any validation error occurs during retrieval.
+     */
     private void getData(HttpServletRequest request, HttpServletResponse response, AuthenticatedUser user) throws NotFoundException, DataException, ValidationException {
         AdminDAO adminDAO = new AdminDAO();
         Admin admin = adminDAO.findById(user.id());

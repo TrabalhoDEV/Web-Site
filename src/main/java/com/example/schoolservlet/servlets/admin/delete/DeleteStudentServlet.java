@@ -16,6 +16,20 @@ import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
 
+/**
+ * Servlet responsible for handling the deletion of students in the admin panel.
+ *
+ * <p>This servlet processes HTTP GET requests to delete a student based on their ID.
+ * It validates the ID parameter, checks admin access, and attempts to find and delete
+ * the specified student using StudentDAO. Any errors encountered during the process
+ * are stored in the session for feedback. After processing, it redirects to the
+ * student listing page.</p>
+ *
+ * @see HttpServlet
+ * @see StudentDAO
+ * @see AccessValidation
+ * @see InputValidation
+ */
 @WebServlet(name = "DeleteStudentServlet", value = "/admin/student/delete")
 public class DeleteStudentServlet extends HttpServlet {
     private final StudentDAO studentDAO = new StudentDAO();

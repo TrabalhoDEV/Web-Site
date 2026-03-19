@@ -29,6 +29,19 @@ public class GenerateBulletinPdfServlet extends HttpServlet {
     private final SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        /**
+         * Servlet for generating a student's bulletin PDF.
+         *
+         * <p>GET: Validates student access and session, retrieves student information,
+         * subjects, and class data, then generates and streams a PDF to the response.
+         * Errors are forwarded to the bulletin JSP page with proper status and messages.
+         *
+         * @param request  the HttpServletRequest object
+         * @param response the HttpServletResponse object
+         * @throws ServletException if a servlet-specific error occurs
+         * @throws IOException      if an I/O error occurs
+         */
         if (!AccessValidation.isStudent(request, response)) return;
 
         HttpSession session = request.getSession(false);
