@@ -73,8 +73,9 @@ public class RenderStudentSubjectGradesDashboardServlet extends HttpServlet {
         String studentSubjectIdParam = request.getParameter(STUDENT_SUBJECT_ID_PARAM);
         try{
             getAllData(request, response, studentSubjectIdParam, user.id());
-        } catch (UnauthorizedException e){
-            response.sendRedirect("/teacher/student/find-many");
+        } catch (UnauthorizedException | NotFoundException e){
+            response.sendRedirect(request.getContextPath() + "/teacher/student/find-many");
+            return;
         }
         request.getRequestDispatcher(RELEASE_GRADE_VIEW).forward(request, response);
     }
@@ -93,7 +94,7 @@ public class RenderStudentSubjectGradesDashboardServlet extends HttpServlet {
      * @param studentSubjectIdParam raw student-subject identifier from the request
      * @return {@code true} when the relation is loaded successfully; {@code false} otherwise
      */
-    public static boolean getAllData(HttpServletRequest request, HttpServletResponse response, String studentSubjectIdParam, int teacherId) throws UnauthorizedException{
+    public static boolean getAllData(HttpServletRequest request, HttpServletResponse response, String studentSubjectIdParam, int teacherId) throws UnauthorizedException, NotFoundException{
         if (studentSubjectIdParam == null || studentSubjectIdParam.trim().isEmpty()) {
             setRequestError(
                     request,
@@ -116,13 +117,10 @@ public class RenderStudentSubjectGradesDashboardServlet extends HttpServlet {
                     HttpServletResponse.SC_BAD_REQUEST,
                     "ID da relação aluno-matéria deve ser um número inteiro válido"
             );
-        } catch (UnauthorizedException e){
-
-        } catch (NotFoundException | ValidationException e) {
-            setRequestError(request, response, e.getStatus(), e.getMessage());
-        } catch (DataException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load student subject for the grade release dashboard.", e);
-            setRequestError(request, response, e.getStatus(), e.getMessage());
+        } catch (UnauthorizedException | NotFoundException e) {
+            throw e;
+        } catch (ValidationException | DataException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
         return false;
