@@ -2,10 +2,13 @@ package com.example.schoolservlet.servlets.teacher;
 
 import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
+import com.example.schoolservlet.exceptions.InvalidNumberException;
 import com.example.schoolservlet.exceptions.NotFoundException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.StudentSubject;
+import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.*;
+import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -93,13 +96,30 @@ public class ReleaseGradesServlet extends HttpServlet {
         String observationsParam = request.getParameter("obs");
         Double grade1 = null;
         Double grade2 = null;
+        AuthenticatedUser user;
+        Teacher teacher;
+
+        try {
+            user = (AuthenticatedUser) session.getAttribute("user");
+        } catch (NullPointerException npe) {
+            // User not authenticated or session attribute missing
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            request.setAttribute("error", "Sessão expirada, faça login novamente");
+            request.getRequestDispatcher("/WEB-INF/views/teacher/index.jsp")
+                    .forward(request, response);
+            return;
+        }
 
         int studentSubjectId;
         try {
             studentSubjectId = Integer.parseInt(studentSubjectIdParam);
+            studentSubjectDAO.findById(studentSubjectId, user.id());
         } catch (NumberFormatException e) {
             session.setAttribute("error", "ID deve ser um número inteiro");
             response.sendRedirect(request.getContextPath() + "/teacher/student/find-many");
+            return;
+        } catch (DataException | ValidationException | NotFoundException e){
+            response.sendRedirect("/teacher/student/find-many");
             return;
         }
 
@@ -135,7 +155,6 @@ public class ReleaseGradesServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/teacher/student/find-many");
         } catch (DataException | ValidationException e) {
             request.setAttribute("error", e.getMessage());
-            getAllData(request, response, studentSubjectIdParam);
             request.getRequestDispatcher("/WEB-INF/views/teacher/student/releaseGrade.jsp")
                     .forward(request, response);
         } catch (NumberFormatException e){

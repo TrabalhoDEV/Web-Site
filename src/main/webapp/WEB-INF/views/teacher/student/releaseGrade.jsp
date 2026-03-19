@@ -196,7 +196,9 @@
                 <% if (ss == null) { %>
                     <div class="error-message">
                         <p>Informações do aluno-matéria não estão disponíveis.</p>
-                        <p><a href="<%= request.getContextPath() %>/teacher/students">Voltar para a lista de alunos</a></p>
+                        <div class="form-actions">
+                            <a href="<%= request.getContextPath() %>/teacher/student/find-many" class="primary-button">Voltar</a>
+                        </div>
                     </div>
                 <% } else { %>
 
@@ -236,8 +238,8 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-cancel" onclick="window.history.back()">Cancelar</button>
-                            <button type="submit" class="btn-save">Salvar Notas</button>
+                            <button type="submit" class="primary-button">Salvar Notas</button>
+                            <button type="button" class="secondary-button" onclick="window.history.back()">Cancelar</button>
                         </div>
                     </form>
 

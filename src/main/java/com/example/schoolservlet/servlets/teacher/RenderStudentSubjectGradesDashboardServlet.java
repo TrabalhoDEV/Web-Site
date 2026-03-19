@@ -3,14 +3,18 @@ package com.example.schoolservlet.servlets.teacher;
 import com.example.schoolservlet.daos.StudentSubjectDAO;
 import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.exceptions.NotFoundException;
+import com.example.schoolservlet.exceptions.UnauthorizedException;
 import com.example.schoolservlet.exceptions.ValidationException;
 import com.example.schoolservlet.models.StudentSubject;
+import com.example.schoolservlet.models.Teacher;
 import com.example.schoolservlet.utils.AccessValidation;
+import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -50,8 +54,28 @@ public class RenderStudentSubjectGradesDashboardServlet extends HttpServlet {
             return;
         }
 
+        AuthenticatedUser user;
+        Teacher teacher;
+        HttpSession session = request.getSession(false);
+
+        try {
+            user = (AuthenticatedUser) session.getAttribute("user");
+            teacher = (Teacher) session.getAttribute("teacher");
+        } catch (NullPointerException npe) {
+            // User not authenticated or session attribute missing
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            request.setAttribute("error", "Sessão expirada, faça login novamente");
+            request.getRequestDispatcher("/WEB-INF/views/teacher/index.jsp")
+                    .forward(request, response);
+            return;
+        }
+
         String studentSubjectIdParam = request.getParameter(STUDENT_SUBJECT_ID_PARAM);
-        getAllData(request, response, studentSubjectIdParam);
+        try{
+            getAllData(request, response, studentSubjectIdParam, user.id());
+        } catch (UnauthorizedException e){
+            response.sendRedirect("/teacher/student/find-many");
+        }
         request.getRequestDispatcher(RELEASE_GRADE_VIEW).forward(request, response);
     }
 
@@ -69,7 +93,7 @@ public class RenderStudentSubjectGradesDashboardServlet extends HttpServlet {
      * @param studentSubjectIdParam raw student-subject identifier from the request
      * @return {@code true} when the relation is loaded successfully; {@code false} otherwise
      */
-    public static boolean getAllData(HttpServletRequest request, HttpServletResponse response, String studentSubjectIdParam) {
+    public static boolean getAllData(HttpServletRequest request, HttpServletResponse response, String studentSubjectIdParam, int teacherId) throws UnauthorizedException{
         if (studentSubjectIdParam == null || studentSubjectIdParam.trim().isEmpty()) {
             setRequestError(
                     request,
@@ -81,7 +105,7 @@ public class RenderStudentSubjectGradesDashboardServlet extends HttpServlet {
         }
 
         try {
-            StudentSubject studentSubject = new StudentSubjectDAO().findById(Integer.parseInt(studentSubjectIdParam.trim()));
+            StudentSubject studentSubject = new StudentSubjectDAO().findById(Integer.parseInt(studentSubjectIdParam.trim()), teacherId);
             request.removeAttribute(ERROR_ATTRIBUTE);
             request.setAttribute(STUDENT_SUBJECT_ATTRIBUTE, studentSubject);
             return true;
@@ -92,6 +116,8 @@ public class RenderStudentSubjectGradesDashboardServlet extends HttpServlet {
                     HttpServletResponse.SC_BAD_REQUEST,
                     "ID da relação aluno-matéria deve ser um número inteiro válido"
             );
+        } catch (UnauthorizedException e){
+
         } catch (NotFoundException | ValidationException e) {
             setRequestError(request, response, e.getStatus(), e.getMessage());
         } catch (DataException e) {
