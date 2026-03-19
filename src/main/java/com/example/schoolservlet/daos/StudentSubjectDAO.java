@@ -736,40 +736,43 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         List<TeacherPendency> pendencies = new ArrayList<>();
 
         try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("SELECT \n" +
-                     "st.id AS id_student,\n" +
-                     "ss.id AS id,\n" +
-                     "ss.grade1,\n" +
-                     "ss.grade2,\n" +
-                     "st.name AS student_name,\n" +
-                     "sb.name AS subject_name,\n" +
-                     "sb.deadline,\n" +
-                     "CASE\n" +
-                     "     WHEN sb.deadline < CURRENT_DATE THEN 'Atrasada'\n" +
-                     "     WHEN sb.deadline <= CURRENT_DATE + INTERVAL '7 days' THEN 'Perto do prazo'\n" +
-                     "     ELSE 'Dentro do prazo'\n" +
-                     "END AS status\n" +
-                     "FROM student_subject ss\n" +
-                     "JOIN student st ON st.id = ss.id_student\n" +
-                     "JOIN subject sb ON sb.id = ss.id_subject\n" +
-                     "JOIN school_class sc ON sc.id = st.id_school_class\n" +
-                     "WHERE EXISTS ( " +
-                     "   SELECT 1 FROM school_class_teacher sct " +
-                     "   WHERE sct.id_school_class = sc.id " +
-                     "   AND sct.id_teacher = ? " +
-                     ") " +
-                     "AND EXISTS ( " +
-                     "   SELECT 1 FROM subject_teacher stt " +
-                     "   WHERE stt.id_subject = sb.id " +
-                     "   AND stt.id_teacher = ? " +
-                     ") " + "AND st.status = ? " +
-                     "AND (ss.grade1 IS NULL OR ss.grade2 IS NULL) " +
-                     "ORDER BY sb.deadline ASC " +
-                     "LIMIT ?")) {
-            pstmt.setInt(1, idTeacher);
+             PreparedStatement pstmt = conn.prepareStatement("""
+                 SELECT
+                     st.id AS id_student,
+                     ss.id,
+                     ss.grade1,
+                     ss.grade2,
+                     st.name AS student_name,
+                     sb.name AS subject_name,
+                     sb.deadline,
+                     CASE
+                         WHEN sb.deadline < CURRENT_DATE THEN 'Atrasada'
+                         WHEN sb.deadline <= CURRENT_DATE + INTERVAL '7 days' THEN 'Perto do prazo'
+                         ELSE 'Dentro do prazo'
+                     END AS status
+                 FROM student_subject ss
+                 JOIN student st ON st.id = ss.id_student
+                 JOIN subject sb ON sb.id = ss.id_subject
+                 JOIN school_class sc ON sc.id = st.id_school_class
+                 WHERE st.status = ?
+                 AND EXISTS (
+                     SELECT 1 FROM school_class_teacher sct
+                     WHERE sct.id_school_class = sc.id
+                     AND sct.id_teacher = ?
+                     AND sb.id = ANY(sct.subject_list)
+                 )
+                 AND EXISTS (
+                     SELECT 1 FROM subject_teacher stt
+                     WHERE stt.id_subject = sb.id
+                     AND stt.id_teacher = ?
+                 )
+                 AND (ss.grade1 IS NULL OR ss.grade2 IS NULL)
+                 ORDER BY sb.deadline ASC
+                 LIMIT ?
+                 """)) {
+            pstmt.setInt(1, StudentStatusEnum.ACTIVE.ordinal() + 1);
             pstmt.setInt(2, idTeacher);
-            pstmt.setInt(3, StudentStatusEnum.ACTIVE.ordinal() + 1);
-
+            pstmt.setInt(3, idTeacher);
             pstmt.setInt(4, Constants.PENDENCIES_TAKE);
 
             ResultSet rs = pstmt.executeQuery();
