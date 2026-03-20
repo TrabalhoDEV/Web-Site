@@ -10,9 +10,7 @@ import java.util.*;
 
 import com.example.schoolservlet.daos.interfaces.GenericDAO;
 import com.example.schoolservlet.daos.interfaces.IStudentSubjectDAO;
-import com.example.schoolservlet.exceptions.DataException;
-import com.example.schoolservlet.exceptions.NotFoundException;
-import com.example.schoolservlet.exceptions.ValidationException;
+import com.example.schoolservlet.exceptions.*;
 import com.example.schoolservlet.models.Student;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.models.Subject;
@@ -86,24 +84,24 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("""
-                 SELECT
-                     ss.id, ss.obs, ss.grade1, ss.grade2,
-                     st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email,
-                     sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline
-                 FROM student st
-                 JOIN school_class sc ON sc.id = st.id_school_class
-                 JOIN student_subject ss ON ss.id_student = st.id
-                 JOIN subject sb ON sb.id = ss.id_subject
-                 WHERE st.status = ?
-                 AND EXISTS (
-                     SELECT 1 FROM school_class_teacher sct
-                     WHERE sct.id_school_class = sc.id
-                     AND sct.id_teacher = ?
-                     AND sb.id = ANY(sct.subject_list)
-                 )
-                 ORDER BY st.id
-                 LIMIT ? OFFSET ?
-                 """)) {
+                     SELECT
+                         ss.id, ss.obs, ss.grade1, ss.grade2,
+                         st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email,
+                         sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline
+                     FROM student st
+                     JOIN school_class sc ON sc.id = st.id_school_class
+                     JOIN student_subject ss ON ss.id_student = st.id
+                     JOIN subject sb ON sb.id = ss.id_subject
+                     WHERE st.status = ?
+                     AND EXISTS (
+                         SELECT 1 FROM school_class_teacher sct
+                         WHERE sct.id_school_class = sc.id
+                         AND sct.id_teacher = ?
+                         AND sb.id = ANY(sct.subject_list)
+                     )
+                     ORDER BY st.id
+                     LIMIT ? OFFSET ?
+                     """)) {
 
             pstmt.setInt(1, StudentStatusEnum.ACTIVE.ordinal() + 1);
             pstmt.setInt(2, teacherId);
@@ -157,19 +155,19 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         InputValidation.validateId(teacherId, "id do professor");
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("""
-                 SELECT COUNT(DISTINCT st.id)
-                 FROM student st
-                 JOIN school_class sc ON sc.id = st.id_school_class
-                 JOIN student_subject ss ON ss.id_student = st.id
-                 JOIN subject sb ON sb.id = ss.id_subject
-                 WHERE st.status = ?
-                 AND EXISTS (
-                     SELECT 1 FROM school_class_teacher sct
-                     WHERE sct.id_school_class = sc.id
-                     AND sct.id_teacher = ?
-                     AND sb.id = ANY(sct.subject_list)
-                 )
-                 """)) {
+                     SELECT COUNT(DISTINCT st.id)
+                     FROM student st
+                     JOIN school_class sc ON sc.id = st.id_school_class
+                     JOIN student_subject ss ON ss.id_student = st.id
+                     JOIN subject sb ON sb.id = ss.id_subject
+                     WHERE st.status = ?
+                     AND EXISTS (
+                         SELECT 1 FROM school_class_teacher sct
+                         WHERE sct.id_school_class = sc.id
+                         AND sct.id_teacher = ?
+                         AND sb.id = ANY(sct.subject_list)
+                     )
+                     """)) {
 
             pstmt.setInt(1, StudentStatusEnum.ACTIVE.ordinal() + 1);
             pstmt.setInt(2, teacherId);
@@ -188,22 +186,22 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         InputValidation.validateId(teacherId, "id do professor");
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("""
-                 SELECT COUNT(ss.id)
-                 FROM student st
-                 JOIN school_class sc ON sc.id = st.id_school_class
-                 JOIN student_subject ss ON ss.id_student = st.id
-                 JOIN school_class_subject scs
-                     ON scs.id_school_class = sc.id
-                     AND scs.id_subject = ss.id_subject
-                 WHERE st.id = ?
-                 AND EXISTS (
-                     SELECT 1
-                     FROM school_class_teacher sct
-                     WHERE sct.id_school_class = sc.id
-                     AND sct.id_teacher = ?
-                     AND ss.id_subject = ANY (sct.subject_list)
-                 )
-                 """)) {
+                     SELECT COUNT(ss.id)
+                     FROM student st
+                     JOIN school_class sc ON sc.id = st.id_school_class
+                     JOIN student_subject ss ON ss.id_student = st.id
+                     JOIN school_class_subject scs
+                         ON scs.id_school_class = sc.id
+                         AND scs.id_subject = ss.id_subject
+                     WHERE st.id = ?
+                     AND EXISTS (
+                         SELECT 1
+                         FROM school_class_teacher sct
+                         WHERE sct.id_school_class = sc.id
+                         AND sct.id_teacher = ?
+                         AND ss.id_subject = ANY (sct.subject_list)
+                     )
+                     """)) {
 
             pstmt.setInt(1, studentId);
             pstmt.setInt(2, teacherId);
@@ -457,7 +455,7 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
     }
 
     @Override
-    public StudentSubject findById(int id) throws NotFoundException, DataException, ValidationException {
+    public StudentSubject findById(int id) throws NotFoundException, DataException, RequiredFieldException, InvalidNumberException{
         InputValidation.validateId(id, "id");
 
         try (Connection conn = PostgreConnection.getConnection();
@@ -501,6 +499,74 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                         subject
                 );
             } else throw new NotFoundException("student_subject", "id", String.valueOf(id));
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new DataException("Erro ao buscar relação entre aluno e matéria", sqle);
+        }
+    }
+
+    public StudentSubject findById(int id, int teacherId) throws NotFoundException, DataException, UnauthorizedException, InvalidNumberException, RequiredFieldException {
+        InputValidation.validateId(id, "id");
+        InputValidation.validateId(teacherId, "id do professor");
+
+        try (Connection conn = PostgreConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement("""
+                 SELECT
+                     ss.id,
+                     ss.obs,
+                     ss.grade1,
+                     ss.grade2,
+                     st.id    AS id_student,
+                     st.name  AS student_name,
+                     st.cpf   AS student_cpf,
+                     st.email AS student_email,
+                     sb.id    AS id_subject,
+                     sb.name  AS subject_name,
+                     sb.deadline AS subject_deadline
+                 FROM student_subject ss
+                 JOIN student              st  ON st.id               = ss.id_student
+                 JOIN subject              sb  ON sb.id               = ss.id_subject
+                 JOIN school_class         sc  ON sc.id               = st.id_school_class
+                 JOIN school_class_teacher sct ON sct.id_school_class = sc.id
+                                              AND sct.id_teacher      = ?
+                                              AND sb.id               = ANY(sct.subject_list)
+                 WHERE ss.id = ?
+                 """)) {
+
+            pstmt.setInt(1, teacherId);
+            pstmt.setInt(2, id);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                Student student = new Student();
+                student.setId(rs.getInt("id_student"));
+                student.setName(rs.getString("student_name"));
+                student.setCpf(rs.getString("student_cpf"));
+                student.setEmail(rs.getString("student_email"));
+                student.setStatus(StudentStatusEnum.ACTIVE);
+
+                Subject subject = new Subject();
+                subject.setId(rs.getInt("id_subject"));
+                subject.setName(rs.getString("subject_name"));
+                subject.setDeadline(rs.getDate("subject_deadline"));
+
+                return new StudentSubject(
+                        rs.getInt("id"),
+                        rs.getString("obs"),
+                        rs.getObject("grade1") != null ? rs.getDouble("grade1") : null,
+                        rs.getObject("grade2") != null ? rs.getDouble("grade2") : null,
+                        student,
+                        subject
+                );
+            }
+
+            if (findById(id) != null) {
+                throw new UnauthorizedException("Professor não tem acesso a essa relação aluno-matéria");
+            } else {
+                throw new NotFoundException("student_subject", "id", String.valueOf(id));
+            }
+
         } catch (SQLException sqle) {
             sqle.printStackTrace();
             throw new DataException("Erro ao buscar relação entre aluno e matéria", sqle);
@@ -605,35 +671,49 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         InputValidation.validateId(teacherId, "id do professor");
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
 
-        String sql = "SELECT * FROM (" +
-                "SELECT ss.id, ss.obs, ss.grade1, ss.grade2, " +
-                "st.id AS id_student, st.name AS student_name, st.cpf AS student_cpf, st.email AS student_email, " +
-                "sb.id AS id_subject, sb.name AS subject_name, sb.deadline AS subject_deadline, " +
-                "CASE " +
-                "WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0 " +
-                "WHEN ss.grade1 IS NOT NULL THEN ss.grade1 " +
-                "ELSE ss.grade2 " +
-                "END AS media " +
-                "FROM student_subject ss " +
-                "JOIN student st ON st.id = ss.id_student " +
-                "JOIN subject sb ON sb.id = ss.id_subject " +
-                "JOIN school_class sc ON sc.id = st.id_school_class " +
-                "WHERE EXISTS ( " +
-                "   SELECT 1 FROM school_class_teacher sct " +
-                "   WHERE sct.id_school_class = sc.id " +
-                "   AND sct.id_teacher = ? " +
-                ") " +
-                "AND EXISTS ( " +
-                "   SELECT 1 FROM subject_teacher stt " +
-                "   WHERE stt.id_subject = sb.id " +
-                "   AND stt.id_teacher = ? " +
-                ") " +
-                "AND (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL) " +
-                "AND st.status = ? " +
-                ") AS sub " +
-                "WHERE sub.media < ? " +
-                "ORDER BY sub.media ASC " +
-                "LIMIT ?";
+        String sql = """
+                SELECT sub.*
+                FROM (
+                    SELECT
+                        ss.id,
+                        ss.obs,
+                        ss.grade1,
+                        ss.grade2,
+                        st.id           AS id_student,
+                        st.name         AS student_name,
+                        st.cpf          AS student_cpf,
+                        st.email        AS student_email,
+                        sb.id           AS id_subject,
+                        sb.name         AS subject_name,
+                        sb.deadline     AS subject_deadline,
+                        CASE
+                            WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL
+                                THEN (ss.grade1 + ss.grade2) / 2.0
+                            WHEN ss.grade1 IS NOT NULL THEN ss.grade1
+                            ELSE ss.grade2
+                        END AS media
+                    FROM student_subject ss
+                    JOIN student              st  ON st.id          = ss.id_student
+                    JOIN subject              sb  ON sb.id          = ss.id_subject
+                    JOIN school_class_teacher sct ON sct.id_school_class = st.id_school_class
+                                                 AND sct.id_teacher      = ?
+                    JOIN subject_teacher      stt ON stt.id_subject = sb.id
+                                                 AND stt.id_teacher  = ?
+                    JOIN school_class sc ON sc.id = st.id_school_class
+                         WHERE (ss.grade1 IS NOT NULL OR ss.grade2 IS NOT NULL)
+                            AND st.status = ?
+                    		AND EXISTS (
+                    		    SELECT 1 FROM school_class_teacher sct\s
+                    			    WHERE sct.id_school_class = sc.id
+                    			        AND sct.id_teacher = ?
+                    				    AND sb.id = ANY(sct.subject_list)
+                    			)
+                ) sub
+                WHERE sub.media < ?
+                ORDER BY sub.media ASC
+                LIMIT ?
+                """;
+
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -641,8 +721,9 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
             pstmt.setInt(1, teacherId);
             pstmt.setInt(2, teacherId);
             pstmt.setInt(3, StudentStatusEnum.ACTIVE.ordinal() + 1);
-            pstmt.setInt(4, Constants.MAX_GRADE_TO_HELP);
-            pstmt.setInt(5, Constants.STUDENTS_HELP_TAKE);
+            pstmt.setInt(4, teacherId);
+            pstmt.setInt(5, Constants.MAX_GRADE_TO_HELP);
+            pstmt.setInt(6, Constants.STUDENTS_HELP_TAKE);
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -684,35 +765,35 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement("""
-                 SELECT
-                 COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS approved,
-                 COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS failed,
-                 COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS pending
-                 FROM (
                      SELECT
-                         ss.id,
-                         sb.deadline,
-                         ss.grade1,
-                         ss.grade2,
-                         CASE
-                             WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0
-                             WHEN ss.grade1 IS NOT NULL THEN ss.grade1
-                             WHEN ss.grade2 IS NOT NULL THEN ss.grade2
-                             ELSE NULL
-                         END AS media
-                     FROM student_subject ss
-                     JOIN student s ON s.id = ss.id_student
-                     JOIN subject sb ON sb.id = ss.id_subject
-                     JOIN school_class sc ON sc.id = s.id_school_class
-                     WHERE s.status = ?
-                     AND EXISTS (
-                         SELECT 1 FROM school_class_teacher sct
-                         WHERE sct.id_school_class = sc.id
-                         AND sct.id_teacher = ?
-                         AND sb.id = ANY(sct.subject_list)
-                     )
-                 ) AS sub
-                 """)) {
+                     COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media >= ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS approved,
+                     COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline <= CURRENT_DATE AND grade1 IS NOT NULL AND grade2 IS NOT NULL AND media < ? THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS failed,
+                     COALESCE(ROUND(100.0 * SUM(CASE WHEN deadline > CURRENT_DATE OR grade1 IS NULL OR grade2 IS NULL THEN 1 ELSE 0 END) / NULLIF(COUNT(*),0), 0), 0) AS pending
+                     FROM (
+                         SELECT
+                             ss.id,
+                             sb.deadline,
+                             ss.grade1,
+                             ss.grade2,
+                             CASE
+                                 WHEN ss.grade1 IS NOT NULL AND ss.grade2 IS NOT NULL THEN (ss.grade1 + ss.grade2) / 2.0
+                                 WHEN ss.grade1 IS NOT NULL THEN ss.grade1
+                                 WHEN ss.grade2 IS NOT NULL THEN ss.grade2
+                                 ELSE NULL
+                             END AS media
+                         FROM student_subject ss
+                         JOIN student s ON s.id = ss.id_student
+                         JOIN subject sb ON sb.id = ss.id_subject
+                         JOIN school_class sc ON sc.id = s.id_school_class
+                         WHERE s.status = ?
+                         AND EXISTS (
+                             SELECT 1 FROM school_class_teacher sct
+                             WHERE sct.id_school_class = sc.id
+                             AND sct.id_teacher = ?
+                             AND sb.id = ANY(sct.subject_list)
+                         )
+                     ) AS sub
+                     """)) {
 
             pstmt.setDouble(1, Constants.MIN_GRADE_TO_BE_APPROVAL);
             pstmt.setDouble(2, Constants.MIN_GRADE_TO_BE_APPROVAL);
@@ -764,6 +845,12 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
                      "   AND stt.id_teacher = ? " +
                      ") " + "AND st.status = ? " +
                      "AND (ss.grade1 IS NULL OR ss.grade2 IS NULL) " +
+                     "AND EXISTS ( " +
+                     "  SELECT 1 FROM school_class_teacher sct " +
+                     "  WHERE sct.id_school_class = sc.id " +
+                     "  AND sct.id_teacher = 2 " +
+                     "  AND sb.id = ANY(sct.subject_list) " +
+                     ")" +
                      "ORDER BY sb.deadline ASC " +
                      "LIMIT ?")) {
             pstmt.setInt(1, idTeacher);
@@ -879,13 +966,13 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
     /**
      * Deletes student_subject records for a specific student
      * restricted to the given set of subject IDs.
-     *
+     * <p>
      * Used during class transfer to remove only the subjects that
      * are NOT offered in the new class, preserving shared grades.
-     *
+     * <p>
      * DELETE FROM student_subject
-     *  WHERE id_student = ?
-     *    AND id_subject  = ANY(?)
+     * WHERE id_student = ?
+     * AND id_subject  = ANY(?)
      *
      * @param studentId  the student ID
      * @param subjectIds set of subject IDs to delete
@@ -915,14 +1002,14 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
     /**
      * Inserts blank student_subject records for a given student
      * for each subject ID in the provided set.
-     *
+     * <p>
      * Used during class transfer to add only the subjects that are
      * NEW in the target class (subjects shared with the old class
      * are skipped — their records already exist with grades).
-     *
+     * <p>
      * INSERT INTO student_subject (id_student, id_subject)
      * VALUES (?, ?) ON CONFLICT DO NOTHING
-     *
+     * <p>
      * ON CONFLICT DO NOTHING is a safety net: if a record already
      * exists for any reason, the insert is silently skipped so no
      * existing grade is overwritten.
@@ -933,10 +1020,10 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
      */
     public void createManyBySubjectIds(int studentId, Set<Integer> subjectIds) throws DataException {
         String sql = """
-            INSERT INTO student_subject (id_student, id_subject)
-            VALUES (?, ?)
-            ON CONFLICT ON CONSTRAINT uk_student_subject DO NOTHING
-            """;
+                INSERT INTO student_subject (id_student, id_subject)
+                VALUES (?, ?)
+                ON CONFLICT ON CONSTRAINT uk_student_subject DO NOTHING
+                """;
 
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -958,10 +1045,10 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
     /**
      * Returns the set of subject IDs for which the student already
      * has a student_subject record (with or without grades).
-     *
+     * <p>
      * Used by UpdateStudentServlet.ensureMissingSubjects to calculate
      * the delta between class subjects and existing student records.
-     *
+     * <p>
      * SELECT id_subject FROM student_subject WHERE id_student = ?
      *
      * @param studentId the student ID
