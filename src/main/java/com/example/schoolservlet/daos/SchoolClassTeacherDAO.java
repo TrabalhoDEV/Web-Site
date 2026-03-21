@@ -347,34 +347,6 @@ public class SchoolClassTeacherDAO implements GenericDAO<SchoolClassTeacher> {
     }
 
     /**
-     * Updates teacher associations by replacing occurrences of a specific teacher
-     * identifier with a new teacher identifier in the school_class_teacher records.
-     * The method validates both identifiers and performs an update operation
-     * affecting all records that reference the old teacher.
-     *
-     * @param oldTeacherId the identifier of the teacher currently associated with the records
-     * @param newTeacherId the identifier of the teacher that will replace the old one
-     * @throws DataException if a database access error occurs during the update operation
-     * @throws ValidationException if any of the provided identifiers do not pass validation
-     * @throws NotFoundException if no records exist with the specified old teacher identifier
-     */
-    public void updateTeacher(int oldTeacherId, int newTeacherId) throws DataException, ValidationException, NotFoundException{
-        InputValidation.validateId(oldTeacherId, "id");
-        InputValidation.validateId(newTeacherId, "id");
-
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("UPDATE SET id_teacher = ? WHERE id_teacher = ?")){
-            pstmt.setInt(1, newTeacherId);
-            pstmt.setInt(2, oldTeacherId);
-
-            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("school_class_teacher", "id", String.valueOf(oldTeacherId));
-        } catch (SQLException sqle){
-            sqle.printStackTrace();
-            throw new DataException("Erro ao atualizar relação entre professor e turma", sqle);
-        }
-    }
-
-    /**
      * Deletes a SchoolClassTeacher record from the database using its unique identifier.
      * The method validates the provided id and executes a delete operation on the
      * school_class_teacher table. If no record is affected by the operation,

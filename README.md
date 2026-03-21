@@ -125,7 +125,7 @@ Após iniciar o servidor, abra no navegador:
 http://localhost:8080
 ```
 
-Para ter acesso é necessário acessar o esqueci minha senha, pois o dataload povoa com senhas não hasheadas.
+Todas as senhas do dataload são "Senha123", entretanto só funcionam se a SECRET na .env for o valor da mesma na .env.example
 
 ------------------------------------------------------------------------
 

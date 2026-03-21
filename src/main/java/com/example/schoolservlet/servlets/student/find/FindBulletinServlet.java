@@ -12,7 +12,6 @@ import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
 import com.example.schoolservlet.utils.ErrorHandler;
-import com.example.schoolservlet.utils.PaginationUtilities;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 
 import com.example.schoolservlet.utils.records.StudentsPerformanceCount;
@@ -25,11 +24,11 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * Servlet responsible for rendering the student bulletin board with grades and subjects.
- * 
+ *
  * This servlet handles GET requests to display paginated student academic records
  * including enrolled subjects and their corresponding grades. Access is restricted
  * to authenticated students only.
- * 
+ *
  * @author Vertice
  * @version 1.0
  */
@@ -37,37 +36,20 @@ import jakarta.servlet.http.HttpSession;
 public class FindBulletinServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(FindBulletinServlet.class.getName());
 
-    /**
-     * Handles GET requests to render the student bulletin board.
-     * 
-     * This method:
-     * 1. Validates that the user is authenticated and has student role
-     * 2. Retrieves the authenticated student's information from session
-     * 3. Extracts pagination parameters from the request
-     * 4. Fetches the student's subjects and grades with pagination
-     * 5. Forwards the data to the bulletin view for rendering
-     * 
-     * @param request the HTTP servlet request containing pagination parameters
-     * @param response the HTTP servlet response to send back to the client
-     * @throws ServletException if servlet processing fails
-     * @throws IOException if an input/output error occurs
-     */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Authentication validation: ensure user is logged in and has student role
         if (!AccessValidation.isStudent(request, response)) {
             LOGGER.log(Level.WARNING, "Access denied: user is not authenticated or lacks permissions");
             return;
         }
 
-        // Retrieve authenticated student information from session
         HttpSession session = request.getSession(false);
         if (session == null) {
             LOGGER.log(Level.SEVERE, "Session not found for authenticated user");
             response.sendRedirect("index.jsp");
             return;
         }
-        
+
         AuthenticatedUser authenticatedUser = (AuthenticatedUser) session.getAttribute("user");
         if (authenticatedUser == null) {
             LOGGER.log(Level.SEVERE, "Authenticated user not found in session");
@@ -75,74 +57,49 @@ public class FindBulletinServlet extends HttpServlet {
             return;
         }
 
-        // Calculate pagination: extract requested page and calculate database skip
-        int page = PaginationUtilities.extractNextPage(request);
-        int skip = page * Constants.MAX_TAKE;
+        // Paginação igual ao FindManyStudentsServlet
+        String pageParam = request.getParameter("page");
+        int page = 1;
+        int take = Constants.MAX_TAKE;
 
         try {
-            // Fetch the total amount of pages
-            int totalSubjects = new StudentSubjectDAO().totalCount(authenticatedUser.id());
-            int totalPages = PaginationUtilities.calculateTotalPages(totalSubjects, Constants.MAX_TAKE);
+            page = Integer.parseInt(pageParam);
+        } catch (NumberFormatException ignored) {}
 
-            // Fetch student's subjects and grades from database with pagination
+        try {
             StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
-            Map<Integer, StudentSubject> studentSubjectMap = null;
 
-            StudentsPerformanceCount performanceCount = null;
-            try {
-                studentSubjectMap = studentSubjectDAO.findMany(
-                        skip,
-                        Constants.MAX_TAKE,
-                        authenticatedUser.id()
-                );
+            int totalSubjects = studentSubjectDAO.totalCount(authenticatedUser.id());
+            int totalPages = Math.max(1, (int) Math.ceil((double) totalSubjects / take));
 
-                performanceCount = studentSubjectDAO.studentPerformanceCount(authenticatedUser.id());
-                request.setAttribute("performanceCount", performanceCount);
-            } catch (DataException | ValidationException e) {
-                LOGGER.log(Level.SEVERE, "Data access error while fetching student subjects for student ID: " + authenticatedUser.id(), e);
-                response.setStatus(e.getStatus());
-                treatUnexpectedError(request, response, e.getMessage());
-                return;
-            }
+            page = Math.max(1, Math.min(page, totalPages));
+            int skip = take * (page - 1);
 
-            // Validate returned data
+            Map<Integer, StudentSubject> studentSubjectMap = studentSubjectDAO.findMany(skip, take, authenticatedUser.id());
+            StudentsPerformanceCount performanceCount = studentSubjectDAO.studentPerformanceCount(authenticatedUser.id());
+
             if (studentSubjectMap == null) {
                 LOGGER.log(Level.WARNING, "Student subject map is null for student ID: " + authenticatedUser.id());
                 studentSubjectMap = Map.of();
             }
 
-            // Prepare request attributes for view rendering
             request.setAttribute("studentSubjectMap", studentSubjectMap);
             request.setAttribute("performanceCount", performanceCount);
             request.setAttribute("page", page);
             request.setAttribute("totalPages", totalPages);
 
-            // Forward to bulletin view template for display
             request.getRequestDispatcher("/WEB-INF/views/student/bulletin.jsp").forward(request, response);
-            
-        } catch (DataException de) {
-            LOGGER.log(Level.SEVERE, "Data access error while processing bulletin for student ID: " + authenticatedUser.id(), de);
-            response.setStatus(de.getStatus());
-            treatUnexpectedError(request, response, de.getMessage());
+
+        } catch (DataException | ValidationException e) {
+            LOGGER.log(Level.SEVERE, "Data access error while fetching student subjects for student ID: " + authenticatedUser.id(), e);
+            response.setStatus(e.getStatus());
+            treatUnexpectedError(request, response, e.getMessage());
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected error in bulletin servlet", e);
             treatUnexpectedError(request, response, "Ocorreu um erro ao buscar boletim");
         }
     }
 
-    /**
-     * Handles unexpected errors by forwarding to the bulletin page with an error message.
-     * 
-     * This method:
-     * 1. Sets an error message in the request attributes
-     * 2. Initializes empty collections for the student subject map
-     * 3. Resets pagination to the first page
-     * 4. Forwards the request to the bulletin view for error display
-     * 5. Logs any exceptions that occur during the forward operation
-     * 
-     * @param request the HTTP servlet request to set error attributes on
-     * @param response the HTTP servlet response for the forward operation
-     */
     private void treatUnexpectedError(HttpServletRequest request, HttpServletResponse response, String error) {
         request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
         request.setAttribute("studentSubjectMap", Map.of());

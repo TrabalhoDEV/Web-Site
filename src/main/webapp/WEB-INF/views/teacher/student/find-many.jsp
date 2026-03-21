@@ -16,7 +16,6 @@
 
     int totalPages = (Integer) request.getAttribute("totalPages");
     int currentPage = (Integer) request.getAttribute("page");
-
     String enrollment = request.getAttribute("enrollment") != null ? (String) request.getAttribute("enrollment") : "";
 %>
 
@@ -192,7 +191,6 @@
         <!-- TOPBAR -->
 
         <header class="topbar">
-            <div class="topbar-left"></div>
             <div class="topbar-right">
                 <div class="topbar-actions">
                     <button type="button" class="icon-button" id="theme-button">
@@ -238,7 +236,7 @@
                     <form method="get" action="${pageContext.request.contextPath}/teacher/student/find-many"
                           class="form-filter">
                         <section>
-                            <input type="text" name="enrollment" value="<%= enrollment %>" placeholder="Matrícula"/>
+                            <input class="enrollment-filterli" type="text" name="enrollment" value="<%= enrollment %>" placeholder="Matrícula"/>
                             <input type="hidden" name="page" value="1"/>
                             <button type="submit" class="primary-button">Buscar</button>
                             <a href="${pageContext.request.contextPath}/teacher/student/find-many" class="secondary-button">Limpar</a>
@@ -247,11 +245,6 @@
                 </div>
 
                 <hr>
-                <%if (request.getAttribute("error") != null) { %>tr>
-                    <p style="color: #9b0404; text-align: start; padding: 8px">
-                        <%= request.getAttribute("error") %>
-                    </p>
-                <% } %>
 
                 <% if (!studentSubjectMap.isEmpty()) { %>
                 <table class="grade-table" style="--cols: 8; grid-template-columns:
@@ -313,8 +306,14 @@
                     </tbody>
                 </table>
 
-                <% } else if (enrollment != null && !enrollment.trim().isEmpty()) {%>
-                <p class="not-found">Nenhum aluno(a) possui essa matrícula</p>
+                <% } else if (enrollment != null && !enrollment.trim().isEmpty()) {
+                    if (request.getAttribute("error") != null) { %>
+                    <p style="color: #9b0404; text-align: start; padding: 8px">
+                        <%= request.getAttribute("error") %>
+                    </p>
+                    <% } else { %>
+                        <p class="not-found">Nenhum aluno(a) possui essa matrícula</p>
+                    <% } %>
                 <% } else if (request.getAttribute("error") == null){%>
                 <p class="not-found">Você ainda não possui alunos</p>
                 <%}%>

@@ -5,7 +5,6 @@ import com.example.schoolservlet.exceptions.DataException;
 import com.example.schoolservlet.models.StudentSubject;
 import com.example.schoolservlet.utils.AccessValidation;
 import com.example.schoolservlet.utils.Constants;
-import com.example.schoolservlet.utils.PaginationUtilities;
 import com.example.schoolservlet.utils.records.AuthenticatedUser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -31,89 +30,57 @@ public class FindFeedbacksServlet extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(FindFeedbacksServlet.class.getName());
 
-    /**
-     * Processes GET requests to load and display student feedbacks.
-     * Implements pagination and authenticated user validation.
-     *
-     * @param request  the HTTP request
-     * @param response the HTTP response
-     * @throws ServletException if a servlet error occurs
-     * @throws IOException      if an I/O error occurs
-     */
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) 
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Validate user authentication and authorization
         if (!AccessValidation.isStudent(request, response)) {
             LOGGER.log(Level.WARNING, "Access denied: user is not authenticated or lacks permissions");
             return;
         }
 
-        try {
-            // Extract next page number from request
-            int page = PaginationUtilities.extractNextPage(request);
-            
-            // Update page attribute in request
-            request.setAttribute("currentPage", page);
-            
-            // Load student feedbacks for the current page
-            int totalAmountOfFeedbacks = loadStudentFeedbacks(request, page);
-
-            // Set total pages attribute for pagination controls in the view
-            request.setAttribute("totalPages", PaginationUtilities.calculateTotalPages(totalAmountOfFeedbacks, Constants.MAX_TAKE));
-            
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error processing feedbacks request", e);
-            request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect("index.jsp");
+            return;
         }
 
-        // Forward to view
-        request.getRequestDispatcher("/WEB-INF/views/student/index.jsp").forward(request, response);
-    }
-
-    /**
-     * Loads the feedbacks (observations) of the authenticated student.
-     * Uses pagination according to application constants.
-     *
-     * @param request     the HTTP request
-     * @param currentPage the page number to load
-     * @return the total amount of feedbacks on the database for the authenticated student
-     */
-    private int loadStudentFeedbacks(HttpServletRequest request, int currentPage) {
-        HttpSession session = request.getSession();
         AuthenticatedUser authenticatedUser = (AuthenticatedUser) session.getAttribute("user");
-
-        // Validate authenticated user exists in session
         if (authenticatedUser == null) {
             LOGGER.log(Level.WARNING, "Authenticated user not found in session");
-            request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
-            return 0;
+            response.sendRedirect("index.jsp");
+            return;
         }
 
-        LOGGER.log(Level.FINE, "Loading feedbacks for user ID: " + authenticatedUser.id());
+        String pageParam = request.getParameter("page");
+        int page = 1;
+        int take = Constants.MAX_TAKE;
 
         try {
-            // Calculate offset based on page number and page size
-            int offset = currentPage * Constants.MAX_TAKE;
-            
-            // Query database for student's subjects and observations
+            page = Integer.parseInt(pageParam);
+        } catch (NumberFormatException ignored) {}
+
+        try {
             StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
+
+            int totalFeedbacks = studentSubjectDAO.countObs(authenticatedUser.id());
+            int totalPages = Math.max(1, (int) Math.ceil((double) totalFeedbacks / take));
+
+            page = Math.max(1, Math.min(page, totalPages));
+            int skip = take * (page - 1);
+
             Map<Integer, StudentSubject> studentSubjectMap = studentSubjectDAO.findManyThatHasFeedbacks(
-                    offset,
-                    Constants.MAX_TAKE,
+                    skip,
+                    take,
                     authenticatedUser.id()
             );
 
-            // Extract non-empty observations and store list in request for view rendering
             request.setAttribute("studentSubjectMap", studentSubjectMap);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+
             LOGGER.log(Level.INFO, "Feedbacks loaded successfully.");
 
-            return studentSubjectDAO.totalCount(authenticatedUser.id());
-
-        } catch (NullPointerException npe) {
-            LOGGER.log(Level.SEVERE, "Error loading feedbacks - unexpected null value", npe);
-            request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
         } catch (DataException de) {
             LOGGER.log(Level.SEVERE, "Error processing feedbacks request: ", de);
             request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
@@ -121,6 +88,7 @@ public class FindFeedbacksServlet extends HttpServlet {
             LOGGER.log(Level.SEVERE, "Error loading feedbacks", e);
             request.setAttribute("error", Constants.UNEXPECTED_ERROR_MESSAGE);
         }
-        return 0;
+
+        request.getRequestDispatcher("/WEB-INF/views/student/index.jsp").forward(request, response);
     }
 }

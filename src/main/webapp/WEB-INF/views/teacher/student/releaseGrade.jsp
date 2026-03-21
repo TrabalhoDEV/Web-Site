@@ -12,10 +12,11 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <title>Liberar Notas</title>
+    <title id="title-grade">Liberar Notas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
     <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
+    <script src="${pageContext.request.contextPath}/assets/js/theme.js"></script>
 </head>
 <body>
 
@@ -181,7 +182,7 @@
             <div class="boletim-grid">
 
                 <div class="header-grid">
-                    <h1>Liberar Notas</h1>
+                    <h1 class="title-grade">Liberar Notas</h1>
                 </div>
 
                 <hr>
@@ -195,7 +196,9 @@
                 <% if (ss == null) { %>
                     <div class="error-message">
                         <p>Informações do aluno-matéria não estão disponíveis.</p>
-                        <p><a href="<%= request.getContextPath() %>/teacher/students">Voltar para a lista de alunos</a></p>
+                        <div class="form-actions">
+                            <a href="<%= request.getContextPath() %>/teacher/student/find-many" class="primary-button">Voltar</a>
+                        </div>
                     </div>
                 <% } else { %>
 
@@ -235,8 +238,8 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-cancel" onclick="window.history.back()">Cancelar</button>
-                            <button type="submit" class="btn-save">Salvar Notas</button>
+                            <button type="submit" class="primary-button">Salvar Notas</button>
+                            <button type="button" class="secondary-button" onclick="window.history.back()">Cancelar</button>
                         </div>
                     </form>
 

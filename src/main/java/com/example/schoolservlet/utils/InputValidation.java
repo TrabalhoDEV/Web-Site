@@ -106,7 +106,7 @@ public class InputValidation {
      * @param field is the name of field ID, if field is ID pass id, but if field is id_table pass id_table
      * @throws ValidationException  if id is empty or less than 0
      */
-    public static void validateId(int id, String field) throws ValidationException{
+    public static void validateId(int id, String field) throws RequiredFieldException, InvalidNumberException{
         if (id == 0) throw new RequiredFieldException(field);
         if (id < 0) throw new InvalidNumberException("id", "ID deve ser maior do que 0");
     }

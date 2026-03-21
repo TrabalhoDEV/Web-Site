@@ -22,50 +22,50 @@ RESTART IDENTITY CASCADE;
 -- school_class (12)
 -- =========================
 INSERT INTO school_class (school_year) VALUES
-                                           ('1o ano a'),
-                                           ('1o ano b'),
-                                           ('1o ano c'),
-                                           ('1o ano d'),
-                                           ('2o ano a'),
-                                           ('2o ano b'),
-                                           ('2o ano c'),
-                                           ('2o ano d'),
-                                           ('3o ano a'),
-                                           ('3o ano b'),
-                                           ('3o ano c'),
-                                           ('3o ano d');
+       ('1o ano a'),
+       ('1o ano b'),
+       ('1o ano c'),
+       ('1o ano d'),
+       ('2o ano a'),
+       ('2o ano b'),
+       ('2o ano c'),
+       ('2o ano d'),
+       ('3o ano a'),
+       ('3o ano b'),
+       ('3o ano c'),
+       ('3o ano d');
 
 -- =========================
 -- teacher (12)
 -- cada professor ministra 2 disciplinas (definidas em subject_teacher)
 -- =========================
 INSERT INTO teacher (name, email, username, password) VALUES
-                                                          ('carlos eduardo lima',    'carlos.lima@escolavertice.com.br',      'carlos.lima',      'aa123456'),
-                                                          ('patricia souza mendes',  'patricia.mendes@escolavertice.com.br',  'patricia.mendes',  'aa123456'),
-                                                          ('roberto alves figueira', 'roberto.figueira@escolavertice.com.br', 'roberto.figueira', 'aa123456'),
-                                                          ('fernanda costa braga',   'fernanda.braga@escolavertice.com.br',   'fernanda.braga',   'aa123456'),
-                                                          ('lucas andrade pinto',    'lucas.pinto@escolavertice.com.br',      'lucas.pinto',      'aa123456'),
-                                                          ('mariana oliveira reis',  'mariana.reis@escolavertice.com.br',     'mariana.reis',     'aa123456'),
-                                                          ('jose roberto carvalho',  'jose.carvalho@escolavertice.com.br',    'jose.carvalho',    'aa123456'),
-                                                          ('ana paula vieira',       'ana.vieira@escolavertice.com.br',       'ana.vieira',       'aa123456'),
-                                                          ('thiago nascimento silva', 'thiago.silva@escolavertice.com.br',    'thiago.silva',     'aa123456'),
-                                                          ('claudia ferreira gomes', 'claudia.gomes@escolavertice.com.br',    'claudia.gomes',    'aa123456'),
-                                                          ('sergio monteiro dias',   'sergio.dias@escolavertice.com.br',      'sergio.dias',      'aa123456'),
-                                                          ('renata lima sousa',      'renata.sousa@escolavertice.com.br',     'renata.sousa',     'aa123456');
+      ('carlos eduardo lima',    'carlos.lima@escolavertice.com.br',      'carlos.lima',      '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('patricia souza mendes',  'patricia.mendes@escolavertice.com.br',  'patricia.mendes',  '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('roberto alves figueira', 'roberto.figueira@escolavertice.com.br', 'roberto.figueira', '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('fernanda costa braga',   'fernanda.braga@escolavertice.com.br',   'fernanda.braga',   '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('lucas andrade pinto',    'lucas.pinto@escolavertice.com.br',      'lucas.pinto',      '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('mariana oliveira reis',  'mariana.reis@escolavertice.com.br',     'mariana.reis',     '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('jose roberto carvalho',  'jose.carvalho@escolavertice.com.br',    'jose.carvalho',    '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('ana paula vieira',       'ana.vieira@escolavertice.com.br',       'ana.vieira',       '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('thiago nascimento silva', 'thiago.silva@escolavertice.com.br',    'thiago.silva',     '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('claudia ferreira gomes', 'claudia.gomes@escolavertice.com.br',    'claudia.gomes',    '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('sergio monteiro dias',   'sergio.dias@escolavertice.com.br',      'sergio.dias',      '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('renata lima sousa',      'renata.sousa@escolavertice.com.br',     'renata.sousa',     '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A');
 
 -- =========================
 -- subject (12)
 -- =========================
 INSERT INTO subject (name, deadline) VALUES
-     ('matematica',      '2026-12-10'),
-     ('portugues',       '2026-12-10'),
-     ('historia',        '2026-12-10'),
-     ('ciencias',        '2026-12-10'),
+     ('matemática',      '2026-12-10'),
+     ('português',       '2026-12-10'),
+     ('história',        '2026-12-10'),
+     ('ciências',        '2026-12-10'),
      ('geografia',       '2026-12-10'),
-     ('fisica',          '2026-12-10'),
-     ('quimica',         '2026-12-10'),
-     ('ingles',          '2026-12-10'),
-     ('educacao fisica', '2026-12-10'),
+     ('física',          '2026-12-10'),
+     ('química',         '2026-12-10'),
+     ('inglês',          '2026-12-10'),
+     ('educacão física', '2026-12-10'),
      ('artes',           '2026-12-10'),
      ('filosofia',       '2026-12-10'),
      ('sociologia',      '2026-12-10');
@@ -74,18 +74,18 @@ INSERT INTO subject (name, deadline) VALUES
 -- admin (12)
 -- =========================
 INSERT INTO admin (document, email, password) VALUES
-      ('12345678901', 'secretaria@escolavertice.com.br',    'as123456'),
-      ('98765432100', 'diretoria@escolavertice.com.br',     'as123456'),
-      ('11122233344', 'coordenacao@escolavertice.com.br',   'as123456'),
-      ('55566677788', 'financeiro@escolavertice.com.br',    'as123456'),
-      ('99988877766', 'rh@escolavertice.com.br',            'as123456'),
-      ('44455566677', 'ti@escolavertice.com.br',            'as123456'),
-      ('33322211100', 'pedagogia@escolavertice.com.br',     'as123456'),
-      ('77788899900', 'biblioteca@escolavertice.com.br',    'as123456'),
-      ('22211100099', 'laboratorio@escolavertice.com.br',   'as123456'),
-      ('66677788899', 'ouvidoria@escolavertice.com.br',     'as123456'),
-      ('10011022033', 'comunicacao@escolavertice.com.br',   'as123456'),
-      ('20022033044', 'devsecretaria@gmail.com',            'as123456');
+      ('12345678901', 'secretaria@escolavertice.com.br',    '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('98765432100', 'diretoria@escolavertice.com.br',     '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('11122233344', 'coordenacao@escolavertice.com.br',   '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('55566677788', 'financeiro@escolavertice.com.br',    '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('99988877766', 'rh@escolavertice.com.br',            '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('44455566677', 'ti@escolavertice.com.br',            '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('33322211100', 'pedagogia@escolavertice.com.br',     '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('77788899900', 'biblioteca@escolavertice.com.br',    '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('22211100099', 'laboratorio@escolavertice.com.br',   '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('66677788899', 'ouvidoria@escolavertice.com.br',     '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('10011022033', 'comunicacao@escolavertice.com.br',   '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+      ('20022033044', 'devsecretaria@gmail.com',            '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A');
 
 -- =========================
 -- student
@@ -94,95 +94,95 @@ INSERT INTO admin (document, email, password) VALUES
 -- ids resultantes: 1-60 (nomeados), 61-63 (nao informado + notas), 64-69 (nao informado, sem notas)
 -- =========================
 
--- alunos com nome real → status = 0 (inativo)
-INSERT INTO student (name, email, cpf, status, id_school_class) VALUES
+-- alunos com nome real → status = 2 (ativo)
+INSERT INTO student (name, email, cpf, status, id_school_class, password) VALUES
     -- 1o ano a (turma 1)
-    ('miguel fernandes',       'miguel.fernandes@aluno.vertice.com.br',     '10000000001', 0,  1),
-    ('ana clara souza',        'ana.clara@aluno.vertice.com.br',            '10000000002', 0,  1),
-    ('bruno henrique silva',   'bruno.henrique@aluno.vertice.com.br',       '10000000003', 0,  1),
-    ('camila rodrigues',       'camila.rodrigues@aluno.vertice.com.br',     '10000000004', 0,  1),
-    ('daniel martins',         'daniel.martins@aluno.vertice.com.br',       '10000000005', 0,  1),
+    ('miguel fernandes',       'miguel.fernandes@aluno.vertice.com.br',     '10000000001', 2,  1, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('ana clara souza',        'ana.clara@aluno.vertice.com.br',            '10000000002', 2,  1, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('bruno henrique silva',   'bruno.henrique@aluno.vertice.com.br',       '10000000003', 2,  1, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('camila rodrigues',       'camila.rodrigues@aluno.vertice.com.br',     '10000000004', 2,  1, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('daniel martins',         'daniel.martins@aluno.vertice.com.br',       '10000000005', 2,  1, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 1o ano b (turma 2)
-    ('eduarda nogueira',       'eduarda.nogueira@aluno.vertice.com.br',     '10000000006', 0,  2),
-    ('felipe araujo',          'felipe.araujo@aluno.vertice.com.br',        '10000000007', 0,  2),
-    ('gabriela moraes',        'gabriela.moraes@aluno.vertice.com.br',      '10000000008', 0,  2),
-    ('henrique almeida',       'henrique.almeida@aluno.vertice.com.br',     '10000000009', 0,  2),
-    ('isabela castro',         'isabela.castro@aluno.vertice.com.br',       '10000000010', 0,  2),
+    ('eduarda nogueira',       'eduarda.nogueira@aluno.vertice.com.br',     '10000000006', 2,  2, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('felipe araujo',          'felipe.araujo@aluno.vertice.com.br',        '10000000007', 2,  2, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('gabriela moraes',        'gabriela.moraes@aluno.vertice.com.br',      '10000000008', 2,  2, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('henrique almeida',       'henrique.almeida@aluno.vertice.com.br',     '10000000009', 2,  2, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('isabela castro',         'isabela.castro@aluno.vertice.com.br',       '10000000010', 2,  2, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 1o ano c (turma 3)
-    ('joao pedro santos',      'joao.pedro@aluno.vertice.com.br',           '10000000011', 0,  3),
-    ('larissa teixeira',       'larissa.teixeira@aluno.vertice.com.br',     '10000000012', 0,  3),
-    ('matheus oliveira',       'matheus.oliveira@aluno.vertice.com.br',     '10000000013', 0,  3),
-    ('nathalia barros',        'nathalia.barros@aluno.vertice.com.br',      '10000000014', 0,  3),
-    ('otavio ramos',           'otavio.ramos@aluno.vertice.com.br',         '10000000015', 0,  3),
+    ('joao pedro santos',      'joao.pedro@aluno.vertice.com.br',           '10000000011', 2,  3, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('larissa teixeira',       'larissa.teixeira@aluno.vertice.com.br',     '10000000012', 2,  3, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('matheus oliveira',       'matheus.oliveira@aluno.vertice.com.br',     '10000000013', 2,  3, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('nathalia barros',        'nathalia.barros@aluno.vertice.com.br',      '10000000014', 2,  3, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('otavio ramos',           'otavio.ramos@aluno.vertice.com.br',         '10000000015', 2,  3, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 1o ano d (turma 4)
-    ('paula vieira',           'paula.vieira@aluno.vertice.com.br',         '10000000016', 0,  4),
-    ('rafael gomes',           'rafael.gomes@aluno.vertice.com.br',         '10000000017', 0,  4),
-    ('sabrina lopes',          'sabrina.lopes@aluno.vertice.com.br',        '10000000018', 0,  4),
-    ('thiago carvalho',        'thiago.carvalho@aluno.vertice.com.br',      '10000000019', 0,  4),
-    ('vitoria nascimento',     'vitoria.nascimento@aluno.vertice.com.br',   '10000000020', 0,  4),
+    ('paula vieira',           'paula.vieira@aluno.vertice.com.br',         '10000000016', 2,  4, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('rafael gomes',           'rafael.gomes@aluno.vertice.com.br',         '10000000017', 2,  4, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('sabrina lopes',          'sabrina.lopes@aluno.vertice.com.br',        '10000000018', 2,  4, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('thiago carvalho',        'thiago.carvalho@aluno.vertice.com.br',      '10000000019', 2,  4, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('vitoria nascimento',     'vitoria.nascimento@aluno.vertice.com.br',   '10000000020', 2,  4, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 2o ano a (turma 5)
-    ('wellington freitas',     'wellington.freitas@aluno.vertice.com.br',   '10000000021', 0,  5),
-    ('yasmin monteiro',        'yasmin.monteiro@aluno.vertice.com.br',      '10000000022', 0,  5),
-    ('andre luiz batista',     'andre.batista@aluno.vertice.com.br',        '10000000023', 0,  5),
-    ('beatriz cunha',          'beatriz.cunha@aluno.vertice.com.br',        '10000000024', 0,  5),
-    ('caio menezes',           'caio.menezes@aluno.vertice.com.br',         '10000000025', 0,  5),
+    ('wellington freitas',     'wellington.freitas@aluno.vertice.com.br',   '10000000021', 2,  5, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('yasmin monteiro',        'yasmin.monteiro@aluno.vertice.com.br',      '10000000022', 2,  5, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('andre luiz batista',     'andre.batista@aluno.vertice.com.br',        '10000000023', 2,  5, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('beatriz cunha',          'beatriz.cunha@aluno.vertice.com.br',        '10000000024', 2,  5, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('caio menezes',           'caio.menezes@aluno.vertice.com.br',         '10000000025', 2,  5, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 2o ano b (turma 6)
-    ('debora santana',         'debora.santana@aluno.vertice.com.br',       '10000000026', 0,  6),
-    ('eduardo pires',          'eduardo.pires@aluno.vertice.com.br',        '10000000027', 0,  6),
-    ('flavia rezende',         'flavia.rezende@aluno.vertice.com.br',       '10000000028', 0,  6),
-    ('gustavo macedo',         'gustavo.macedo@aluno.vertice.com.br',       '10000000029', 0,  6),
-    ('helena correia',         'helena.correia@aluno.vertice.com.br',       '10000000030', 0,  6),
+    ('debora santana',         'debora.santana@aluno.vertice.com.br',       '10000000026', 2,  6, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('eduardo pires',          'eduardo.pires@aluno.vertice.com.br',        '10000000027', 2,  6, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('flavia rezende',         'flavia.rezende@aluno.vertice.com.br',       '10000000028', 2,  6, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('gustavo macedo',         'gustavo.macedo@aluno.vertice.com.br',       '10000000029', 2,  6, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('helena correia',         'helena.correia@aluno.vertice.com.br',       '10000000030', 2,  6, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 2o ano c (turma 7)
-    ('igor cavalcante',        'igor.cavalcante@aluno.vertice.com.br',      '10000000031', 0,  7),
-    ('juliana pacheco',        'juliana.pacheco@aluno.vertice.com.br',      '10000000032', 0,  7),
-    ('kevin rocha',            'kevin.rocha@aluno.vertice.com.br',          '10000000033', 0,  7),
-    ('leticia azevedo',        'leticia.azevedo@aluno.vertice.com.br',      '10000000034', 0,  7),
-    ('marcos vinicius toledo', 'marcos.toledo@aluno.vertice.com.br',        '10000000035', 0,  7),
+    ('igor cavalcante',        'igor.cavalcante@aluno.vertice.com.br',      '10000000031', 2,  7, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('juliana pacheco',        'juliana.pacheco@aluno.vertice.com.br',      '10000000032', 2,  7, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('kevin rocha',            'kevin.rocha@aluno.vertice.com.br',          '10000000033', 2,  7, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('leticia azevedo',        'leticia.azevedo@aluno.vertice.com.br',      '10000000034', 2,  7, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('marcos vinicius toledo', 'marcos.toledo@aluno.vertice.com.br',        '10000000035', 2,  7, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 2o ano d (turma 8)
-    ('nicole ferreira',        'nicole.ferreira@aluno.vertice.com.br',      '10000000036', 0,  8),
-    ('pedro henrique duarte',  'pedro.duarte@aluno.vertice.com.br',         '10000000037', 0,  8),
-    ('rafaela campos',         'rafaela.campos@aluno.vertice.com.br',       '10000000038', 0,  8),
-    ('samuel borges',          'samuel.borges@aluno.vertice.com.br',        '10000000039', 0,  8),
-    ('tatiana moreira',        'tatiana.moreira@aluno.vertice.com.br',      '10000000040', 0,  8),
+    ('nicole ferreira',        'nicole.ferreira@aluno.vertice.com.br',      '10000000036', 2,  8, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('pedro henrique duarte',  'pedro.duarte@aluno.vertice.com.br',         '10000000037', 2,  8, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('rafaela campos',         'rafaela.campos@aluno.vertice.com.br',       '10000000038', 2,  8, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('samuel borges',          'samuel.borges@aluno.vertice.com.br',        '10000000039', 2,  8, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('tatiana moreira',        'tatiana.moreira@aluno.vertice.com.br',      '10000000040', 2,  8, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 3o ano a (turma 9)
-    ('ursula fonseca',         'ursula.fonseca@aluno.vertice.com.br',       '10000000041', 0,  9),
-    ('vitor hugo alves',       'vitor.alves@aluno.vertice.com.br',          '10000000042', 0,  9),
-    ('wendy cristina lima',    'wendy.lima@aluno.vertice.com.br',           '10000000043', 0,  9),
-    ('xavier costa melo',      'xavier.melo@aluno.vertice.com.br',          '10000000044', 0,  9),
-    ('yara beatriz silva',     'yara.silva@aluno.vertice.com.br',           '10000000045', 0,  9),
+    ('ursula fonseca',         'ursula.fonseca@aluno.vertice.com.br',       '10000000041', 2,  9, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('vitor hugo alves',       'vitor.alves@aluno.vertice.com.br',          '10000000042', 2,  9, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('wendy cristina lima',    'wendy.lima@aluno.vertice.com.br',           '10000000043', 2,  9, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('xavier costa melo',      'xavier.melo@aluno.vertice.com.br',          '10000000044', 2,  9, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('yara beatriz silva',     'yara.silva@aluno.vertice.com.br',           '10000000045', 2,  9, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 3o ano b (turma 10)
-    ('zelia prado',            'zelia.prado@aluno.vertice.com.br',          '10000000046', 0, 10),
-    ('alex souza pereira',     'alex.pereira@aluno.vertice.com.br',         '10000000047', 0, 10),
-    ('bruna mendes',           'bruna.mendes@aluno.vertice.com.br',         '10000000048', 0, 10),
-    ('cesar augusto neves',    'cesar.neves@aluno.vertice.com.br',          '10000000049', 0, 10),
-    ('diana leal',             'diana.leal@aluno.vertice.com.br',           '10000000050', 0, 10),
+    ('zelia prado',            'zelia.prado@aluno.vertice.com.br',          '10000000046', 2, 10, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('alex souza pereira',     'alex.pereira@aluno.vertice.com.br',         '10000000047', 2, 10, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('bruna mendes',           'bruna.mendes@aluno.vertice.com.br',         '10000000048', 2, 10, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('cesar augusto neves',    'cesar.neves@aluno.vertice.com.br',          '10000000049', 2, 10, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('diana leal',             'diana.leal@aluno.vertice.com.br',           '10000000050', 2, 10, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 3o ano c (turma 11)
-    ('elton marques',          'elton.marques@aluno.vertice.com.br',        '10000000051', 0, 11),
-    ('fabio henrique',         'fabio.henrique@aluno.vertice.com.br',       '10000000052', 0, 11),
-    ('giovana porto',          'giovana.porto@aluno.vertice.com.br',        '10000000053', 0, 11),
-    ('hugo diniz',             'hugo.diniz@aluno.vertice.com.br',           '10000000054', 0, 11),
-    ('iris santos',            'iris.santos@aluno.vertice.com.br',          '10000000055', 0, 11),
+    ('elton marques',          'elton.marques@aluno.vertice.com.br',        '10000000051', 2, 11, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('fabio henrique',         'fabio.henrique@aluno.vertice.com.br',       '10000000052', 2, 11, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('giovana porto',          'giovana.porto@aluno.vertice.com.br',        '10000000053', 2, 11, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('hugo diniz',             'hugo.diniz@aluno.vertice.com.br',           '10000000054', 2, 11, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('iris santos',            'iris.santos@aluno.vertice.com.br',          '10000000055', 2, 11, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
     -- 3o ano d (turma 12)
-    ('julio cezar ribeiro',    'julio.ribeiro@aluno.vertice.com.br',        '10000000056', 0, 12),
-    ('karla miranda',          'karla.miranda@aluno.vertice.com.br',        '10000000057', 0, 12),
-    ('leandro soares',         'leandro.soares@aluno.vertice.com.br',       '10000000058', 0, 12),
-    ('monica teles',           'monica.teles@aluno.vertice.com.br',         '10000000059', 0, 12),
-    ('nilson araujo',          'nilson.araujo@aluno.vertice.com.br',        '10000000060', 0, 12);
+    ('julio cezar ribeiro',    'julio.ribeiro@aluno.vertice.com.br',        '10000000056', 2, 12, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('karla miranda',          'karla.miranda@aluno.vertice.com.br',        '10000000057', 2, 12, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('leandro soares',         'leandro.soares@aluno.vertice.com.br',       '10000000058', 2, 12, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('monica teles',           'monica.teles@aluno.vertice.com.br',         '10000000059', 2, 12, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A'),
+    ('nilson araujo',          'nilson.araujo@aluno.vertice.com.br',        '10000000060', 2, 12, '$argon2id$v=19$m=65536,t=3,p=1$WBSHsp7QOW+Ax1kDYiOHfA$FIGsUfRoSMeTjJLiKrkPvL28CFY7wXAfjWxHBD+hO+A');
 
--- alunos sem nome cadastrado COM notas → status = 0 (inativo)  [ids: 61, 62, 63]
+-- alunos sem nome cadastrado COM notas → status = 1 (inativo)  [ids: 61, 62, 63]
 INSERT INTO student (cpf, status, id_school_class) VALUES
-   ('20000000001', 0,  1),
-   ('20000000002', 0,  5),
-   ('20000000003', 0,  9);
+   ('20000000001', 1,  1),
+   ('20000000002', 1,  5),
+   ('20000000003', 1,  9);
 
--- alunos sem nome cadastrado SEM notas → status = 1 (ativo, default)  [ids: 64-69]
+-- alunos sem nome cadastrado SEM notas → status = 2 (ativo, default)  [ids: 64-69]
 INSERT INTO student (cpf, id_school_class) VALUES
-       ('20000000004',  2),
-       ('20000000005',  6),
-       ('20000000006',  7),
-       ('20000000007', 10),
-       ('20000000008', 11),
-       ('20000000009', 12);
+   ('20000000004',  2),
+   ('20000000005',  6),
+   ('20000000006',  7),
+   ('20000000007', 10),
+   ('20000000008', 11),
+   ('20000000009', 12);
 
 -- =========================
 -- school_class_teacher (24)

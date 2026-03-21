@@ -274,37 +274,6 @@ public class SubjectTeacherDAO implements GenericDAO<SubjectTeacher> {
     }
 
     /**
-     * Updates all subject-teacher associations for a specific teacher.
-     *
-     * <p>This method replaces the old teacher ID with a new teacher ID in all
-     * associations within the subject_teacher table. Validation is performed
-     * on both IDs, and if no records are affected, a NotFoundException is thrown.</p>
-     *
-     * @param oldTeacherId the current teacher ID to be replaced
-     * @param newTeacherId the new teacher ID to assign to the associations
-     * @throws DataException if a database access error occurs during the update
-     * @throws ValidationException if either teacher ID fails validation
-     * @throws NotFoundException if no associations exist for the old teacher ID
-     */
-    public void updateTeacher(int oldTeacherId, int newTeacherId) throws DataException, NotFoundException, ValidationException {
-        InputValidation.validateId(oldTeacherId, "id");
-        InputValidation.validateId(newTeacherId, "id");
-
-        try (Connection conn = PostgreConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(
-                     "UPDATE subject_teacher SET id_teacher = ? WHERE id_teacher = ?"
-             )) {
-            pstmt.setInt(1, newTeacherId);
-            pstmt.setInt(2, oldTeacherId);
-
-            if (pstmt.executeUpdate() <= 0) throw new NotFoundException("subject_teacher", "id", String.valueOf(oldTeacherId));
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-            throw new DataException("Erro ao atualizar relações entre matéria e professor", sqle);
-        }
-    }
-
-    /**
      * Deletes a specific subject-teacher association from the database by its ID.
      *
      * <p>This method validates the provided ID and attempts to remove the corresponding

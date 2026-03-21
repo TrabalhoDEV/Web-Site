@@ -24,7 +24,6 @@ import java.util.List;
 public class InsertSchoolClassServlet extends HttpServlet {
     private SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
     private SubjectDAO subjectDAO = new SubjectDAO();
-    private SchoolClassSubjectDAO schoolClassSubjectDAO = new SchoolClassSubjectDAO();
 
     /**
      * Handles HTTP GET requests for the insertion of a school class.

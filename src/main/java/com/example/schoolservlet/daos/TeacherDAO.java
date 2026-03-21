@@ -55,14 +55,14 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     /**
-     * Retrieves the total number of teachers in the database.
+     * Retrieves the total number of teachers stored in the database.
+     * <p>
+     * The method executes a count query on the teacher table and returns
+     * the total number of records available.
+     * </p>
      *
-     * <p>This method executes a COUNT query on the teacher table and returns the
-     * total number of teacher records. If the query does not return a result,
-     * the method returns -1.</p>
-     *
-     * @return the total count of teachers, or -1 if unavailable
-     * @throws DataException if a database access error occurs during the count query
+     * @return the total number of teachers, or -1 if no result is obtained
+     * @throws DataException if an error occurs while accessing the database
      */
     @Override
     public int totalCount() throws DataException {
@@ -83,17 +83,18 @@ public class TeacherDAO implements GenericDAO<Teacher> {
     }
 
     /**
-     * Retrieves a specific teacher from the database by their unique ID.
+     * Retrieves a teacher by its unique identifier.
+     * <p>
+     * The method validates the provided identifier and queries the database
+     * to find the corresponding teacher record. If the teacher exists, the
+     * entity is returned; otherwise, a {@code NotFoundException} is thrown.
+     * </p>
      *
-     * <p>This method validates the provided ID and queries the database to fetch
-     * the corresponding Teacher object. If no record is found, a NotFoundException
-     * is thrown.</p>
-     *
-     * @param id the unique identifier of the teacher to retrieve
-     * @return the Teacher object corresponding to the given ID
-     * @throws DataException if a database access error occurs during retrieval
-     * @throws ValidationException if the provided ID fails validation
-     * @throws NotFoundException if no teacher exists with the given ID
+     * @param id the unique identifier of the teacher to be retrieved
+     * @return the {@code Teacher} entity associated with the given identifier
+     * @throws DataException if an error occurs while accessing the database
+     * @throws NotFoundException if no teacher is found with the given identifier
+     * @throws ValidationException if the provided identifier is invalid
      */
     @Override
     public Teacher findById(int id) throws DataException, NotFoundException, ValidationException{
