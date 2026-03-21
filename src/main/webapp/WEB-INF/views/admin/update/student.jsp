@@ -1,5 +1,8 @@
 <%@ page import="com.example.schoolservlet.models.Student" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
+<%@ page import="com.example.schoolservlet.models.SchoolClass" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 
@@ -7,31 +10,21 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Update Student</title>
+    <title>Atualizar aluno</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css"/>
     <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
-
 </head>
 <body>
-<h1>Update Student</h1>
 
 <%
     // Load Student object from request attributes for form pre-population
     Student student = (Student) request.getAttribute("student");
     String errorMessage = (String) request.getAttribute("error");
     boolean hasError = errorMessage != null && !errorMessage.trim().isEmpty();
-    String schoolYear = (String) request.getAttribute("schoolYear");
 
-    // Verify that student object exists before rendering form
-    if (student == null) {
-%>
-<div class="error-message">
-    <strong>Error:</strong> Student data could not be loaded. Please try again.
-</div>
-<a href="${pageContext.request.contextPath}/admin/student/find-many">Back to Student List</a>
-<%
-        return;
-    }
+    SchoolClass schoolClass = (SchoolClass) request.getAttribute("schoolClass");
+    List<SchoolClass> schoolClasses = new ArrayList<>();
+    if (request.getAttribute("schoolClasses") != null) schoolClasses = (List<SchoolClass>) request.getAttribute("schoolClasses");
 %>
 
 <!-- SIDEBAR -->
@@ -196,6 +189,19 @@
             </li>
 
             <li class="sidebar-item non-active">
+                <a href="${pageContext.request.contextPath}/admin/dashboard">
+                      <span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2">
+                          <line x1="18" y1="20" x2="18" y2="10"></line>
+                          <line x1="12" y1="20" x2="12" y2="4"></line>
+                          <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                      </span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item non-active">
                 <a href="${pageContext.request.contextPath}/admin/find-one">
               <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="23" height="26" viewBox="0 0 23 26" fill="none">
@@ -235,11 +241,12 @@
 
             <hr>
             <!-- Student update form: POST to update servlet -->
-            <form method="post" action="${pageContext.request.contextPath}/admin/student/update">
+            <form method="post" action="${pageContext.request.contextPath}/admin/student/update" class="generic-form">
                 <!-- Enrollment field (read-only identifier) -->
+                <input type="hidden" name="enrollment" value="<%= student.getId() %>"/>
                 <div class="form-group">
-                    <label for="enrollment">Enrollment</label>
-                    <input type="text" id="enrollment" name="enrollment"
+                    <label for="enrollment">Matrícula</label>
+                    <input type="text" id="enrollment"
                            value="<%= String.format("%06d", student.getId()) %>" readonly/>
                 </div>
 
@@ -262,6 +269,26 @@
                     <label for="cpf">CPF</label>
                     <input type="text" id="cpf" name="cpf"
                            value="<%= student.getCpf() != null ? OutputFormatService.formatCpf(student.getCpf()) : "" %>" readonly/>
+                </div>
+
+                <!-- School class dropdown
+                     - Current class comes first with its real id as value (selected)
+                     - Other classes are filtered by id so there is no duplicate
+                     - value="" is never submitted, avoiding parseClassId ValidationException -->
+                <div class="form-group">
+                    <label for="newClassId">Ano Escolar</label>
+                    <select id="newClassId" name="newClassId" required>
+                        <option value="<%= schoolClass.getId() %>" selected>
+                            <%= OutputFormatService.formatName(schoolClass.getSchoolYear()) %>
+                        </option>
+                        <% for (SchoolClass sc : schoolClasses) { %>
+                        <% if (sc.getId() != schoolClass.getId()) { %>
+                        <option value="<%= sc.getId() %>">
+                            <%= OutputFormatService.formatName(sc.getSchoolYear()) %>
+                        </option>
+                        <% } %>
+                        <% } %>
+                    </select>
                 </div>
 
                 <%if (hasError) {%>

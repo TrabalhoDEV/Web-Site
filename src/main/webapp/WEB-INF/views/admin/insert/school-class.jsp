@@ -13,10 +13,6 @@
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
   <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
 </head>
-<%
-  List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
-  List<SchoolClass> schoolClasses= (List<SchoolClass>) request.getAttribute("schoolClasses");
-%>
 
 <body>
 
@@ -145,6 +141,19 @@
         </li>
 
         <li class="sidebar-item non-active">
+          <a href="${pageContext.request.contextPath}/admin/dashboard">
+                      <span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2">
+                          <line x1="18" y1="20" x2="18" y2="10"></line>
+                          <line x1="12" y1="20" x2="12" y2="4"></line>
+                          <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                      </span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="sidebar-item non-active">
           <a href="${pageContext.request.contextPath}/admin/find-one">
               <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="23" height="26" viewBox="0 0 23 26" fill="none">
@@ -188,27 +197,6 @@
           <div class="form-group">
             <label for="name">Nome da turma:</label>
             <input type="text" id="name" name="name" placeholder="Digite o nome da turma" required>
-          </div>
-
-          <!-- Subjects Fieldset -->
-          <div class="fieldset-group">
-            <fieldset class="checkbox-fieldset">
-              <legend>Selecione as Matérias:</legend>
-              <div class="checkbox-grid">
-                <%
-                  if (subjects != null) {
-                    for (Subject subject : subjects) {
-                %>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="subject_<%= subject.getId() %>" name="subjectIds" value="<%= subject.getId() %>">
-                  <label for="subject_<%= subject.getId() %>"><%= OutputFormatService.formatName(subject.getName()) %></label>
-                </div>
-                <%
-                    }
-                  }
-                %>
-              </div>
-            </fieldset>
           </div>
 
           <%

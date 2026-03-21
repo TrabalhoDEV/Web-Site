@@ -137,6 +137,16 @@ dialog {
 input, select {
     display: block;
 }
+
+.input-group > input{
+    width: 100%;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #dfe3ea;
+    font-size:13px;
+    min-width: 250px;
+}
+
 select{
     margin-bottom: 15px;
     border-radius: var(--medium-radius);
@@ -511,4 +521,9 @@ a.blue_button:active {
     background: transparent;
     border: solid 3px var(--button-hover-color);
     color: var(--button-hover-color);
+}
+
+textarea{
+    padding: 10px 14px;
+    border-radius: var(--medium-radius);
 }

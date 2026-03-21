@@ -2,13 +2,16 @@
 <%@ page import="com.example.schoolservlet.models.SchoolClass" %>
 <%@ page import="java.util.TreeMap" %>
 <%@ page import="com.example.schoolservlet.utils.OutputFormatService" %>
+<%@ page import="java.util.HashMap" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    Map<Integer, SchoolClass> schoolClassMap =
-            (Map<Integer, SchoolClass>) request.getAttribute("schoolClassMap");
+    Map<Integer, SchoolClass> schoolClassMap = new HashMap<>();
+    if (request.getAttribute("schoolClassMap") != null)
+        schoolClassMap = (Map<Integer, SchoolClass>) request.getAttribute("schoolClassMap");
     schoolClassMap = new TreeMap<>(schoolClassMap);
     int totalPages = (Integer) request.getAttribute("totalPages");
     int currentPage = (Integer) request.getAttribute("page");
+    String nameFilter = request.getAttribute("nameFilter") != null ? (String) request.getAttribute("nameFilter") : "";
 %>
 
 <!DOCTYPE html>
@@ -185,6 +188,19 @@
             </li>
 
             <li class="sidebar-item non-active">
+                <a href="${pageContext.request.contextPath}/admin/dashboard">
+                      <span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2">
+                          <line x1="18" y1="20" x2="18" y2="10"></line>
+                          <line x1="12" y1="20" x2="12" y2="4"></line>
+                          <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                      </span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="sidebar-item non-active">
                 <a href="${pageContext.request.contextPath}/admin/find-one">
               <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="23" height="26" viewBox="0 0 23 26" fill="none">
@@ -223,9 +239,24 @@
             <div class="header-grid">
                 <h1>Lista de Turmas</h1>
 
-                <a href="${pageContext.request.contextPath}/admin/school-class/insert">
-                    <button class="btn-add">Adicionar Turma</button>
-                </a>
+                <form method="get" action="${pageContext.request.contextPath}/admin/school-class/find-many"
+                      class="form-filter">
+                    <section>
+                        <input
+                                type="text"
+                                name="name"
+                                value="<%= nameFilter %>"
+                                placeholder="Nome da turma"
+                        />
+                        <input type="hidden" name="page" value="1"/>
+                        <button type="submit" class="primary-button">Buscar</button>
+                        <a href="${pageContext.request.contextPath}/admin/school-class/find-many" class="secondary-button">Limpar</a>
+                    </section>
+
+                    <a href="${pageContext.request.contextPath}/admin/school-class/insert" class="primary-button">
+                        Adicionar Turma
+                    </a>
+                </form>
             </div>
 
             <hr>
@@ -236,8 +267,10 @@
             </p>
             <% }%>
 
+            <% if (!schoolClassMap.isEmpty()) { %>
+
             <table class="grade-table"
-                   style="--cols: 2; grid-template-columns: 3fr 1fr">
+                   style="--cols: 2; grid-template-columns: 1fr 160px">
 
                 <thead>
                 <tr>
@@ -248,8 +281,6 @@
 
                 <tbody>
 
-                <% if (schoolClassMap != null && !schoolClassMap.isEmpty()) { %>
-
                 <% for (SchoolClass schoolClass : schoolClassMap.values()) { %>
 
                 <tr>
@@ -259,22 +290,56 @@
 
                     <td class="actions">
                         <div class="btn-action">
-                            <a href="${pageContext.request.contextPath}/admin/school-class/update?id=<%=schoolClass.getId()%>">
-                                <button class="btn-edit">Modificar</button>
+                            <%-- Subjects --%>
+                            <a href="${pageContext.request.contextPath}/admin/school-class/subject/find-many?classId=<%=schoolClass.getId()%>">
+                                <button title="Ver matérias" class="btn-icon btn-details">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                        <line x1="9" y1="7" x2="15" y2="7"/>
+                                        <line x1="9" y1="11" x2="15" y2="11"/>
+                                    </svg>
+                                </button>
                             </a>
 
+                            <%-- Teachers --%>
+                            <a href="${pageContext.request.contextPath}/admin/school-class/teacher/find-many?classId=<%=schoolClass.getId()%>">
+                                <button title="Ver professores" class="btn-icon btn-details">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                        <circle cx="9" cy="7" r="4"/>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                    </svg>
+                                </button>
+                            </a>
+
+                            <%-- Modify --%>
+                            <a href="${pageContext.request.contextPath}/admin/school-class/update?id=<%= schoolClass.getId()%>">
+                                <button title="Modificar" class="btn-icon btn-edit">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                    </svg>
+                                </button>
+                            </a>
+
+                            <%-- Delete --%>
                             <a href="#"
-                               onclick=openModalDelete("${pageContext.request.contextPath}/admin/school-class/delete?id=<%=schoolClass.getId()%>")>
-                                <button class="btn-delete">Deletar</button>
+                               onclick="openModalDelete('${pageContext.request.contextPath}/admin/school-class/delete?id=<%= schoolClass.getId()%>')">
+                                <button title="Deletar" class="btn-icon btn-delete">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="3 6 5 6 21 6"/>
+                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                        <path d="M10 11v6"/>
+                                        <path d="M14 11v6"/>
+                                        <path d="M9 6V4h6v2"/>
+                                    </svg>
+                                </button>
                             </a>
                         </div>
-                    </td>
-                </tr>
-
-                <% } } else { %>
-                <tr>
-                    <td colspan="2" style="text-align:center">
-                        Nenhuma turma foi encontrada
                     </td>
                 </tr>
 
@@ -282,6 +347,15 @@
 
                 </tbody>
             </table>
+            <% } else if (!nameFilter.isEmpty()) { %>
+
+            <p class="not-found">Nenhuma turma foi encontrada pela filtragem</p>
+
+            <% } else if (request.getAttribute("error") == null) { %>
+
+            <p class="not-found">Nenhuma turma está cadastrada</p>
+
+            <% } %>
 
         </div>
 
@@ -289,28 +363,28 @@
         <div class="pagination">
 
             <% if (currentPage > 1) { %>
-            <a href="?page=<%=currentPage-1%>">Anterior</a>
+            <a href="${pageContext.request.contextPath}/admin/school-class/find-many?page=<%= currentPage - 1 %>&name=<%= nameFilter %>">Anterior</a>
             <% } %>
 
-
-            <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1%>
+            <strong><%= currentPage != 0 ? currentPage : 1 %>/<%= totalPages != 0 ? totalPages : 1 %>
             </strong>
 
             <% if (currentPage < totalPages) { %>
-            <a href="?page=<%=currentPage+1%>">Próxima</a>
+            <a href="${pageContext.request.contextPath}/admin/school-class/find-many?page=<%= currentPage + 1 %>&name=<%= nameFilter %>">Próxima</a>
             <% } %>
+
         </div>
     </section>
 </main>
 
 <dialog id="deleteDialog">
-    <div class="modal-cardD">
+    <div class="modal-card">
         <h3>Deseja deletar esta turma?</h3>
         <p id="deleteText">Essa é uma ação irreversível</p>
 
         <div class="modal-actions">
-            <button id="confirmDelete">Confirmar</button>
-            <button id="closeDelete">Cancelar</button>
+            <button class="primary-button" id="confirmDelete">Confirmar</button>
+            <a class="secondary-button" id="closeDelete">Cancelar</a>
         </div>
     </div>
 </dialog>

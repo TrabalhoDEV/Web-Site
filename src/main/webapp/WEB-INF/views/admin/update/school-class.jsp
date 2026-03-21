@@ -11,21 +11,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Editar Turma | Vértice</title>
+  <title>Editar Turma</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/create.css" />
   <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/img/logo_pequena.svg" type="image/x-icon">
 </head>
 <%
   SchoolClass schoolClass = (SchoolClass) request.getAttribute("schoolClass");
-  List<Subject> schoolClassSubjects = (List<Subject>) request.getAttribute("schoolClassSubjects");
-  List<Subject> subjects = (List<Subject>) request.getAttribute("subjects");
-
-  Set<Integer> subjectsIds = new HashSet<>();
-  if (schoolClassSubjects != null) {
-    for (Subject ts : schoolClassSubjects) {
-      subjectsIds.add(ts.getId());
-    }
-  }
 %>
 
 <body>
@@ -154,6 +145,19 @@
         </li>
 
         <li class="sidebar-item non-active">
+          <a href="${pageContext.request.contextPath}/admin/dashboard">
+                      <span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2">
+                          <line x1="18" y1="20" x2="18" y2="10"></line>
+                          <line x1="12" y1="20" x2="12" y2="4"></line>
+                          <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                      </span>
+            <span>Dashboard</span>
+          </a>
+        </li>
+
+        <li class="sidebar-item non-active">
           <a href="${pageContext.request.contextPath}/admin/find-one">
               <span class="icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="23" height="26" viewBox="0 0 23 26" fill="none">
@@ -194,30 +198,10 @@
             <label for="schoolYear">Nome da turma:</label>
             <input type="text" name="schoolYear" id="schoolYear"
                    placeholder="Digite o nome da turma aqui"
-                   value="<%= schoolClass.getSchoolYear().toUpperCase() %>">
+                   value="<%= OutputFormatService.formatName(schoolClass.getSchoolYear()) %>">
             <input type="hidden" name="id" value="<%= schoolClass.getId() %>">
           </div>
           <% } %>
-
-          <div class="fieldset-group">
-            <fieldset class="checkbox-fieldset">
-              <legend>Selecione as matérias:</legend>
-              <div class="checkbox-grid">
-                <% for (Subject subject : subjects) { %>
-                <div class="checkbox-item">
-                  <input type="checkbox"
-                         id="subject_<%= subject.getId() %>"
-                         name="subjectIds"
-                         value="<%= subject.getId() %>"
-                    <%= subjectsIds.contains(subject.getId()) ? "checked" : "" %>>
-                  <label for="subject_<%= subject.getId() %>">
-                    <%= OutputFormatService.formatName(subject.getName()) %>
-                  </label>
-                </div>
-                <% } %>
-              </div>
-            </fieldset>
-          </div>
 
           <% if (request.getAttribute("error") != null) { %>
           <p style="color: red;"><%= request.getAttribute("error") %></p>

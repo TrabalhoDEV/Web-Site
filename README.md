@@ -49,10 +49,11 @@ cd Web-Site
 
 O projeto utiliza variáveis de ambiente para configuração.
 
-Crie um arquivo chamado `.env` na raiz do projeto baseado no arquivo `.env.example`.
+Crie um arquivo chamado `.env` (para o docker compose) na raiz do projeto baseado no arquivo `.env.example` e outra `.env` (para execução) dentro da pasta `resources` dentro de `src` .
 
 ```bash
 cp .env.example .env
+cp .env.example /src/resource/.env
 ```
 
 Depois abra o arquivo `.env` e configure as variáveis necessárias.
@@ -75,7 +76,13 @@ BREVO_API_KEY=
 BREVO_EMAIL=
 
 # Cryptography
-SECRET=
+SECRET=SuperSecret001
+
+# Gemini:
+AI_MODEL_API_KEY=
+
+# Aplication:
+BASE_URL="http://localhost:8080/SchoolServlet_war_exploded/"
 ```
 
 ---
@@ -98,7 +105,13 @@ Abra a pasta do projeto no **IntelliJ IDEA**.
 
 ---
 
-## 6. Rodar o servidor
+## 6. Servidor
+
+Configure o Apache Tomcat, se necessário baixe o em https://tomcat.apache.org/download-11.cgi.
+
+Configure dentro da pasta do projeto um war_exploded para o projeto.
+
+Baixe as dependências pelo Maven.
 
 Execute o servidor Servlet (Tomcat configurado no projeto).
 
@@ -112,8 +125,25 @@ Após iniciar o servidor, abra no navegador:
 http://localhost:8080
 ```
 
+Para ter acesso é necessário acessar o esqueci minha senha, pois o dataload povoa com senhas não hasheadas.
+
 ------------------------------------------------------------------------
 
 # 👩‍💻 Autores
 
-Projeto desenvolvido por Caio Marcos Ambrósio Maciel,Caio Mezini De Paula Machado, Eduardo Costa Amex Macal,Erick Santos Silva,Isabelly Vila Silva Da Hora e Mariana Marrão Ferreira Felis
+Projeto desenvolvido pelos seguintes alunos da 2ºSérie da Escola de Tecnologia do Instituto J&F:
+- Caio Marcos Ambrósio Maciel;
+- Caio Mezini De Paula Machado;
+- Eduardo Costa Amex Macal;
+- Erick Santos Silva;
+- Isabelly Vila Silva Da Hora;
+- Mariana Marrão Ferreira Felis.
+
+# Agradecimento:
+
+Gostaríamos de dar os créditos da ideação do projeto ao nosso docente de Desenvolvimento de Sistemas, chamado Diogo Martins Nascimento,
+que propôs esse desafio em sala de aula como forma de medir o nosso grau de conhecimento no desenvolvimento de aplicações Web com HTML5, CSS e Java Servlets.
+Esse projeto não foi apenas um teste, foi uma forma de refletir acerca do aprendizado e aumento da nossa capacidade intelectual 
+dentro da programação desde o ano passado (2025), pois ao contruí-lo percebemos erros que cometíamos no passado, e formas melhores de resolver determinado problema. 
+
+Muito obrigado, professor!

@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <title>Perfil do Administrador</title>
+  <title>Atualizar meu perfil</title>
   <link rel="stylesheet"
         href="${pageContext.request.contextPath}/assets/css/editAdmin.css"/>
   <link rel="shortcut icon" href="<%= request.getContextPath() %>/assets/img/Logo%20-%20Vértice.svg" type="image/x-icon">
@@ -140,6 +140,19 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions-icon lucide-captions"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
                         </span>
             <span>Matérias</span>
+          </a>
+        </li>
+
+        <li class="sidebar-item non-active">
+          <a href="${pageContext.request.contextPath}/admin/dashboard">
+                      <span class="icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2">
+                          <line x1="18" y1="20" x2="18" y2="10"></line>
+                          <line x1="12" y1="20" x2="12" y2="4"></line>
+                          <line x1="6" y1="20" x2="6" y2="14"></line>
+                        </svg>
+                      </span>
+            <span>Dashboard</span>
           </a>
         </li>
 
