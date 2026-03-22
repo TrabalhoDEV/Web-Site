@@ -38,7 +38,6 @@ public class InputNormalizer {
 
     /**
      * Normalizes a student enrollment string by trimming and removing leading zeros.
-         *
      * @param enrollment the student's enrollment value
      * @return enrollment as integer without leading zeros, or {@code -1} if input is null/empty
      */
