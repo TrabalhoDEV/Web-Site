@@ -9,6 +9,13 @@ package com.example.schoolservlet.exceptions;
  * @see ValidationException
  */
 public class TransformTypeException extends ValidationException{
+    /**
+     * Creates a new exception indicating that a value could not be converted
+     * to the target representation/type.
+     *
+     * @param value the source value that failed conversion
+     * @param to the target type/representation
+     */
     public TransformTypeException(String value, String to){
         super(String.format("Não foi possível converter %s para a forma de %s", value, to));
     }

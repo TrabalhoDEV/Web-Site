@@ -11,10 +11,20 @@ import jakarta.servlet.http.HttpServletResponse;
  * @see ValidationException
  */
 public class UnauthorizedException extends ValidationException{
+    /**
+     * Creates a new unauthorized exception with the required role/permission.
+     *
+     * @param necessary the required role or permission
+     */
     public UnauthorizedException(String necessary){
         super(String.format("Para acessar essa página, é necessário ser um %s", necessary));
     }
 
+    /**
+     * Returns the HTTP status code associated with this exception.
+     *
+     * @return HTTP 401 (Unauthorized)
+     */
     @Override
     public int getStatus() {
         return HttpServletResponse.SC_UNAUTHORIZED;

@@ -9,6 +9,12 @@ package com.example.schoolservlet.exceptions;
  * @see ValidationException
  */
 public class ValueAlreadyExistsException extends ValidationException{
+    /**
+     * Creates a new exception for uniqueness constraint violation.
+     *
+     * @param field the unique field name
+     * @param value the value that already exists
+     */
     public ValueAlreadyExistsException(String field, String value){
         super(String.format("O %s %s já está cadastrado", field, value), field);
     }

@@ -35,12 +35,12 @@ public class InsertSubjectServlet extends HttpServlet {
     }
 
     /**
-     * Handles HTTP GET requests to display the form for inserting a new subject.
+     * Handles HTTP POST requests to process insertion of a new subject.
      *
-     * @param request  The HttpServletRequest containing client request information.
-     * @param response The HttpServletResponse used to send the JSP page to the client.
-     * @throws ServletException If a servlet error occurs during forwarding.
-     * @throws IOException      If an I/O error occurs during forwarding.
+     * @param request  The HttpServletRequest containing submitted form data.
+     * @param response The HttpServletResponse used to return validation errors or redirect on success.
+     * @throws ServletException If a servlet error occurs during request forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding or redirection.
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

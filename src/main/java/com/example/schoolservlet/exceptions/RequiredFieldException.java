@@ -9,6 +9,11 @@ package com.example.schoolservlet.exceptions;
  * @see ValidationException
  */
 public class RequiredFieldException extends ValidationException{
+    /**
+     * Creates a new required field exception.
+     *
+     * @param field the required field name
+     */
     public RequiredFieldException(String field){
         super(String.format("O campo %s é obrigatório", field), field);
     }

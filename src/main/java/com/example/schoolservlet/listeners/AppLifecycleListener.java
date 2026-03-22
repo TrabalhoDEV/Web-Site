@@ -17,9 +17,21 @@ import jakarta.servlet.annotation.WebListener;
  */
 @WebListener
 public class AppLifecycleListener implements ServletContextListener {
+    /**
+     * Initializes application-level resources when the servlet context starts.
+     *
+     * @param sce the servlet context event
+     */
     @Override
-    public void contextInitialized(ServletContextEvent sce) { PostgreConnection.start(); }
+    public void contextInitialized(ServletContextEvent sce) {
+        PostgreConnection.start();
+    }
 
+    /**
+     * Releases application-level resources when the servlet context is destroyed.
+     *
+     * @param sce the servlet context event
+     */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         PostgreConnection.shutdown();

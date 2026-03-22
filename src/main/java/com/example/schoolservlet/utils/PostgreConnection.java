@@ -20,19 +20,24 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class PostgreConnection {
 
     /**
-     * Static initializer block that configures and initializes the HikariCP connection pool.
+     * Shared HikariCP data source used by the application.
+     *
+     * <p>It is initialized by {@link #start()} and closed by {@link #shutdown()}.
+     */
+    private static HikariDataSource dataSource;
+
+    /**
+     * Initializes the HikariCP connection pool.
      *
      * <p>Responsibilities include:
      * <ul>
      *   <li>Loading environment variables from a .env file if available</li>
      *   <li>Reading database URL, user, and password from environment or config service</li>
      *   <li>Loading the PostgreSQL JDBC driver</li>
-     *   <li>Setting HikariCP configuration such as pool size, timeouts, auto-commit, and prepared statement caching</li>
-     *   <li>Initializing the static dataSource instance with the configured HikariCP settings</li>
+     *   <li>Configuring pool size, timeouts, auto-commit, and prepared statement caching</li>
+     *   <li>Creating the shared {@code dataSource} instance</li>
      * </ul>
      */
-    private  static HikariDataSource dataSource;
-
     public static void start(){
         Dotenv dotenv = null;
 
@@ -77,6 +82,12 @@ public class PostgreConnection {
         dataSource = new HikariDataSource(config);
     }
 
+    /**
+     * Returns a database connection from the initialized HikariCP pool.
+     *
+     * @return an open SQL connection
+     * @throws SQLException if acquiring a connection from the pool fails
+     */
     public static Connection getConnection()  throws SQLException{
         return dataSource.getConnection();
     }

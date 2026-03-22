@@ -9,6 +9,11 @@ package com.example.schoolservlet.exceptions;
  * @see ValidationException
  */
 public class RegexException extends ValidationException{
+    /**
+     * Creates a new regex validation exception.
+     *
+     * @param field the field name with invalid format
+     */
     public RegexException(String field){
         super(String.format("O formato do campo %s está inválido", field), field);
     }

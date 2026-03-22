@@ -9,7 +9,13 @@ package com.example.schoolservlet.exceptions;
  * @see ValidationException
  */
 public class MinLengthException extends ValidationException{
-    public MinLengthException(String field, int lenght){
-        super(String.format("O campo %s deve ter mais do que %d caracteres", field, lenght), field);
+    /**
+     * Creates a new min length exception.
+     *
+     * @param field the field name
+     * @param length the minimum required length
+     */
+    public MinLengthException(String field, int length){
+        super(String.format("O campo %s deve ter mais do que %d caracteres", field, length), field);
     }
 }
