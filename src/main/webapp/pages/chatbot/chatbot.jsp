@@ -132,7 +132,7 @@
 
     <nav class="nav-links">
       <a href="<%=request.getContextPath()%>/index.html#hero">Início</a>
-      <a href="<%=request.getContextPath()%>//pages/chatbot/chatbot.jsp">Detalhes</a>
+      <a href="#">Chatbot</a>
       <a href="<%=request.getContextPath()%>/index.html#recursos">Recursos</a>
       <a href="<%=request.getContextPath()%>/index.html#beneficios">Benefícios</a>
     </nav>
@@ -157,7 +157,7 @@
         Tudo o que acontece na escola num clique. Para todos que fazem a educação acontecer.
 
         <span class="wave">
-<svg xmlns="http://www.w3.org/2000/svg" width="487" height="34" viewBox="0 0 487 34" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" height="34" viewBox="0 0 487 34" fill="none">
 <path d="M4.00098 30C73.6316 10.3798 266.915 -17.0885 483.001 30"
       stroke="#4361EE"
       stroke-width="8"
@@ -171,10 +171,9 @@
         Centralize notas, observações e relatórios em um ambiente seguro.
         Acompanhamento em tempo real para pais e ferramentas de produtividade de ponta para educadores.
       </p>
-      <a href="<%=request.getContextPath()%>/index.jsp"
-         target="_blank"
-         class="btn btn-primary btn-large">
-        Acesse o painel
+      <a href="<%=request.getContextPath()%>/index.html"
+         class="btn-large btn-primary">
+        Ir para Home
       </a>
     </div>
 
@@ -212,8 +211,8 @@
         <button type="submit" class="btn-send">
           Enviar
         </button>
-        <p style="color: #ff0066"><%= errorMessage %></p>
       </form>
+      <p style="color: #ff0066; margin-left: 24px"><%= errorMessage %></p>
     </div>
   </div>
 </main>

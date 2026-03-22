@@ -138,8 +138,8 @@
 
 .secondary-button:hover{
     color: var(--button-hover-color);
-    background-color: rgba(255,255,255,0.3);
-    border: var(--button-hover-color) solid 3px;
+    background-color: #dbe8fc;
+    border: var(--button-hover-color) solid 2px;
 }
 
 .btn-action {
@@ -287,7 +287,6 @@ dialog::backdrop {
 .pagination > a:hover{
     background-color: var(--button-hover-color);
 }
-
 .btn-icon {
     display: inline-flex;
     align-items: center;

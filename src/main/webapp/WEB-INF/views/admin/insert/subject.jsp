@@ -217,8 +217,8 @@
 
           <!-- Submit button -->
           <div class="form-actions">
-            <button type="submit" class="btn-save">Salvar</button>
-            <a href="${pageContext.request.contextPath}/admin/subject/find-many" class="btn-cancel">
+            <button type="submit" class="primary-button">Salvar</button>
+            <a href="${pageContext.request.contextPath}/admin/subject/find-many" class="secondary-button">
               Cancelar
             </a>
           </div>

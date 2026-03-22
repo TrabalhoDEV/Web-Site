@@ -39,10 +39,10 @@ public class ChatbotServlet extends HttpServlet {
     private static final String RESPONSE_ATTRIBUTE = "response";
 
     // Error messages
-    private static final String EMPTY_PROMPT_ERROR = "User prompt cannot be empty.";
-    private static final String MISSING_API_KEY_ERROR = "AI model API key is not configured.";
-    private static final String SYSTEM_PROMPT_NOT_FOUND_ERROR = "System prompt file not found.";
-    private static final String AI_REQUEST_ERROR = "An error occurred while processing your request.";
+    private static final String EMPTY_PROMPT_ERROR = "Estamos melhorando as configurações do chat.";
+    private static final String MISSING_API_KEY_ERROR = "Estamos melhorando o chat.";
+    private static final String SYSTEM_PROMPT_NOT_FOUND_ERROR = "Estamos acrescentando dados ao chat.";
+    private static final String AI_REQUEST_ERROR = "Ocorreu um problema, tente novamente em alguns minutos.";
 
     private String apiKey;
 
