@@ -19,6 +19,21 @@ import java.util.List;
 @WebServlet(name = "DeleteSchoolClassServlet", value = "/admin/school-class/delete")
 public class DeleteSchoolClassServlet extends HttpServlet {
     private final String responsePath = "/admin/school-class/find-many";
+
+    /**
+     * Handles HTTP GET requests for deleting a school class.
+     *
+     * <p>This method performs access validation to ensure the user is an admin,
+     * validates the 'id' parameter, and checks if the school class exists.
+     * If the class has no students, it deletes the class; otherwise, it forwards
+     * to a JSP page showing details preventing deletion. Errors are captured and
+     * stored in the session for feedback.</p>
+     *
+     * @param request the HttpServletRequest object containing client request data
+     * @param response the HttpServletResponse object used to send responses
+     * @throws ServletException if a servlet-related error occurs
+     * @throws IOException if an input or output error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -58,6 +73,20 @@ public class DeleteSchoolClassServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + responsePath);
     }
 
+    /**
+     * Handles HTTP POST requests for deleting a school class and optionally
+     * reassigning its students to a new class.
+     *
+     * <p>This method performs admin access validation, validates input parameters,
+     * and ensures that the source and destination class IDs are different. It updates
+     * students to the new class if applicable, deletes the original class, and
+     * handles errors by forwarding back to a JSP page with relevant messages.</p>
+     *
+     * @param request the HttpServletRequest object containing client request data
+     * @param response the HttpServletResponse object used to send responses
+     * @throws ServletException if a servlet-related error occurs
+     * @throws IOException if an input or output error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -103,6 +132,17 @@ public class DeleteSchoolClassServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + responsePath);
     }
 
+    /**
+     * Retrieves all school classes and sets them as a request attribute.
+     *
+     * <p>This helper method queries the database for all school classes and attaches
+     * the list to the request. If no classes are available for reassignment or an error
+     * occurs during retrieval, an error message is set as a request attribute.</p>
+     *
+     * @param request the HttpServletRequest object to set attributes on
+     * @param response the HttpServletResponse object (not used but kept for consistency)
+     * @param id the ID of the class to exclude from reassignment checks
+     */
     private void getAllData(HttpServletRequest request, HttpServletResponse response, int id){
         SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
 

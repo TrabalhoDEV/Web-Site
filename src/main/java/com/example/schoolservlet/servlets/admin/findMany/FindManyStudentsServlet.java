@@ -11,6 +11,21 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Servlet for listing students with pagination in the admin panel.
+ *
+ * <p>This servlet handles HTTP GET requests to fetch and display a paginated list
+ * of students. It validates admin access, reads the optional page parameter, and
+ * calculates the total number of pages based on the total count of students.
+ * The student data for the current page is retrieved using StudentDAO and set
+ * as request attributes along with pagination info for rendering in the JSP view.
+ * Any errors during data access are forwarded to the view using ErrorHandler.</p>
+ *
+ * @see HttpServlet
+ * @see StudentDAO
+ * @see AccessValidation
+ * @see ErrorHandler
+ */
 @WebServlet(name = "admin-find-many-student", value = "/admin/student/find-many")
 public class FindManyStudentsServlet extends HttpServlet {
     private final StudentDAO studentDAO = new StudentDAO();

@@ -14,7 +14,30 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Data Access Object responsible for retrieving dashboard statistics and
+ * analytical data used to populate charts and KPI indicators.
+ * <p>
+ * This class executes queries on database views that aggregate information
+ * about students, teachers, classes, subjects, grades, and approval rates.
+ * The returned data is structured using maps and lists to facilitate
+ * dynamic usage in dashboard visualizations.
+ * </p>
+ */
 public class DashboardDAO {
+
+    /**
+     * Retrieves key performance indicators (KPIs) for the dashboard.
+     * <p>
+     * The data is obtained from the database view that aggregates general
+     * statistics about the educational system, including totals and averages.
+     * </p>
+     *
+     * @return a map containing dashboard KPI values such as total students,
+     *         total teachers, total classes, total subjects, average students per class,
+     *         the class with the most students, and the maximum number of students in a class
+     * @throws DataException if an error occurs while accessing the database
+     */
     public Map<String, Object> getKpis() throws DataException {
         try (Connection conn = PostgreConnection.getConnection();
              Statement stmt = conn.createStatement()) {
@@ -45,6 +68,18 @@ public class DashboardDAO {
         }
     }
 
+    /**
+     * Retrieves the total number of students per class.
+     * <p>
+     * The data is collected from a database view and ordered by the school year,
+     * returning a list of records containing the class identifier and the
+     * corresponding number of enrolled students.
+     * </p>
+     *
+     * @return a list of maps containing the school year and the total number
+     *         of students for each class
+     * @throws DataException if an error occurs while accessing the database
+     */
     public List<Map<String, Object>> getStudentsPerClass() throws DataException {
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
@@ -69,6 +104,18 @@ public class DashboardDAO {
         }
     }
 
+    /**
+     * Retrieves the average grade for each subject.
+     * <p>
+     * The data is obtained from a database view that calculates the average
+     * grade across students for each subject. The results are ordered in
+     * descending order based on the calculated average grade.
+     * </p>
+     *
+     * @return a list of maps containing the subject name and its corresponding
+     *         average grade
+     * @throws DataException if an error occurs while accessing the database
+     */
     public List<Map<String, Object>> getAvgGradesSubject() throws DataException {
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
@@ -93,6 +140,17 @@ public class DashboardDAO {
         }
     }
 
+    /**
+     * Retrieves the average grade per class.
+     * <p>
+     * The information is collected from a database view that aggregates
+     * grade averages for each class based on the school year.
+     * </p>
+     *
+     * @return a list of maps containing the school year and the corresponding
+     *         average grade for that class
+     * @throws DataException if an error occurs while accessing the database
+     */
     public List<Map<String, Object>> getAvgGradesClass() throws DataException {
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
@@ -117,6 +175,17 @@ public class DashboardDAO {
         }
     }
 
+    /**
+     * Retrieves the approval rate for each class.
+     * <p>
+     * The approval rate represents the percentage of students who passed
+     * within each class and is calculated through a database view.
+     * </p>
+     *
+     * @return a list of maps containing the school year and the approval
+     *         rate associated with that class
+     * @throws DataException if an error occurs while accessing the database
+     */
     public List<Map<String, Object>> getApprovalRate() throws DataException {
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
@@ -141,6 +210,18 @@ public class DashboardDAO {
         }
     }
 
+    /**
+     * Retrieves the number of subjects assigned to each teacher.
+     * <p>
+     * The result is limited to a predefined maximum number of records
+     * defined by a system constant and is ordered by the number of
+     * subjects in descending order.
+     * </p>
+     *
+     * @return a list of maps containing the teacher name and the total
+     *         number of subjects assigned to that teacher
+     * @throws DataException if an error occurs while accessing the database
+     */
     public List<Map<String, Object>> getSubjectsPerTeacher() throws DataException {
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(
@@ -166,6 +247,18 @@ public class DashboardDAO {
         }
     }
 
+    /**
+     * Retrieves the number of classes assigned to each teacher.
+     * <p>
+     * The result is limited to a predefined maximum number of records
+     * defined by a system constant and is ordered by the number of
+     * classes in descending order.
+     * </p>
+     *
+     * @return a list of maps containing the teacher name and the total
+     *         number of classes assigned to that teacher
+     * @throws DataException if an error occurs while accessing the database
+     */
     public List<Map<String, Object>> getClassesPerTeacher() throws DataException {
         try (Connection conn = PostgreConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(

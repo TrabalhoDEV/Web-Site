@@ -25,6 +25,21 @@ import java.util.Map;
 
 @WebServlet(name = "teacher-home", value = "/teacher")
 public class HomeServlet extends HttpServlet {
+
+    /**
+     * Servlet for the teacher's home dashboard.
+     *
+     * <p>GET: Validates teacher access and session, retrieves teacher information if missing,
+     * gathers student performance data, students needing help, and teacher pendencies.
+     * Sets request attributes for the dashboard and forwards to the teacher's index JSP page.
+     *
+     * <p>Response status is set to 200 OK on success, or 401 Unauthorized if the session is invalid.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");

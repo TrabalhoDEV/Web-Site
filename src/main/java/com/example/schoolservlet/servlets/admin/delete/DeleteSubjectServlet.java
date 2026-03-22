@@ -18,6 +18,22 @@ import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
 
+/**
+ * Servlet responsible for handling the deletion of subjects in the admin panel.
+ *
+ * <p>This servlet processes HTTP GET requests to delete a subject based on its ID.
+ * It validates the ID parameter, checks admin access, and attempts to find and delete
+ * the specified subject using SubjectDAO. If an error occurs, it forwards to an error
+ * handler with the appropriate status and message. After processing, it redirects to
+ * the subject listing page.</p>
+ *
+ * @see HttpServlet
+ * @see SubjectDAO
+ * @see StudentSubjectDAO
+ * @see AccessValidation
+ * @see InputValidation
+ * @see ErrorHandler
+ */
 @WebServlet(name = "DeleteSubjectServlet", value = "/admin/subject/delete")
 public class DeleteSubjectServlet extends HttpServlet {
     private final String pagePath = "";

@@ -17,6 +17,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+/**
+ * Servlet responsible for listing school classes with pagination in the admin panel.
+ *
+ * <p>This servlet handles HTTP GET requests to retrieve and display a paginated list
+ * of school classes. It validates admin access, handles optional page parameters,
+ * calculates total pages, and fetches a subset of classes using SchoolClassDAO.
+ * Errors during data retrieval are forwarded to a JSP page using the ErrorHandler.
+ * The results and pagination data are set as request attributes for rendering in the view.</p>
+ *
+ * @see HttpServlet
+ * @see SchoolClassDAO
+ * @see AccessValidation
+ * @see ErrorHandler
+ */
 @WebServlet(name = "admin-find-many-school-classes", value = "/admin/school-class/find-many")
 public class FindManySchoolClassesServlet extends HttpServlet {
     private final SchoolClassDAO schoolClassDAO = new SchoolClassDAO();

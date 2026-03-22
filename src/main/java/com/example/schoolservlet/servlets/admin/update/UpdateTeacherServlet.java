@@ -47,6 +47,25 @@ public class UpdateTeacherServlet extends HttpServlet {
         enrollInURL = ConfigService.getEnv("BASE_URL", dotenv);
     }
 
+    /**
+     * Handles HTTP GET requests to load the teacher update page.
+     * <p>
+     * This method validates the teacher ID received from the request,
+     * retrieves the corresponding teacher from the database, and loads
+     * the necessary data to populate the update form. If the teacher is
+     * found, the request is forwarded to the teacher update JSP page.
+     * </p>
+     * <p>
+     * If the ID is invalid, missing, or the teacher does not exist,
+     * an appropriate error message is handled and displayed.
+     * Access to this endpoint is restricted to administrators.
+     * </p>
+     *
+     * @param request the {@link HttpServletRequest} containing the client request
+     * @param response the {@link HttpServletResponse} used to send the response
+     * @throws ServletException if a servlet-related error occurs
+     * @throws IOException if an input or output error occurs during request processing
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -205,6 +224,21 @@ public class UpdateTeacherServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Loads the data required to populate the teacher update page.
+     * <p>
+     * This method retrieves the teacher information, the list of all
+     * available subjects, and the subjects currently associated with
+     * the teacher. These data are then stored as request attributes so
+     * they can be used to pre-fill the update form in the view layer.
+     * </p>
+     *
+     * @param request the {@link HttpServletRequest} used to store attributes for the view
+     * @param teacherId the unique identifier of the teacher whose data will be loaded
+     * @throws DataException if an error occurs while accessing the data source
+     * @throws NotFoundException if the teacher with the given ID does not exist
+     * @throws ValidationException if the provided teacher ID fails validation
+     */
     private void loadUpdateData(HttpServletRequest request, int teacherId)
             throws DataException, NotFoundException, ValidationException {
 
@@ -218,12 +252,39 @@ public class UpdateTeacherServlet extends HttpServlet {
         request.setAttribute("teacherSubjects", teacherSubjects);
     }
 
+    /**
+     * Safely loads the data required for the teacher update page.
+     * <p>
+     * This method wraps the {@code loadUpdateData} call to prevent
+     * checked exceptions from interrupting the request flow. Any
+     * exception thrown during the loading process is silently ignored,
+     * allowing the application to continue rendering the view even if
+     * some data cannot be retrieved.
+     * </p>
+     *
+     * @param request the {@link HttpServletRequest} used to store attributes for the view
+     * @param id the unique identifier of the teacher whose data should be loaded
+     */
     private void loadSafely(HttpServletRequest request, int id) {
         try {
             loadUpdateData(request, id);
         } catch (Exception ignored) {}
     }
 
+    /**
+     * Handles errors that occur during the teacher update flow.
+     * <p>
+     * This method sets an error message as a request attribute and forwards
+     * the request to the teacher listing page so the message can be displayed
+     * to the user.
+     * </p>
+     *
+     * @param request the {@link HttpServletRequest} containing the current request
+     * @param response the {@link HttpServletResponse} used to send the response
+     * @param message the error message to be shown to the user
+     * @throws ServletException if an error occurs while forwarding the request
+     * @throws IOException if an input or output error occurs during request processing
+     */
     private void handleError(HttpServletRequest request,
                              HttpServletResponse response,
                              String message)

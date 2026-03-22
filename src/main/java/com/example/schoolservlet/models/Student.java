@@ -2,6 +2,9 @@ package com.example.schoolservlet.models;
 
 import com.example.schoolservlet.utils.enums.StudentStatusEnum;
 
+/**
+ * Represents a student.
+ */
 public class Student {
     // Attributes:
     private int id;
@@ -12,11 +15,19 @@ public class Student {
     private StudentStatusEnum status;
     private int idSchoolClass;
 
-    // Constructors:
-    public Student(){
+    /** Creates an empty student instance. */
+    public Student(){}
 
-    }
-
+    /**
+     * Creates a student without password.
+     *
+     * @param id student identifier
+     * @param name student name
+     * @param email student email
+     * @param cpf student CPF
+     * @param status current student status
+     * @param idSchoolClass class identifier
+     */
     public Student(int id, String name, String email, String cpf, StudentStatusEnum status, int idSchoolClass){
         this.id = id;
         this.name = name;
@@ -26,6 +37,17 @@ public class Student {
         this.idSchoolClass = idSchoolClass;
     }
 
+    /**
+     * Creates a student with full data.
+     *
+     * @param id student identifier
+     * @param name student name
+     * @param email student email
+     * @param password student password
+     * @param cpf student CPF
+     * @param status current student status
+     * @param idSchoolClass class identifier
+     */
     public Student(int id, String name, String email, String password, String cpf, StudentStatusEnum status, int idSchoolClass) {
         this.id = id;
         this.name = name;
@@ -36,68 +58,62 @@ public class Student {
         this.idSchoolClass = idSchoolClass;
     }
 
-    // Getters:
-    public int getId() {
-        return id;
-    }
+    /** @return student identifier */
+    public int getId() { return id; }
 
-    public String getName() {
-        return name;
-    }
+    /** @return student name */
+    public String getName() { return name; }
 
-    public String getEmail() {
-        return email;
-    }
+    /** @return student email */
+    public String getEmail() { return email; }
 
-    public String getCpf() {
-        return cpf;
-    }
+    /** @return student CPF */
+    public String getCpf() { return cpf; }
 
-    public StudentStatusEnum getStatus() {
-        return status;
-    }
+    /** @return student status */
+    public StudentStatusEnum getStatus() { return status; }
 
+    /**
+     * Returns enrollment code based on student ID, left-padded to 6 digits.
+     *
+     * @return enrollment string
+     */
     public String getEnrollment(){
         return String.format("%06d", this.id);
     }
 
-    public int getIdSchoolClass() {
-        return idSchoolClass;
-    }
+    /** @return class identifier */
+    public int getIdSchoolClass() { return idSchoolClass; }
 
-    public String getPassword() {
-        return password;
-    }
+    /** @return student password */
+    public String getPassword() { return password; }
 
-    // Setters:
-    public void setId(int id) {
-        this.id = id;
-    }
+    /** @param id student identifier */
+    public void setId(int id) { this.id = id; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    /** @param name student name */
+    public void setName(String name) { this.name = name; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    /** @param email student email */
+    public void setEmail(String email) { this.email = email; }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
+    /** @param cpf student CPF */
+    public void setCpf(String cpf) { this.cpf = cpf; }
 
-    public void setStatus(StudentStatusEnum status) {
-        this.status = status;
-    }
+    /** @param status student status */
+    public void setStatus(StudentStatusEnum status) { this.status = status; }
 
-    public void setIdSchoolClass(int idSchoolClass) {
-        this.idSchoolClass = idSchoolClass;
-    }
+    /** @param idSchoolClass class identifier */
+    public void setIdSchoolClass(int idSchoolClass) { this.idSchoolClass = idSchoolClass; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    /** @param password student password */
+    public void setPassword(String password) { this.password = password; }
 
+    /**
+     * Returns a printable representation with masked password.
+     *
+     * @return string representation
+     */
     @Override
     public String toString() {
         return "Student{" +

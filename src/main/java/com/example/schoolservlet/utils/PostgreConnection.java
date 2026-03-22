@@ -6,10 +6,38 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.cdimascio.dotenv.Dotenv;
 
+/**
+ * Utility class for managing PostgreSQL database connections using HikariCP connection pool.
+ *
+ * <p>This class handles:
+ * <ul>
+ *   <li>Loading environment variables for database configuration</li>
+ *   <li>Initializing HikariCP connection pool with custom settings</li>
+ *   <li>Providing methods to obtain and close connections</li>
+ *   <li>Graceful shutdown of the connection pool</li>
+ * </ul>
+ */
 public class PostgreConnection {
 
-    private  static HikariDataSource dataSource;
+    /**
+     * Shared HikariCP data source used by the application.
+     *
+     * <p>It is initialized by {@link #start()} and closed by {@link #shutdown()}.
+     */
+    private static HikariDataSource dataSource;
 
+    /**
+     * Initializes the HikariCP connection pool.
+     *
+     * <p>Responsibilities include:
+     * <ul>
+     *   <li>Loading environment variables from a .env file if available</li>
+     *   <li>Reading database URL, user, and password from environment or config service</li>
+     *   <li>Loading the PostgreSQL JDBC driver</li>
+     *   <li>Configuring pool size, timeouts, auto-commit, and prepared statement caching</li>
+     *   <li>Creating the shared {@code dataSource} instance</li>
+     * </ul>
+     */
     public static void start(){
         Dotenv dotenv = null;
 
@@ -54,10 +82,24 @@ public class PostgreConnection {
         dataSource = new HikariDataSource(config);
     }
 
+    /**
+     * Returns a database connection from the initialized HikariCP pool.
+     *
+     * @return an open SQL connection
+     * @throws SQLException if acquiring a connection from the pool fails
+     */
     public static Connection getConnection()  throws SQLException{
         return dataSource.getConnection();
     }
 
+    /**
+     * Closes the provided database connection if it is not null and not already closed.
+     *
+     * <p>Any SQLException encountered during closing is caught, printed, and rethrown as a RuntimeException.
+     *
+     * @param conn the Connection object to be closed
+     * @throws RuntimeException if an error occurs while closing the connection
+     */
     public static void disconnect(Connection conn) {
         try {
             if (conn != null && !conn.isClosed()) {
@@ -69,6 +111,11 @@ public class PostgreConnection {
         }
     }
 
+    /**
+     * Shuts down the HikariCP connection pool by closing the dataSource if it is open.
+     *
+     * <p>This method ensures that all pooled connections are properly released and the pool is terminated.
+     */
     public static void shutdown() {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();

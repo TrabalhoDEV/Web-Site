@@ -7,15 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class that user regex or ifs to validate if user's input is valid or not.
- * This allows us to change business' rules of validation much easier than if we use that
- * directed in the Servlets or DAOs
+ * Utility class for validating user input using regular expressions and
+ * business-rule checks.
+ *
+ * <p>Centralizing validation rules here makes maintenance easier than spreading
+ * validations across servlets and DAOs.
  */
 public class InputValidation {
     /**
-     * Static method that verifies if cpf is valid
-     * @param cpf Is user's cpf
-     * @return    true if cpf's format is valid
+     * Validates CPF format and character set.
+     *
+     * @param cpf the user's CPF
+     * @throws ValidationException if CPF is null/blank, contains invalid characters, or has invalid format
      */
     public static void validateCpf(String cpf) throws ValidationException{
         validateIsNull("cpf", cpf);
@@ -24,9 +27,11 @@ public class InputValidation {
     }
 
     /**
-     * Static method to verifies email shape
-     * @param email Is the e-mail from the user
-     * @return      true if the email's format is valid (name@domain.com)
+     * Validates email format, character set, and length constraints.
+     *
+     * @param email the user's email
+     * @throws ValidationException if email is null/blank, contains invalid characters,
+     *                             violates length limits, or has invalid format
      */
     public static void validateEmail(String email) throws ValidationException{
         validateIsNull("email", email);
@@ -37,9 +42,11 @@ public class InputValidation {
     }
 
     /**
-     * Static method that verifies password format
+     * Validates password against business rules.
+     *
      * @param password the user's password
-     * @throws ValidationException if the password is different of some bussiness' rule for that
+     * @throws ValidationException if password is null/blank, violates length limits,
+     *                             or does not contain required character categories
      */
     public static void validatePassword(String password) throws ValidationException {
         validateIsNull("senha", password);
@@ -69,18 +76,20 @@ public class InputValidation {
     }
 
     /**
-     * Static method that verifies if the grade is not greater than 10 or less than 0
-     * @param grade Is the user's grade
-     * @return      if grade is valid returns true else returns false
+     * Validates whether a grade is within the allowed range.
+     *
+     * @param grade the grade value
+     * @return {@code true} if grade is between minimum and maximum limits (inclusive)
      */
     public static boolean validateGrade(double grade){
         return grade >= Constants.MIN_GRADE && grade <= Constants.MAX_GRADE;
     }
 
     /**
-     * Static method that validates enrollment
-     * @param enrollment is student's enrollment
-     * @throws ValidationException if enrollment has not 6 characters or if it's empty
+     * Validates student enrollment format.
+     *
+     * @param enrollment the student's enrollment
+     * @throws ValidationException if enrollment is null/blank or does not match the required 6-digit format
      */
     public static void validateEnrollment(String enrollment) throws ValidationException{
         validateIsNull("matrícula", enrollment);
@@ -88,10 +97,11 @@ public class InputValidation {
     }
 
     /**
-     * Static method that validates userName
-     * @param userName is the teacher userName
-     * @throws ValidationException if userName is empty, or has more or less characters than allowed,
-     *                             or if it has not a dot in the middle
+     * Validates teacher username format and length.
+     *
+     * @param userName the teacher username
+     * @throws ValidationException if username is null/blank, violates length limits,
+     *                             or does not match the required pattern
      */
     public static void validateUserName(String userName) throws ValidationException{
         validateIsNull("usuário", userName);
@@ -101,10 +111,12 @@ public class InputValidation {
     }
 
     /**
-     * Static method that validates if ID value is greater than 0
-     * @param id is the ID that user want to find, update or delete
-     * @param field is the name of field ID, if field is ID pass id, but if field is id_table pass id_table
-     * @throws ValidationException  if id is empty or less than 0
+     * Validates whether an ID is greater than zero.
+     *
+     * @param id the ID value to validate
+     * @param field the field name associated with the ID
+     * @throws RequiredFieldException if ID is zero
+     * @throws InvalidNumberException if ID is negative
      */
     public static void validateId(int id, String field) throws RequiredFieldException, InvalidNumberException{
         if (id == 0) throw new RequiredFieldException(field);
@@ -112,19 +124,21 @@ public class InputValidation {
     }
 
     /**
-     * Static method that validates userName
-     * @param studentClass Is the student's class
-     * @return             true if studentClass is between 1 and 12
+     * Validates whether a student class number is within the allowed range.
+     *
+     * @param studentClass the student class number
+     * @return {@code true} if studentClass is between allowed limits (inclusive)
      */
     public static boolean validateStudentClass(int studentClass) {
         return studentClass >= Constants.MIN_STUDENT_CLASS && studentClass <= Constants.MAX_STUDENT_CLASS;
     }
 
     /**
-     * Static method that verifies teacher's name format
-     * @param name the teacher's name
-     * @throws ValidationException if the name is null, smaller or greater than allowed length,
-     * or contains invalid characters according to business rules
+     * Validates teacher name format and length.
+     *
+     * @param name the teacher name
+     * @throws ValidationException if name is null/blank, violates length limits,
+     *                             or contains invalid characters
      */
     public static void validateTeacherName(String name) throws ValidationException {
         validateIsNull("nome", name);
@@ -140,14 +154,14 @@ public class InputValidation {
     }
 
     /**
-     * Static method that verifies if the IDs sent from the form
-     * really exist in database.
-     * If an ID does not exist, it is not added to the returned list.
+     * Validates that IDs submitted by a form exist in the database list.
      *
-     * @param idsFromForm      Array of IDs received from the form submission
-     * @param idsFromDatabase  List of valid IDs stored in database
-     * @return                 List containing only IDs that exist in database
-     * @throws ValidationException if an invalid number is sent
+     * <p>Only IDs found in {@code idsFromDatabase} are returned.
+     *
+     * @param idsFromForm array of ID strings submitted from the form
+     * @param idsFromDatabase list of valid IDs stored in database
+     * @return a list containing only valid and existing IDs
+     * @throws ValidationException if any submitted ID is not a valid number
      */
     public static List<Integer> validateIdsExist(
             String[] idsFromForm,
@@ -174,22 +188,25 @@ public class InputValidation {
 
         return validIds;
     }
+
     /**
-     * Static method that validates if a field is null
-     * @param field    is field's name
-     * @param input    is field's value
-     * @throws RequiredFieldException if value is blank
+     * Validates whether a string field is null or blank.
+     *
+     * @param field the field name
+     * @param input the field value
+     * @throws RequiredFieldException if value is null or blank
      */
     public static void validateIsNull(String field, String input) throws RequiredFieldException{
         if (input == null || input.isBlank()) throw new RequiredFieldException(field);
     }
 
     /**
-     * Static method that validates if subject name is valid
-     * @param name  is subject's name
-     * @throws RequiredFieldException if name is blank or null
-     * @throws MinLengthException  if name's length is less than minimal defined in a constant
-     * @throws MaxLengthException  if name's lenght is greater than it should
+     * Validates subject name length constraints.
+     *
+     * @param name the subject name
+     * @throws RequiredFieldException if name is null or blank
+     * @throws MinLengthException if name length is below minimum
+     * @throws MaxLengthException if name length exceeds maximum
      */
     public static void validateSubjectName(String name) throws RequiredFieldException, MinLengthException, MaxLengthException{
         validateIsNull("nome", name);
@@ -198,16 +215,10 @@ public class InputValidation {
     }
 
     /**
-     * Static method that validates if name contains only letters and whitespace characters.
+     * Validates whether student name contains only letters and whitespace.
      *
-     * Validation rules:
-     * - Name cannot be null or blank
-     * - Name can only contain letters (A-Z, a-z) and whitespace
-     * - Special characters, numbers and symbols are not allowed
-     *
-     * @param name is the user's name to be validated
-     * @throws RequiredFieldException if name is null or blank
-     * @throws ValidationException if name contains invalid characters (numbers, special characters, symbols)
+     * @param name the student name to validate
+     * @throws ValidationException if name is null/blank or contains invalid characters
      */
     public static void validateStudentName(String name) throws ValidationException {
         validateIsNull("nome", name);
@@ -217,13 +228,15 @@ public class InputValidation {
             }
         }
     }
-    
-    public static void validateName(String name) throws ValidationException{
-        validateIsNull("nome", name);
-        if (!StandardCharsets.US_ASCII.newEncoder().canEncode(name)) throw new ValidationException("Nome contém caracteres inválidos");
-        if (name.matches("^[\\p{L} ]*$")) throw new RegexException("nome");
-    }
 
+    /**
+     * Validates school class name format.
+     *
+     * <p>Allowed characters: letters, digits, whitespace, ordinal symbols (º, ª).
+     *
+     * @param name the school class name
+     * @throws ValidationException if name is null/blank or contains invalid characters
+     */
     public static void validateSchoolClassName(String name) throws ValidationException{
         validateIsNull("nome da turma", name);
         if (!name.matches("^[\\p{L}\\d ºª]+$")) throw new ValidationException("Nome da turma contém caracteres inválidos");

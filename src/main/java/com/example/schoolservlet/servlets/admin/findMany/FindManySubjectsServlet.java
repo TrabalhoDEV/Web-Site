@@ -12,6 +12,21 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Servlet for listing subjects with pagination in the admin panel.
+ *
+ * <p>This servlet handles HTTP GET requests to fetch and display a paginated list
+ * of subjects. It validates admin access, reads the optional page parameter, and
+ * calculates the total number of pages based on the total count of subjects.
+ * The subject data for the current page is retrieved using SubjectDAO and set
+ * as request attributes along with pagination info for rendering in the JSP view.
+ * Any errors during data access are forwarded to the JSP view with the appropriate
+ * HTTP status code.</p>
+ *
+ * @see HttpServlet
+ * @see SubjectDAO
+ * @see AccessValidation
+ */
 @WebServlet(name = "admin-subjects-find-many", value = "/admin/subject/find-many")
 public class FindManySubjectsServlet extends HttpServlet {
     private final SubjectDAO subjectDAO = new SubjectDAO();
