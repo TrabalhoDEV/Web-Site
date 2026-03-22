@@ -12,6 +12,19 @@ import java.util.*;
 
 public class SubjectDAO implements GenericDAO<Subject> {
 
+    /**
+     * Retrieves a paginated map of subjects from the database.
+     *
+     * <p>This method fetches a limited number of subjects ordered by their ID, applying
+     * pagination using the provided skip (offset) and take (limit) parameters. The result
+     * is returned as a map where the key is the subject ID and the value is the corresponding
+     * Subject object.</p>
+     *
+     * @param skip the number of records to skip (offset) for pagination
+     * @param take the maximum number of records to retrieve (limit)
+     * @return a map of subjects keyed by their ID
+     * @throws DataException if a database access error occurs
+     */
     @Override
     public Map<Integer, Subject> findMany(int skip, int take) throws DataException {
         Map<Integer, Subject> subjects = new HashMap<>();
@@ -40,6 +53,15 @@ public class SubjectDAO implements GenericDAO<Subject> {
         return subjects;
     }
 
+    /**
+     * Retrieves a list of subjects from the database.
+     *
+     * <p>This method fetches subjects ordered by their ID and returns them as a List of
+     * Subject objects. Each Subject contains the ID and name retrieved from the database.</p>
+     *
+     * @return a list of Subject objects
+     * @throws DataException if a database access error occurs
+     */
     public List<Subject> findMany() throws DataException{
         List<Subject> subjects = new ArrayList<>();
         try(Connection conn = PostgreConnection.getConnection();
@@ -61,6 +83,16 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    /**
+     * Retrieves all subjects from the database.
+     *
+     * <p>This method fetches every record from the 'subject' table, ordered by ID,
+     * and returns them as a list of Subject objects. Each Subject includes the ID,
+     * name, and deadline.</p>
+     *
+     * @return a list of all Subject objects
+     * @throws DataException if a database access error occurs
+     */
     public List<Subject> findAll() throws DataException {
         List<Subject> subjects = new ArrayList<>();
 
@@ -85,6 +117,20 @@ public class SubjectDAO implements GenericDAO<Subject> {
 
         return subjects;
     }
+
+    /**
+     * Retrieves a Subject from the database by its ID.
+     *
+     * <p>This method validates the provided ID and queries the 'subject' table
+     * for a matching record. If a subject with the given ID exists, it returns
+     * a Subject object containing the ID, name, and deadline.</p>
+     *
+     * @param id the unique identifier of the subject to retrieve
+     * @return the Subject object corresponding to the given ID
+     * @throws ValidationException if the provided ID is invalid
+     * @throws NotFoundException if no subject with the given ID exists
+     * @throws DataException if a database access error occurs
+     */
     @Override
     public Subject findById(int id) throws DataException, NotFoundException, ValidationException{
         InputValidation.validateId(id, "id");
@@ -107,6 +153,17 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    /**
+     * Retrieves a list of subjects taught by a specific teacher.
+     *
+     * <p>This method queries the 'subject' table joined with 'subject_teacher'
+     * to find all subjects associated with the given teacher ID. Each resulting
+     * row is mapped to a Subject object containing the ID, name, and deadline.</p>
+     *
+     * @param teacherId the unique identifier of the teacher
+     * @return a list of Subject objects taught by the specified teacher
+     * @throws DataException if a database access error occurs
+     */
     public List<Subject> findByTeacherId(int teacherId) throws DataException {
         List<Subject> subjects = new ArrayList<>();
         String sql = "SELECT s.id, s.name, s.deadline " +
@@ -132,6 +189,18 @@ public class SubjectDAO implements GenericDAO<Subject> {
         return subjects;
     }
 
+    /**
+     * Retrieves a list of subjects assigned to a specific school class.
+     *
+     * <p>This method queries the 'subject' table joined with 'school_class_subject'
+     * to find all subjects associated with the provided school class ID.
+     * The results are ordered alphabetically by subject name and mapped to Subject objects,
+     * containing the ID, name, and deadline.</p>
+     *
+     * @param schoolClassId the unique identifier of the school class
+     * @return a list of Subject objects associated with the specified school class
+     * @throws DataException if a database access error occurs
+     */
     public List<Subject> findBySchoolClassId(int schoolClassId)
             throws DataException {
 
@@ -166,6 +235,15 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    /**
+     * Retrieves all subject IDs from the 'subject' table.
+     *
+     * <p>This method executes a simple query to collect every ID from the subject table
+     * and returns them as a list of integers.</p>
+     *
+     * @return a list of integers representing the IDs of all subjects
+     * @throws DataException if a database access error occurs
+     */
     public List<Integer> findAllIds() throws DataException {
         String sql = "SELECT id FROM subject";
         List<Integer> ids = new ArrayList<>();
@@ -185,6 +263,21 @@ public class SubjectDAO implements GenericDAO<Subject> {
         return ids;
     }
 
+    /**
+     * Retrieves a paginated collection of subjects filtered by name.
+     * <p>
+     * The method performs a case-insensitive search on the subject name
+     * and returns the matching records ordered by their identifier.
+     * Pagination is supported through the skip and take parameters.
+     * </p>
+     *
+     * @param skip the number of records to skip before collecting the results
+     * @param take the maximum number of records to return
+     * @param nameFilter the filter used to search subjects by name
+     * @return a map containing subject entities indexed by their identifier
+     * @throws DataException if an error occurs while accessing the database
+     * @throws ValidationException if the provided subject name filter is invalid
+     */
     public Map<Integer, Subject> findMany(int skip, int take, String nameFilter) throws DataException, ValidationException {
         InputValidation.validateSubjectName(nameFilter);
         Map<Integer, Subject> subjects = new HashMap<>();
@@ -220,6 +313,18 @@ public class SubjectDAO implements GenericDAO<Subject> {
         return subjects;
     }
 
+    /**
+     * Counts the total number of subjects that match the provided name filter.
+     * <p>
+     * The method performs a case-insensitive search on the subject name and
+     * returns the number of records that satisfy the filter criteria.
+     * </p>
+     *
+     * @param nameFilter the filter used to search subjects by name
+     * @return the total number of subjects that match the filter
+     * @throws DataException if an error occurs while accessing the database
+     * @throws ValidationException if the provided subject name filter is invalid
+     */
     public int count(String nameFilter) throws DataException, ValidationException {
         InputValidation.validateSubjectName(nameFilter);
 
@@ -240,6 +345,15 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    /**
+     * Retrieves the total number of subjects in the 'subject' table.
+     *
+     * <p>This method executes a COUNT query on the subject table and returns
+     * the total number of records found. If no records exist, it returns -1.</p>
+     *
+     * @return the total number of subjects, or -1 if none are found
+     * @throws DataException if a database access error occurs
+     */
     @Override
     public int totalCount() throws DataException {
         try(Connection conn = PostgreConnection.getConnection();
@@ -256,6 +370,18 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    /**
+     * Inserts a new subject into the 'subject' table.
+     *
+     * <p>Before insertion, this method validates that the subject's name and deadline
+     * are not null and that the deadline is after the current date. If any validation
+     * fails, the corresponding exception is thrown.</p>
+     *
+     * @param subject the Subject object to be created
+     * @throws DataException if a database access error occurs
+     * @throws RequiredFieldException if the subject's name or deadline is null/empty
+     * @throws InvalidDateException if the subject's deadline is before the current date
+     */
     @Override
     public void create(Subject subject) throws DataException, RequiredFieldException, InvalidDateException{
         if (subject.getName() == null || subject.getName().isEmpty()) throw new RequiredFieldException("nome");
@@ -275,8 +401,25 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
-
-
+    /**
+     * Updates an existing subject in the 'subject' table.
+     *
+     * <p>Validations performed before updating:</p>
+     * <ul>
+     *     <li>Subject name must not be null or empty.</li>
+     *     <li>Subject ID must be a valid positive integer.</li>
+     *     <li>Deadline must not be null and must be after the current date.</li>
+     * </ul>
+     *
+     * <p>If the subject with the given ID does not exist, a NotFoundException is thrown.</p>
+     *
+     * @param subject the Subject object containing updated information
+     * @throws NotFoundException if no subject with the given ID exists
+     * @throws DataException if a database access error occurs
+     * @throws ValidationException if the subject ID is invalid
+     * @throws RequiredFieldException if the name or deadline is missing
+     * @throws InvalidDateException if the deadline is before the current date
+     */
     @Override
     public void update(Subject subject) throws NotFoundException, DataException, ValidationException {
         if (subject.getName() == null || subject.getName().isEmpty()) throw new RequiredFieldException("nome");
@@ -298,6 +441,25 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    /**
+     * Deletes a subject from the database after performing validation checks.
+     *
+     * <p>The deletion is conditional based on the following rules:
+     * - The subject has no enrolled students.
+     * - All enrolled students have no grades.
+     * - The subject's deadline has passed and all enrolled students have grades.
+     *
+     * If these conditions are not met, a ValidationException is thrown with
+     * an appropriate message explaining why the subject cannot be deleted.</p>
+     *
+     * <p>The method also retrieves basic subject information and enrollment statistics
+     * before attempting deletion to determine eligibility.</p>
+     *
+     * @param subjectId the unique identifier of the subject to be deleted
+     * @throws DataException if a database access error occurs during retrieval or deletion
+     * @throws ValidationException if the subject cannot be deleted due to enrollment or grading constraints
+     * @throws NotFoundException if no subject exists with the provided ID
+     */
     @Override
     public void delete(int subjectId) throws DataException, ValidationException, NotFoundException {
         InputValidation.validateId(subjectId, "id da matéria");
@@ -371,6 +533,17 @@ public class SubjectDAO implements GenericDAO<Subject> {
         }
     }
 
+    /**
+     * Checks if there are any students enrolled in a specific subject.
+     *
+     * <p>This method validates the subject ID and queries the database to determine
+     * whether at least one student is associated with the given subject.</p>
+     *
+     * @param subjectId the unique identifier of the subject to check for student enrollment
+     * @return true if there is at least one student enrolled in the subject; false otherwise
+     * @throws DataException if a database access error occurs during the check
+     * @throws ValidationException if the subjectId fails validation
+     */
     public boolean hasStudentsById(int subjectId) throws DataException, ValidationException {
         InputValidation.validateId(subjectId, "id da matéria");
 

@@ -8,11 +8,33 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.util.Base64;
 
+/**
+ * Provides methods for sending emails via the Brevo (formerly Sendinblue) API.
+ *
+ * <p>This service handles sending simple HTML emails or emails with file attachments.
+ * The API URL, API key, and sender email are loaded from environment variables.
+ *
+ * <p>Static methods:
+ * <ul>
+ *   <li>{@link #sendEmail(String, String, String)} – sends an email without attachment</li>
+ *   <li>{@link #sendEmail(String, String, String, String)} – sends an email with optional attachment</li>
+ * </ul>
+ *
+ * <p>Throws exceptions if required environment variables are missing, the file does not exist,
+ * or if the email fails to send.
+ */
 public class EmailService {
     private static final String BREVO_API_URL;
     private static final String BREVO_API_KEY;
     private static final String BREVO_EMAIL;
 
+    /**
+     * Static initializer block for the EmailService class.
+     *
+     * <p>Loads Brevo API configuration from environment variables using Dotenv.
+     * Ensures that BREVO_API_URL, BREVO_API_KEY, and BREVO_EMAIL are all set.
+     * If any required configuration is missing, throws a RuntimeException.
+     */
     static{
         Dotenv dotenv = null;
 
@@ -34,10 +56,32 @@ public class EmailService {
         }
     }
 
+    /**
+     * Sends an HTML email to the specified destination without attachments.
+     *
+     * <p>This method delegates to {@link #sendEmail(String, String, String, String)} with a null filePath.
+     *
+     * @param destination the recipient's email address
+     * @param topic       the subject of the email
+     * @param messageHtml the HTML content of the email
+     * @throws Exception if sending the email fails
+     */
     public static void sendEmail(String destination, String topic, String messageHtml) throws Exception {
         sendEmail(destination, topic, messageHtml, null);
     }
 
+    /**
+     * Sends an HTML email to the specified destination with an optional attachment.
+     *
+     * <p>Constructs a JSON payload including sender, recipient, subject, HTML content,
+     * and optional file attachment in Base64 format, then sends it via HTTP POST to Brevo API.
+     *
+     * @param destination the recipient's email address
+     * @param topic       the subject of the email
+     * @param messageHtml the HTML content of the email
+     * @param filePath    the file path of an attachment, or null if no attachment
+     * @throws Exception if the email cannot be sent, the file is missing, or an HTTP error occurs
+     */
     public static void sendEmail(String destination, String topic, String messageHtml, String filePath) throws Exception {
         try {
             URL url = new URL(BREVO_API_URL);

@@ -27,6 +27,20 @@ public class DeleteTeacherServlet extends HttpServlet {
     private final SchoolClassTeacherDAO schoolClassTeacherDAO = new SchoolClassTeacherDAO();
     private final SubjectTeacherDAO subjectTeacherDAO = new SubjectTeacherDAO();
 
+    /**
+     * Handles HTTP GET requests for deleting a teacher.
+     *
+     * <p>This method validates admin access and the teacher ID parameter. It checks
+     * if the teacher exists and evaluates any pending student performances. If no
+     * pending performances exist, the teacher is deleted. Otherwise, it forwards
+     * to a JSP page showing why deletion is blocked. Errors are captured in the
+     * session for feedback. After processing, it redirects to the teacher listing page.</p>
+     *
+     * @param request the HttpServletRequest object containing client request data
+     * @param response the HttpServletResponse object used to send responses
+     * @throws ServletException if a servlet-related error occurs
+     * @throws IOException if an input or output error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");

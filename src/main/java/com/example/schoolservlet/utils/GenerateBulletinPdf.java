@@ -25,7 +25,35 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Utility class for generating a PDF report (bulletin) for a student.
+ *
+ * <p>This class generates a PDF containing student information, grades, overall performance,
+ * and a motivational quote. The PDF is sent directly to the HttpServletResponse output stream
+ * with proper headers for download.
+ */
 public class GenerateBulletinPdf {
+
+    /**
+     * Generates a PDF report card for a specific student including personal information,
+     * class details, subject grades, final status, and a motivational quote.
+     *
+     * <p>The PDF contains:
+     * <ul>
+     *   <li>Header with school logo and title</li>
+     *   <li>General student information (name, class, unit, issue date)</li>
+     *   <li>Subjects table with grades and status for each subject</li>
+     *   <li>Final student status based on grades and subject deadlines</li>
+     *   <li>A motivational citation displayed at the bottom of the page</li>
+     * </ul>
+     *
+     * @param request the HttpServletRequest object containing the request details
+     * @param response the HttpServletResponse object used to write the PDF output
+     * @param student the Student object representing the student whose report is generated
+     * @param studentSubjects a list of StudentSubject objects containing subjects and corresponding grades
+     * @param schoolClass the SchoolClass object representing the student's class
+     * @throws IOException if an I/O error occurs when creating or sending the PDF
+     */
     public static void generatePDF(HttpServletRequest request, HttpServletResponse response, Student student,
                             List<StudentSubject> studentSubjects, SchoolClass schoolClass) throws IOException {
         response.setContentType("application/pdf");
@@ -179,6 +207,13 @@ public class GenerateBulletinPdf {
         document.close();
     }
 
+    /**
+     * Creates a table cell for displaying general information in the PDF with no border.
+     *
+     * @param texto the text content to display inside the cell
+     * @param alinhamento the text alignment for the cell content
+     * @return a Cell object formatted for general information display
+     */
     private static Cell infoCell(String texto, TextAlignment alinhamento) {
         return new Cell()
                 .add(new Paragraph(texto))
@@ -188,6 +223,13 @@ public class GenerateBulletinPdf {
                 .setPadding(5);
     }
 
+    /**
+     * Creates a default table cell for the PDF with gray border and centered vertical alignment.
+     *
+     * @param texto the text content to display inside the cell
+     * @param alinhamento the horizontal text alignment for the cell content
+     * @return a Cell object formatted with standard border, padding, and vertical alignment
+     */
     private static Cell defaultCell(String texto, TextAlignment alinhamento) {
         return new Cell()
                 .add(new Paragraph(texto).setFontSize(9))
@@ -197,6 +239,16 @@ public class GenerateBulletinPdf {
                 .setPadding(4);
     }
 
+    /**
+     * Creates a table cell for displaying a student's grade in the PDF.
+     * <p>
+     * If the grade is null, a dash ("-") is displayed. Grades below the minimum
+     * approval threshold are shown in red. The cell has centered text alignment,
+     * gray border, and padding.
+     *
+     * @param grade the grade value to display; can be null
+     * @return a Cell object formatted to display the grade appropriately
+     */
     private static Cell gradeCell(Double grade) {
 
         Paragraph p;

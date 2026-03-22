@@ -7,15 +7,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- *  Class that contains static methods to normalize the user's input to the database format.
- *  This class allows us to change the business' rule easier than if we keep that validation in
- *  other classes like DAOs or Servlets.
+ * Utility class with static methods to normalize user input into formats
+ * expected by persistence and business layers.
+ *
+ * <p>Centralizing normalization rules simplifies maintenance and avoids
+ * duplicating formatting logic across DAOs and servlets.
  */
 public class InputNormalizer {
     /**
-     * Static method that normalizes e-mail to lower case
-     * @param email Is user's e-mail
-     * @return      e-mail in lower case
+     * Normalizes an email by trimming it and converting it to lowercase.
+     *
+     * @param email the user's email
+     * @return normalized email in lowercase, or {@code null} if input is null/empty
      */
     public static String normalizeEmail(String email){
         if (email == null || email.isEmpty()) return null;
@@ -23,9 +26,10 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalizes name to lower case
-     * @param name Is user's name
-     * @return      name in lower case
+     * Normalizes a name by trimming it and converting it to lowercase.
+     *
+     * @param name the user's name
+     * @return normalized name in lowercase, or {@code null} if input is null/empty
      */
     public static String normalizeName(String name){
         if (name == null || name.isEmpty()) return null;
@@ -33,9 +37,9 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalizes student's enrollment to lower case
-     * @param enrollment Is the enrollment that every student has
-     * @return      enrollment without the initial zeros
+     * Normalizes a student enrollment string by trimming and removing leading zeros.
+     * @param enrollment the student's enrollment value
+     * @return enrollment as integer without leading zeros, or {@code -1} if input is null/empty
      */
     public static int normalizeEnrollment(String enrollment){
         if (enrollment == null || enrollment.isEmpty()) return -1;
@@ -45,9 +49,10 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalizes observation to lower case
-     * @param obs is the observation made by a teacher for some user
-     * @return    observation in lower case
+     * Normalizes an observation by trimming surrounding whitespace.
+     *
+     * @param obs the observation text
+     * @return trimmed observation, or {@code null} if input is null/empty
      */
     public static String normalizeObs(String obs){
         if (obs == null || obs.isEmpty()) return null;
@@ -55,9 +60,10 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalizes userName to lower case
-     * @param userName is teacher's userName
-     * @return         userName in lower case
+     * Normalizes a teacher username by trimming it and converting it to lowercase.
+     *
+     * @param userName the teacher username
+     * @return normalized username in lowercase, or {@code null} if input is null/empty
      */
     public static String normalizeUserName(String userName){
         if (userName == null || userName.isEmpty()) return null;
@@ -65,15 +71,23 @@ public class InputNormalizer {
     }
 
     /**
-     * Static method that normalizes cpf to only have number
-     * @param cpf is the cpf of user
-     * @return    cpf without . or -
+     * Normalizes a CPF by removing all non-digit characters.
+     *
+     * @param cpf the user's CPF
+     * @return CPF containing digits only, or {@code null} if input is null/empty
      */
     public static String normalizeCpf(String cpf){
         if (cpf == null || cpf.isEmpty()) return null;
         return cpf.replaceAll("[^\\d]", "");
     }
 
+    /**
+     * Parses a date string in {@code yyyy-MM-dd} format.
+     *
+     * @param date the date string to parse
+     * @return parsed {@link Date}
+     * @throws TransformTypeException if the input cannot be parsed to the expected date format
+     */
     public static Date normalizeDate(String date) throws TransformTypeException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {

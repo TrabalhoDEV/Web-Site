@@ -29,6 +29,20 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet(name = "teacher-find-many-students", value = "/teacher/student/find-many")
 public class FindManyStudentsServlet extends HttpServlet {
+
+    /**
+     * Handles GET requests for listing students for a teacher.
+     *
+     * <p>Validates teacher access and session, retrieves teacher information if missing,
+     * optionally filters students by enrollment, and fetches student subjects with pagination.
+     * Sets request attributes including studentSubjectMap, teacher, page, totalPages, and studentsPerformanceCount,
+     * then forwards to the teacher's student listing JSP page.
+     *
+     * @param request  the HttpServletRequest object
+     * @param response the HttpServletResponse object
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
@@ -45,6 +59,8 @@ public class FindManyStudentsServlet extends HttpServlet {
         StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
         String responsePath = "/WEB-INF/views/teacher/student/find-many.jsp";
         Map<Integer, List<StudentSubject>> studentSubjectMap;
+
+        request.setAttribute("enrollment", enrollmentFilter);
 
         request.setAttribute("enrollment", enrollmentFilter);
 

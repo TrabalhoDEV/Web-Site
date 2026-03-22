@@ -6,6 +6,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+/**
+ * Utility class for handling and forwarding error responses in servlets.
+ *
+ * <p>Provides a static method to set the HTTP status code, attach an error message,
+ * and forward the request to a specified view.
+ *
+ * <p>The class cannot be instantiated.
+ */
 public class ErrorHandler {
     private ErrorHandler(){}
 

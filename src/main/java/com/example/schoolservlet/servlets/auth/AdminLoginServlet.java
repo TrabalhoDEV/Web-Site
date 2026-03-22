@@ -18,6 +18,20 @@ import java.io.IOException;
 
 @WebServlet(name = "admin-auth", value = "/admin/auth")
 public class AdminLoginServlet extends HttpServlet {
+
+    /**
+     * Servlet for handling admin authentication and login.
+     *
+     * <p>GET requests forward the user to the admin login JSP page.
+     * POST requests validate CPF and password input, authenticate the admin using {@link AdminDAO},
+     * create an {@link AuthenticatedUser} session if successful, and redirect to the admin dashboard.
+     * Invalid credentials or errors forward back to the login page with appropriate error messages.</p>
+     *
+     * @param request  HttpServletRequest containing login form data.
+     * @param response HttpServletResponse used to forward or redirect the user.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding or redirect.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/pages/admin/login.jsp").forward(request, response);

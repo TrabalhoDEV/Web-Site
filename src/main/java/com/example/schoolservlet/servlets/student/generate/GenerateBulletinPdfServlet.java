@@ -20,13 +20,32 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
+/**
+ * Servlet responsible for generating and streaming the authenticated student's
+ * bulletin as a PDF document.
+ *
+ * <p>Endpoint: <code>/student/bulletin/generate-pdf</code>.
+ */
 @WebServlet(name = "GenerateBulletinPdfServlet", value = "/student/bulletin/generate-pdf")
 public class GenerateBulletinPdfServlet extends HttpServlet {
     private final StudentSubjectDAO studentSubjectDAO = new StudentSubjectDAO();
     private final StudentDAO studentDAO = new StudentDAO();
     private final SchoolClassDAO schoolClassDAO = new SchoolClassDAO();
+
+    /**
+     * Handles HTTP GET requests to generate the student's bulletin PDF.
+     *
+     * <p>This method validates student access and session state, loads student,
+     * subject, and class data, and writes the generated PDF to the response.
+     * If any validation, lookup, or data-layer error occurs, the request is
+     * forwarded to the bulletin page with the corresponding status and message.
+     *
+     * @param request the HTTP servlet request
+     * @param response the HTTP servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an input/output error occurs while handling the request
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!AccessValidation.isStudent(request, response)) return;

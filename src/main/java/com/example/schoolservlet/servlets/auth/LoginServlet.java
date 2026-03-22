@@ -21,6 +21,21 @@ import java.io.IOException;
 
 @WebServlet(name = "auth", value = "/auth")
 public class LoginServlet extends HttpServlet {
+
+    /**
+     * Servlet for handling user login for both teachers and students.
+     *
+     * <p>GET requests forward users to the login page (index.jsp).
+     * POST requests validate the user identifier and password, determine the role
+     * (teacher or student), authenticate using the corresponding DAO,
+     * create an {@link AuthenticatedUser} session, and redirect to the appropriate dashboard.
+     * Invalid credentials or errors forward back to the login page with error messages.</p>
+     *
+     * @param request  HttpServletRequest containing login form data.
+     * @param response HttpServletResponse used to forward or redirect the user.
+     * @throws ServletException If a servlet error occurs during forwarding.
+     * @throws IOException      If an I/O error occurs during forwarding or redirect.
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");

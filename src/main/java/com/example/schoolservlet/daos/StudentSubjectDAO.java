@@ -24,6 +24,16 @@ import com.example.schoolservlet.utils.records.TeacherPendency;
 
 
 public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSubjectDAO {
+
+    /**
+     * Retrieves a paginated collection of StudentSubject entries from the database.
+     * Each entry includes its associated Student and Subject objects with relevant details.
+     *
+     * @param skip the number of records to skip (used as the OFFSET in the SQL query)
+     * @param take the maximum number of records to retrieve (used as the LIMIT in the SQL query)
+     * @return a map where the key is the StudentSubject ID and the value is the corresponding StudentSubject object
+     * @throws DataException if any SQL exception occurs while accessing the database
+     */
     @Override
     public Map<Integer, StudentSubject> findMany(int skip, int take) throws DataException {
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
@@ -78,6 +88,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a paginated mapping of students and their associated subjects for a specific teacher.
+     * Each key in the returned map corresponds to a student ID, and the value is a list of StudentSubject objects.
+     * If a student has no subjects assigned under the teacher, a placeholder StudentSubject with null subject is included.
+     *
+     * @param skip the number of student records to skip (used as the OFFSET in the SQL query)
+     * @param take the maximum number of student records to retrieve (used as the LIMIT in the SQL query)
+     * @param teacherId the ID of the teacher for which to fetch students and subjects
+     * @return a map where each key is a student ID and the value is a list of StudentSubject objects for that student
+     * @throws ValidationException if the teacherId is invalid
+     * @throws DataException if any SQL exception occurs while accessing the database
+     */
     public Map<Integer, List<StudentSubject>> findManyByTeacherId(int skip, int take, int teacherId) throws DataException, ValidationException {
         InputValidation.validateId(teacherId, "id do professor");
         Map<Integer, List<StudentSubject>> studentsMap = new HashMap<>();
@@ -151,6 +173,20 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Counts the number of active students associated with a specific teacher
+     * through class and subject relationships.
+     * <p>
+     * The method verifies whether the teacher is assigned to teach subjects
+     * within a class and counts distinct active students enrolled in those
+     * subjects. Only students with an active status are considered in the result.
+     * </p>
+     *
+     * @param teacherId the identifier of the teacher whose related students will be counted
+     * @return the total number of distinct active students associated with the teacher
+     * @throws DataException if an error occurs while accessing the database
+     * @throws ValidationException if the provided teacher identifier is invalid
+     */
     public int countByTeacherId(int teacherId) throws DataException, ValidationException {
         InputValidation.validateId(teacherId, "id do professor");
         try (Connection conn = PostgreConnection.getConnection();
@@ -181,6 +217,22 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+        /**
+     * Counts the number of subject relationships between a specific student
+     * and a teacher within the context of their shared class.
+     * <p>
+     * The method verifies whether the teacher is assigned to teach subjects
+     * in the student's class and counts how many of those subjects are
+     * associated with the student. Only valid class-subject-teacher
+     * relationships are considered in the result.
+     * </p>
+     *
+     * @param studentId the identifier of the student whose relationships will be counted
+     * @param teacherId the identifier of the teacher whose relationships with the student will be evaluated
+     * @return the total number of subject relationships between the student and the teacher
+     * @throws DataException if an error occurs while accessing the database
+     * @throws ValidationException if any of the provided identifiers are invalid
+     */
     public int countByStudentIdAndTeacherId(int studentId, int teacherId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         InputValidation.validateId(teacherId, "id do professor");
@@ -215,6 +267,17 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a paginated map of subjects associated with a specific student.
+     * Each key in the returned map corresponds to a student_subject ID, and the value is the StudentSubject object.
+     *
+     * @param skip the number of records to skip (used as OFFSET in the SQL query)
+     * @param take the maximum number of records to retrieve (used as LIMIT in the SQL query)
+     * @param studentId the ID of the student for whom the subjects are fetched
+     * @return a map where each key is a student_subject ID and the value is a StudentSubject object
+     * @throws ValidationException if the provided studentId is invalid
+     * @throws DataException if a database access error occurs
+     */
     @Override
     public Map<Integer, StudentSubject> findMany(int skip, int take, int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
@@ -276,6 +339,17 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         return studentsSubjects;
     }
 
+    /**
+     * Retrieves a paginated map of StudentSubject entries for a specific student that have feedback notes.
+     * Only entries where the 'obs' field is not null are included.
+     *
+     * @param skip the number of records to skip (used as OFFSET in the SQL query)
+     * @param take the maximum number of records to retrieve (used as LIMIT in the SQL query)
+     * @param studentId the ID of the student whose subjects with feedback are fetched
+     * @return a map where each key is a student_subject ID and the value is the corresponding StudentSubject object
+     * @throws ValidationException if the provided studentId is invalid
+     * @throws DataException if a database access error occurs
+     */
     public Map<Integer, StudentSubject> findManyThatHasFeedbacks(int skip, int take, int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         Map<Integer, StudentSubject> studentsSubjects = new HashMap<>();
@@ -336,6 +410,17 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         return studentsSubjects;
     }
 
+    /**
+     * Retrieves a paginated mapping of a student's subjects with their associated StudentSubject records.
+     * Each student ID maps to a list of StudentSubject objects containing the subject details, grades, and observations.
+     *
+     * @param skip the number of records to skip (used for pagination OFFSET)
+     * @param take the maximum number of records to retrieve (used for pagination LIMIT)
+     * @param studentId the ID of the student whose subjects are being retrieved
+     * @return a map where the key is the student ID and the value is a list of StudentSubject objects for that student
+     * @throws ValidationException if the provided studentId is invalid
+     * @throws DataException if a database access error occurs while fetching the data
+     */
     public Map<Integer, List<StudentSubject>> findManyByStudentId(int skip, int take, int studentId, Integer teacherId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         Map<Integer, List<StudentSubject>> studentsMap = new HashMap<>();
@@ -454,6 +539,15 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a specific StudentSubject record by its unique ID, including the associated Student and Subject details.
+     *
+     * @param id the unique identifier of the StudentSubject record
+     * @return the StudentSubject object containing the student's information, the subject's information, grades, and observations
+     * @throws ValidationException if the provided ID is invalid
+     * @throws NotFoundException if no StudentSubject record exists for the given ID
+     * @throws DataException if a database access error occurs while fetching the data
+     */
     @Override
     public StudentSubject findById(int id) throws NotFoundException, DataException, RequiredFieldException, InvalidNumberException{
         InputValidation.validateId(id, "id");
@@ -505,6 +599,30 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a student-subject relationship by its identifier,
+     * ensuring that the specified teacher has access to the record.
+     * <p>
+     * The method validates the provided identifiers and performs a query
+     * that checks whether the teacher is assigned to the subject within
+     * the student's class. If the relationship exists and the teacher has
+     * permission, the corresponding entity is returned.
+     * </p>
+     * <p>
+     * If the relationship exists but the teacher is not authorized to access it,
+     * an {@code UnauthorizedException} is thrown. If the relationship does not
+     * exist, a {@code NotFoundException} is thrown.
+     * </p>
+     *
+     * @param id the identifier of the student-subject relationship to be retrieved
+     * @param teacherId the identifier of the teacher requesting access to the relationship
+     * @return the {@code StudentSubject} entity associated with the given identifier
+     * @throws NotFoundException if the relationship does not exist
+     * @throws DataException if an error occurs while accessing the database
+     * @throws UnauthorizedException if the teacher does not have permission to access the relationship
+     * @throws InvalidNumberException if any of the provided identifiers are invalid
+     * @throws RequiredFieldException if any required parameter is missing
+     */
     public StudentSubject findById(int id, int teacherId) throws NotFoundException, DataException, UnauthorizedException, InvalidNumberException, RequiredFieldException {
         InputValidation.validateId(id, "id");
         InputValidation.validateId(teacherId, "id do professor");
@@ -573,6 +691,15 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Calculates the performance summary of students for a given teacher.
+     * The summary includes counts of approved, failed, and pending students based on their grades.
+     *
+     * @param teacherId the unique identifier of the teacher whose students' performance is being evaluated
+     * @return a StudentsPerformanceCount object containing counts of approved, pending, and failed students
+     * @throws ValidationException if the provided teacher ID is invalid
+     * @throws DataException if a database access error occurs while fetching the performance data
+     */
     public StudentsPerformanceCount studentsPerformanceCount(int teacherId) throws DataException, ValidationException {
         InputValidation.validateId(teacherId, "id do professor");
 
@@ -616,6 +743,15 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves the performance summary of a specific student across all their subjects.
+     * The summary includes the number of approved, failed, and pending subjects based on the student's grades.
+     *
+     * @param studentId the unique identifier of the student whose performance is being evaluated
+     * @return a StudentsPerformanceCount object containing counts of approved, pending, and failed subjects
+     * @throws ValidationException if the provided student ID is invalid
+     * @throws DataException if a database access error occurs while fetching the performance data
+     */
     public StudentsPerformanceCount studentPerformanceCount(int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
 
@@ -666,6 +802,16 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a map of students along with their subjects where the student requires attention from a specific teacher.
+     * A student requires attention if their average grade (computed from grade1 and grade2) is below a defined threshold.
+     * Only active students are considered, and results are limited by a maximum count constant.
+     *
+     * @param teacherId the unique identifier of the teacher for whom students requiring attention are being queried
+     * @return a map where each key is the StudentSubject ID and the value is the corresponding StudentSubject object
+     * @throws ValidationException if the provided teacher ID is invalid
+     * @throws DataException if a database access error occurs while fetching the student-subject data
+     */
     @Override
     public Map<Integer, StudentSubject> findStudentsThatRequireTeacher(int teacherId) throws DataException, ValidationException {
         InputValidation.validateId(teacherId, "id do professor");
@@ -758,7 +904,16 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
-
+    /**
+     * Calculates the overall performance percentages of students for a specific teacher.
+     * The performance is categorized into approved, failed, and pending based on students' average grades.
+     * Only students with active status are included in the calculation.
+     *
+     * @param idTeacher the unique identifier of the teacher for whom student performance is being calculated
+     * @return a StudentsPerformance object containing the percentage of approved, pending, and failed students
+     * @throws ValidationException if the provided teacher ID is invalid
+     * @throws DataException if a database access error occurs while computing student performance
+     */
     @Override
     public StudentsPerformance studentsPerformance(int idTeacher) throws ValidationException, DataException {
         InputValidation.validateId(idTeacher, "id do professor");
@@ -811,6 +966,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Retrieves a list of pending student subjects that require attention from a specific teacher.
+     * A pending is considered when a student has at least one missing grade (grade1 or grade2),
+     * and the student is actively enrolled. Each pendency includes information about the student,
+     * subject, grades, deadline, and the calculated status relative to the deadline:
+     * "Atrasada" (Overdue), "Perto do prazo" (Near deadline), or "Dentro do prazo" (Within deadline).
+     *
+     * @param idTeacher the unique identifier of the teacher for whom the pendencies are retrieved
+     * @return a List of TeacherPendency objects representing students with pending subjects
+     * @throws ValidationException if the provided teacher ID is invalid
+     * @throws DataException if a database access error occurs while retrieving pendencies
+     */
     @Override
     public List<TeacherPendency> teacherPendency(int idTeacher) throws DataException, ValidationException {
         InputValidation.validateId(idTeacher, "id do professor");
@@ -881,6 +1048,13 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Returns the total number of records in the student_subject table, representing
+     * all existing associations between students and subjects.
+     *
+     * @return the total count of student-subject associations, or -1 if no records exist
+     * @throws DataException if a database access error occurs while counting the records
+     */
     @Override
     public int totalCount() throws DataException {
         try (Connection conn = PostgreConnection.getConnection();
@@ -897,6 +1071,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Counts the total number of subject relationships associated with a specific student.
+     * <p>
+     * The method queries the student-subject relationship table and returns
+     * the number of subjects linked to the given student identifier.
+     * </p>
+     *
+     * @param studentId the identifier of the student whose subject relationships will be counted
+     * @return the total number of subjects associated with the student, or -1 if no result is obtained
+     * @throws DataException if an error occurs while accessing the database
+     * @throws ValidationException if the provided student identifier is invalid
+     */
     @Override
     public int totalCount(int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
@@ -918,6 +1104,19 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Counts the number of subject records for a specific student that contain observations.
+     * <p>
+     * The method queries the student-subject relationship table and returns
+     * the number of records where the observation field is not null for the
+     * given student.
+     * </p>
+     *
+     * @param studentId the identifier of the student whose observation records will be counted
+     * @return the total number of subject records with non-null observations, or -1 if no result is obtained
+     * @throws DataException if an error occurs while accessing the database
+     * @throws ValidationException if the provided student identifier is invalid
+     */
     public int countObs(int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
 
@@ -938,6 +1137,15 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Counts the total number of subjects a specific student is enrolled in,
+     * considering only valid school class-subject associations.
+     *
+     * @param studentId the ID of the student to count subjects for
+     * @return the total number of subjects associated with the student, or 0 if none are found
+     * @throws ValidationException if the provided studentId is invalid
+     * @throws DataException if a database access error occurs while counting the subjects
+     */
     public int countByStudentId(int studentId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
 
@@ -1079,6 +1287,19 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         return subjectIds;
     }
 
+    /**
+     * Creates a new relationship between a student and a subject.
+     * <p>
+     * The method inserts a record into the student-subject relationship table,
+     * optionally including grade values and observations associated with the
+     * student's performance in the subject.
+     * </p>
+     *
+     * @param studentSubject the entity containing the student, subject,
+     *                       grades, and observation data to be stored
+     * @throws DataException if an error occurs while accessing or modifying the database
+     * @throws ValidationException if the provided student or subject identifiers are invalid
+     */
     @Override
     public void create(StudentSubject studentSubject) throws DataException, ValidationException {
         InputValidation.validateId(studentSubject.getStudent().getId(), "id_student");
@@ -1109,6 +1330,19 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Assigns multiple subjects to all students of a specific school class in a batch operation.
+     *
+     * <p>This method validates the school class ID and each subject ID before attempting to insert
+     * records into the database. It executes the inserts in a single transaction, rolling back if
+     * any error occurs.</p>
+     *
+     * @param idSchoolClass the ID of the school class whose students will receive the subjects
+     * @param addedSubjectIds a list of subject IDs to assign to each student in the class
+     * @throws ValidationException if the school class ID or any subject ID is invalid,
+     *                             or if a student already has a subject assigned
+     * @throws DataException if a database access error occurs while performing the batch insert
+     */
     public void createManyBySchoolClass(int idSchoolClass, List<Integer> addedSubjectIds)
             throws DataException, ValidationException {
 
@@ -1157,6 +1391,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Assigns all subjects of a specific school class to a single student.
+     *
+     * <p>This method fetches the subjects associated with the provided school class and inserts
+     * them for the given student in a batch operation within a transaction. If no subjects exist
+     * for the class, the method returns without performing any insert.</p>
+     *
+     * @param studentId the ID of the student to receive the subjects
+     * @param schoolClassId the ID of the school class from which subjects are retrieved
+     * @throws ValidationException if the student ID or school class ID is invalid
+     * @throws DataException if a database access error occurs during retrieval or insertion
+     */
     public void createManyByStudentClass(int studentId, int schoolClassId) throws DataException, ValidationException {
         InputValidation.validateId(studentId, "id do aluno");
         InputValidation.validateId(schoolClassId, "id da turma");
@@ -1194,6 +1440,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Updates an existing student-subject relationship in the database.
+     *
+     * <p>This method modifies the student ID, subject ID, grades, and observation for a given
+     * student-subject entry. It validates all IDs before attempting the update and uses a
+     * prepared statement to perform the operation.</p>
+     *
+     * @param studentSubject the StudentSubject object containing updated data
+     * @throws ValidationException if any ID (student, subject, or student-subject) is invalid
+     * @throws NotFoundException if the student-subject entry does not exist in the database
+     * @throws DataException if a database access error occurs during the update
+     */
     @Override
     public void update(StudentSubject studentSubject) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId(studentSubject.getId(), "id");
@@ -1226,6 +1484,18 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Deletes a student-subject relationship from the database by its ID.
+     *
+     * <p>This method validates the provided ID and attempts to remove the corresponding entry
+     * from the student_subject table. If no entry matches the given ID, a NotFoundException
+     * is thrown.</p>
+     *
+     * @param id the ID of the student-subject relationship to be deleted
+     * @throws ValidationException if the provided ID is invalid
+     * @throws NotFoundException if no student-subject entry exists with the specified ID
+     * @throws DataException if a database access error occurs during deletion
+     */
     @Override
     public void delete(int id) throws NotFoundException, DataException, ValidationException {
         InputValidation.validateId(id, "id");
@@ -1241,6 +1511,19 @@ public class StudentSubjectDAO implements GenericDAO<StudentSubject>, IStudentSu
         }
     }
 
+    /**
+     * Deletes multiple student-subject relationships for all students in a given school class.
+     *
+     * <p>This method removes the specified subjects from all students who belong to the provided
+     * school class. The operation is performed in a batch within a single transaction to ensure
+     * atomicity. If the provided list of subject IDs is null or empty, the method exits without
+     * performing any deletion.</p>
+     *
+     * @param idSchoolClass the ID of the school class whose students will have subjects removed
+     * @param removedSubjectIds a list of subject IDs to be removed from the students
+     * @throws ValidationException if the provided school class ID or any subject ID is invalid
+     * @throws DataException if a database access error occurs during deletion
+     */
     public void deleteManyBySchoolClass(int idSchoolClass, List<Integer> removedSubjectIds)
             throws DataException, ValidationException {
         InputValidation.validateId(idSchoolClass, "id da turma");
