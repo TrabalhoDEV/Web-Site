@@ -11,6 +11,12 @@
         <location>/pages/errors/error404.jsp</location>
     </error-page>
 
+    <!-- Página de erro 405 -->
+    <error-page>
+        <error-code>405</error-code>
+        <location>/pages/errors/error404.jsp</location>
+    </error-page>
+         
     <!-- Página de erro 500 -->
     <error-page>
         <error-code>500</error-code>
